@@ -1,14 +1,12 @@
 {
-  "name": "next",
+  "name": "bucky DAO",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 3001",
-    "lint": "next lint",
-    "www": "ssh cyfswww 'sh /root/www/update.sh'",
-    "aigc": "ssh aigc 'sh /root/www/update.sh'"
+    "start": "next start -p 3050",
+    "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
