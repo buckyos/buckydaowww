@@ -1,0 +1,268 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ISourceDevGroup.ProjectState",
+        "name": "oldState",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ISourceDevGroup.ProjectState",
+        "name": "newState",
+        "type": "uint8"
+      }
+    ],
+    "name": "ProjectChange",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProjectCreate",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ISourceDevGroup.ProjectResult",
+        "name": "result",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "contributor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint64",
+            "name": "value",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct ISourceDevGroup.Contribution[]",
+        "name": "contributions",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "acceptProject",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "who",
+        "type": "address"
+      }
+    ],
+    "name": "contributionOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "budget",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "issueId",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "startDate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "endDate",
+        "type": "uint64"
+      }
+    ],
+    "name": "createProject",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "ProjectId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      }
+    ],
+    "name": "projectOf",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "manager",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "proposalId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "budget",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "issueId",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "startDate",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "endDate",
+            "type": "uint64"
+          },
+          {
+            "internalType": "enum ISourceDevGroup.ProjectState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum ISourceDevGroup.ProjectResult",
+            "name": "result",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct ISourceDevGroup.ProjectBrief",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      }
+    ],
+    "name": "promoteProject",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "contributor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint64",
+            "name": "value",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct ISourceDevGroup.Contribution",
+        "name": "contribution",
+        "type": "tuple"
+      }
+    ],
+    "name": "updateContribute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "projectIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "withdrawContributions",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

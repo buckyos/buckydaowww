@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  /* background-color: black; */
+  color: black;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+}
+
+.title {
+  @apply text-6xl font-bold;
+}
+
+.box {
+  @apply w-full max-w-[1200px] mx-auto;
+}
+
+.box2 {
+  @apply w-full max-w-[920px] mx-auto;
+}
+
+.box3 {
+  @apply w-full max-w-[1020px] mx-auto;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.border-round {
+  @apply border border-solid rounded-lg border-[#F0F0F0];
+}
+
+.btn-dan {
+  @apply bg-blue-500 hover:bg-blue-700 text-white hover:text-white font-bold flex items-center justify-center  rounded-lg cursor-pointer text-sm;
+}

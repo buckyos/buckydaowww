@@ -1,0 +1,573 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "member",
+        "type": "address"
+      }
+    ],
+    "name": "MemberAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "member",
+        "type": "address"
+      }
+    ],
+    "name": "MemberRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProposalAccept",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProposalExecuted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProposalExpire",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProposalReject",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "fullPropose",
+        "type": "bool"
+      }
+    ],
+    "name": "ProposalStart",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "support",
+        "type": "bool"
+      }
+    ],
+    "name": "ProposalVoted",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "member",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "addCommitteeMember",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "proxyContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "cancelContractUpgrade",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "voters",
+        "type": "address[]"
+      }
+    ],
+    "name": "endFullPropose",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "endBlockNumber",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "params",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "threshold",
+        "type": "uint256"
+      }
+    ],
+    "name": "fullPropose",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "proxyContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getContractUpgradeProposal",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "fromGroup",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "origin",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expired",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "support",
+            "type": "address[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "reject",
+            "type": "address[]"
+          },
+          {
+            "internalType": "enum ISourceDaoCommittee.ProposalState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "paramroot",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ISourceDaoCommittee.Proposal",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "someOne",
+        "type": "address"
+      }
+    ],
+    "name": "isMember",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "members",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "member",
+        "type": "address"
+      }
+    ],
+    "name": "perpareAddMember",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "proxyContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newImplementAddress",
+        "type": "address"
+      }
+    ],
+    "name": "perpareContractUpgrade",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "member",
+        "type": "address"
+      }
+    ],
+    "name": "perpareRemoveMember",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "proposalOf",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "fromGroup",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "origin",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expired",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "support",
+            "type": "address[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "reject",
+            "type": "address[]"
+          },
+          {
+            "internalType": "enum ISourceDaoCommittee.ProposalState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "paramroot",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ISourceDaoCommittee.Proposal",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "duration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "params",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "propose",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "params",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "reject",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "member",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeCommitteeMember",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setProposalExecuted",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "settleProposal",
+    "outputs": [
+      {
+        "internalType": "enum ISourceDaoCommittee.ProposalResult",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "params",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "support",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "params",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "takeResult",
+    "outputs": [
+      {
+        "internalType": "enum ISourceDaoCommittee.ProposalResult",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementAddress",
+        "type": "address"
+      }
+    ],
+    "name": "verifyContractUpgrade",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

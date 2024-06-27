@@ -1,0 +1,46 @@
+{
+  "name": "next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "www": "ssh cyfswww 'sh /root/www/update.sh'",
+    "aigc": "ssh aigc 'sh /root/www/update.sh'"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.2.5",
+    "@metamask/detect-provider": "^2.0.0",
+    "@metamask/sdk": "^0.14.2",
+    "@types/lodash": "^4.14.199",
+    "@types/node": "20.4.9",
+    "@types/react": "18.2.19",
+    "@types/react-dom": "18.2.7",
+    "ahooks": "^3.7.8",
+    "antd": "^5.9.4",
+    "autoprefixer": "10.4.14",
+    "bufferutil": "^4.0.7",
+    "classnames": "^2.3.2",
+    "dayjs": "^1.11.9",
+    "eslint": "8.46.0",
+    "eslint-config-next": "13.4.13",
+    "ethers": "^6.7.1",
+    "lodash": "^4.17.21",
+    "next": "14.1.4",
+    "postcss": "8.4.27",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-markdown": "^8.0.7",
+    "remark-gfm": "^3.0.1",
+    "tailwindcss": "3.3.3",
+    "typescript": "5.1.6",
+    "utf-8-validate": "^6.0.3",
+    "ws": "^8.13.0",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.154.0"
+  }
+}

@@ -1,0 +1,262 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ActivityCreate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IMarketingGroup.ActivityState",
+        "name": "oldState",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IMarketingGroup.ActivityState",
+        "name": "newState",
+        "type": "uint8"
+      }
+    ],
+    "name": "ActivityStateChange",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      }
+    ],
+    "name": "activityOf",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum IMarketingGroup.ActivityState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "budget",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reward",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "evaluatePercent",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "startDate",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "endDate",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "principal",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "description",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "proposalId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IMarketingGroup.Activity",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "who",
+        "type": "address"
+      }
+    ],
+    "name": "contributionOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "budget",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "startDate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "endDate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "description",
+        "type": "bytes32"
+      }
+    ],
+    "name": "createActivity",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "ActivityId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "evaluatePercent",
+        "type": "uint256"
+      }
+    ],
+    "name": "evaluate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      }
+    ],
+    "name": "pay",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      }
+    ],
+    "name": "takeReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activityId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "contributor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint64",
+            "name": "value",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct IMarketingGroup.Contribution[]",
+        "name": "contributions",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "updateContribute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "activityIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "withdrawReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

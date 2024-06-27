@@ -1,0 +1,231 @@
+[
+  {
+    "inputs": [],
+    "name": "assetWallet",
+    "outputs": [
+      {
+        "internalType": "contract IMultiSigWallet",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "committee",
+    "outputs": [
+      {
+        "internalType": "contract ISourceDaoCommittee",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "committeeWallet",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "devGroup",
+    "outputs": [
+      {
+        "internalType": "contract ISourceDevGroup",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dividend",
+    "outputs": [
+      {
+        "internalType": "contract ISourceDAOTokenDividend",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "incomeWallet",
+    "outputs": [
+      {
+        "internalType": "contract IMultiSigWallet",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "investment",
+    "outputs": [
+      {
+        "internalType": "contract IInvestment",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "isAuthorizedAddress",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lockup",
+    "outputs": [
+      {
+        "internalType": "contract ISourceTokenLockup",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "perpareSetAssetWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "perpareSetCommitteeWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "perpareSetIncomeWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setAssetWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCommitteeWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setIncomeWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "token",
+    "outputs": [
+      {
+        "internalType": "contract ISourceDAOToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,450 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "refund",
+        "type": "bool"
+      }
+    ],
+    "name": "abortInvestment",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "addresses",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "minLimits",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxLimits",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "addWhitelist",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "proposalDuration",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "totalTokenAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum IInvestment.PriceType",
+            "name": "priceType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenExchangeRate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "assetExchangeRate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minAssetPerInvestor",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxAssetPerInvestor",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "goalAssetAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "assetAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "onlyWhitelist",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct IInvestment.InvestmentParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "createInvestment",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "finishInvestment",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTokenBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getWhitelist",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "addresses",
+        "type": "address[]"
+      }
+    ],
+    "name": "getWhitelistLimit",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "assetAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "invest",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "refund",
+        "type": "bool"
+      }
+    ],
+    "name": "proposeAbortInvestment",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "refundAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "startInvestment",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "viewInvestment",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "proposalId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum IInvestment.InvestmentState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "raisedAssetAmount",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "totalTokenAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "enum IInvestment.PriceType",
+                "name": "priceType",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint256",
+                "name": "tokenExchangeRate",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "assetExchangeRate",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "endTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minAssetPerInvestor",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxAssetPerInvestor",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "goalAssetAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "assetAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "bool",
+                "name": "onlyWhitelist",
+                "type": "bool"
+              }
+            ],
+            "internalType": "struct IInvestment.InvestmentParams",
+            "name": "params",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct IInvestment.InvestmentBrief",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "viewSelfInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "investmentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
