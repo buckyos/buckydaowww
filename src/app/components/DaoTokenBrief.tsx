@@ -87,7 +87,7 @@ export default function DaoTokenBrief() {
   return (
     <div className='flex items-center justify-between md:flex-row md:items-start my-20'>
       <div className='flex flex-col w-[820px]'>
-        <div className='text-black-secondary'>Governance of OpenDAN</div>
+        <div className='text-black-secondary'>Governance of Buckyos</div>
         <div
           className={font.className + ' text-[40px] font-medium leading-[60px]'}
           style={{
@@ -96,10 +96,19 @@ export default function DaoTokenBrief() {
             color: 'transparent',
           }}
         >
-          <p>OpenDAN: Crafting the Future of AIOS.</p>
-          <p>Harnessing AI&apos;s Power, Ensuring its Control.</p>
-          <p>Defined not by One Company,</p>
-          <p>but by Every OpenDAN DAO Token Holder.</p>
+          <p>Buckyos is a Cloud OS (Network OS) for everyone.</p>
+          <p>
+            Its primary design goal is to allow consumers to have their own
+            cluster/cloud (we call this cluster Zone).
+          </p>
+          <p>
+            Consumers can install Service in their own Zone just like installing
+            App.
+          </p>
+          <p>
+            Based on buckyos, users can have AI Agents that can access all their
+            data, devices, and services.
+          </p>
         </div>
       </div>
       <div className='grid grid-cols-2 gap-x-4 gap-y-2 xs:grid-cols-1 '>

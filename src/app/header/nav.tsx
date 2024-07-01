@@ -1,26 +1,11 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { HomeOutlined, SwapRightOutlined } from '@ant-design/icons'
-// import images from '@images'
-// import Icon from '@ant-design/icons'
-// import {Image} from 'antd'
+import { SwapRightOutlined } from '@ant-design/icons'
 
 const Nav = () => {
   const router = useRouter()
   return (
     <nav className='flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-[38px]'>
-      <div
-        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer flex items-center gap-2'
-        onClick={() => {
-          router.push('/')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
-      >
-        <HomeOutlined />
-        <div>OpenDan DAO</div>
-      </div>
-
       <div
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer flex items-center gap-2'
         onClick={() => {

@@ -12,7 +12,7 @@ export default function Header() {
     <header className='max-w-[90%] mx-auto h-24 flex'>
       <div className='w-full flex items-center gap-10'>
         <Link href='/'>
-          <div className='text-4xl'>BuckyDAO</div>
+          <div className='text-4xl no-underline text-black'>BuckyDAO</div>
         </Link>
         <Nav />
         <div className='flex-1'></div>
