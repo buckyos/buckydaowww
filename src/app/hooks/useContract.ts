@@ -153,11 +153,8 @@ const useContractStore = create<ContractStoreDefine>()(
           daoTokenContract.symbol(),
           daoTokenContract.decimals(),
         ])
-        console.log(
-          '🐼 useContractStore fetchToken info symbol decimals',
-          token,
-          parseInt(token[4]),
-        )
+
+        // console.log( '🐼 useContractStore fetchToken info symbol decimals', token, parseInt(token[4]),)
         set({
           totalSupply: token[0],
           totalReleased: token[1],

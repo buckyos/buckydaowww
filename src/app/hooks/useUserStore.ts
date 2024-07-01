@@ -60,11 +60,15 @@ const useUserStore = create<UserStoreDefine>()(
       },
       isLogin() {
         const expiration = get().expiration
-        console.log(
-          'isLogin',
-          dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-          dayjs(expiration).format('YYYY-MM-DD HH:mm:ss'),
-        )
+        console.log('isLogin', dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'))
+
+        if (expiration) {
+          console.log(
+            'expiration date',
+            dayjs(expiration).format('YYYY-MM-DD HH:mm:ss'),
+          )
+        }
+
         // check expiration
         if (Date.now() > expiration) {
           return false
