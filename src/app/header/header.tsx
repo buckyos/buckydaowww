@@ -11,8 +11,8 @@ export default function Header() {
   return (
     <header className='max-w-[90%] mx-auto h-24 flex'>
       <div className='w-full flex items-center gap-10'>
-        <Link href='/'>
-          <div className='text-4xl no-underline text-black'>BuckyDAO</div>
+        <Link className='text-4xl no-underline text-black' href='/'>
+          <div>BuckyDAO</div>
         </Link>
         <Nav />
         <div className='flex-1'></div>
