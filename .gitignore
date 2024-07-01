@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 package-lock.json
+pnpm-lock.yaml
 
 # testing
 /coverage
@@ -26,5 +27,6 @@ yarn-error.log*
 next/.env.local
 api.bak
 
+/update.sh
 
 # next
