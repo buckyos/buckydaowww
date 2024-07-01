@@ -11,8 +11,8 @@ const font = localFont({
 })
 
 export const metadata = {
-  title: 'OpenDAN DAO (power by CYFS source DAO)',
-  description: 'OpenDAN DAO (power by CYFS source DAO)',
+  title: 'Bucky DAO (power by CYFS source DAO)',
+  description: 'Bucky DAO (power by CYFS source DAO)',
 }
 
 export default function RootLayout({
