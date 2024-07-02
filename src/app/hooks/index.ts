@@ -27,7 +27,7 @@ function useBindWalletAddress() {
     const result = await bindAddress(signature, jwt)
     console.log('🍻 bind result :', result)
 
-    if (result.code == 0) {
+    if (result == 200) {
       console.log('🍻 refetch userinfo  ')
       updateUser()
     }
