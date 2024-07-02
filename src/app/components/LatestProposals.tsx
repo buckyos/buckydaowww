@@ -1,11 +1,12 @@
 'use client'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { Button, Empty, message, Pagination } from 'antd'
 import images from '@images'
 import { useAsyncEffect } from 'ahooks'
 import ProposalCard from './ProposalCard'
-import { useRouter } from 'next/navigation'
 import { fetchMembers } from '@services/index'
 
 type LastestProposalsProps = {
@@ -78,7 +79,12 @@ const LatestProposals: React.FC<LastestProposalsProps> = ({
           {showButton && (
             <Button className='my-6' onClick={handleMoreVotes}>
               <div className='flex-center'>
-                <img src={images.IconArrowRight.src} alt='icon' />
+                <Image
+                  src={images.IconArrowRight}
+                  alt='icon'
+                  width={14}
+                  height={14}
+                />
                 More Votes
               </div>
             </Button>

@@ -17,7 +17,7 @@ export default function Fetcher() {
     window.ethereum.request({ method: 'eth_chainId' }).then((chainId: any) => {
       console.log('当前连接的网络ID是：', chainId)
     })
-  }, [])
+  }, [fetchContractAddress, fetchToken])
 
   return <></>
 }
