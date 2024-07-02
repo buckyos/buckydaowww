@@ -9,14 +9,12 @@ export default function GovernanceIntroducing() {
   const [markdown] = useState<string>(`
 # Basic Information
 
-- **Name**: OpenDAN DAO
-- **Goal**: OpenDAN DAO is an open-source organization with the mission to unite AI developers in building a decentralized AI operating system, OpenDAN.
+- **Name**: BuckyDAO
+- **Goal**: BuckyDAO Buckyos is a Cloud OS (Network OS) for everyone. Its primary design goal is to allow consumers to have their own cluster/cloud (we call this cluster Zone).Consumers can install Service in their own Zone just like installing App. Based on buckyos, users can have AI Agents that can access all their data, devices, and services.
 
-  OpenDAN can be fully deployed on personal computing devices and provides a standardized environment for various AI modules to run and interoperate. OpenDAN's open-source, local deployment, and diversified features enable efficient collaboration among different AIs while representing the owner's personal interests rather than being manipulated by large corporations.
+- **DAO Token name**: BST (Buckyos Sourcedao Token)
 
-- **DAO Token name**: DANDT (OpenDAN Dao Token)
-
-# OpenDAN DAO Governance Principles
+# BuckyDAO Governance Principles
 
 1. The decision-making rules of the DAO should ensure that all proposals can inevitably reach a decision.
 2. The decision-making rules of the DAO should prevent the tyranny of the majority.
@@ -28,7 +26,7 @@ export default function GovernanceIntroducing() {
 - **Total supply**: 1 billion
 - **Can increase supply**: YES (equity increase model); 1 billion tokens will be released upon achieving the original goal as planned. Afterward, additional tokens can be issued with authorization based on milestone versions.
 
-## DANDT allocation
+## BST allocation
 
 1. Initial team (20%)
 2. Mining through development  (51%)
@@ -41,11 +39,11 @@ All tokens are currently in a waiting-to-be-released state according to the abov
 
 ### Obtaining Tokens through Investment
 
-When DAN reaches a certain stage as planned, financing can be initiated based on the roadmap: selling unreleased DANDT using financing contracts. The conditions for each round of financing will differ, and tokens obtained from investment may have locking conditions.
+When DAN reaches a certain stage as planned, financing can be initiated based on the roadmap: selling unreleased BST using financing contracts. The conditions for each round of financing will differ, and tokens obtained from investment may have locking conditions.
 
 ## Token Rights
 
-DANDT holders can participate in DAO governance and influence DAO operations through the DAO voting mechanism.
+BST holders can participate in DAO governance and influence DAO operations through the DAO voting mechanism.
 
 ## Token Returns (Dividends)
 Our DAO organization has assets, which primarily increase in the following ways:
@@ -53,21 +51,21 @@ Our DAO organization has assets, which primarily increase in the following ways:
 1. Donations. As an open-source project, we accept cryptocurrency donations.
 2. Income. Our product can generate income (freedom does not necessarily mean completely free), resulting in digital currency revenue.
 3. Financing. In most cases, assets obtained through public financing are not considered income. However, our rules allow a portion of each round of financing (specified during public financing) to purchase existing DAO members' tokens or become a dividable income.
-All revenue mentioned above is published based on financial transparency rules. The DAO organization will periodically put assets belonging to the DAO into a dividend asset pool. During a dividend cycle, users who wish to participate in dividends can deposit DANDT into the dividend pool and exchange assets in proportion. Generally, the dividend pool will set a limit on the number of DANDT eligible for dividends and adopt a first-come-first-served basis.
+All revenue mentioned above is published based on financial transparency rules. The DAO organization will periodically put assets belonging to the DAO into a dividend asset pool. During a dividend cycle, users who wish to participate in dividends can deposit BST into the dividend pool and exchange assets in proportion. Generally, the dividend pool will set a limit on the number of BST eligible for dividends and adopt a first-come-first-served basis.
 
 # Basic Operating Procedures
-1. The DAO is established with the goals, initial DANDT allocation, initial members, and initial roadmap set.
-2. The roadmap illustrates the relationship between system maturity and DANDT releases: the more mature the system, the more DANDT released. From a software engineering perspective, the roadmap outlines the project's rough plan, divided into five stages: PoC, MVP, Alpha, Beta, Formula (Product Release), each with corresponding DANDT release plans.
-3. Mining through development : this is the primary phase for the DAO to achieve its goals. For the roadmap to progress to the next stage, community developers need to cooperate closely. The DAO will prepare a budget and plan according to traditional software project management procedures and regularly calculate contribution values of project participants. Contributors will receive DANDT based on their contribution ratio after project acceptance.
-4. DANDT can also be used for marketing activities to increase project visibility. Its primary incentive principle is to motivate new users (e.g., engineers who give us stars on Github) or reward design for the introduction of new friends who bring new engineers and new users to the project.
-5. Hold DANDT and participate in DAO governance.
-6. Based on DANDT, public financing is conducted to obtain resources of other asset types for the DAO organization.
+1. The DAO is established with the goals, initial BST allocation, initial members, and initial roadmap set.
+2. The roadmap illustrates the relationship between system maturity and BST releases: the more mature the system, the more BST released. From a software engineering perspective, the roadmap outlines the project's rough plan, divided into five stages: PoC, MVP, Alpha, Beta, Formula (Product Release), each with corresponding BST release plans.
+3. Mining through development : this is the primary phase for the DAO to achieve its goals. For the roadmap to progress to the next stage, community developers need to cooperate closely. The DAO will prepare a budget and plan according to traditional software project management procedures and regularly calculate contribution values of project participants. Contributors will receive BST based on their contribution ratio after project acceptance.
+4. BST can also be used for marketing activities to increase project visibility. Its primary incentive principle is to motivate new users (e.g., engineers who give us stars on Github) or reward design for the introduction of new friends who bring new engineers and new users to the project.
+5. Hold BST and participate in DAO governance.
+6. Based on BST, public financing is conducted to obtain resources of other asset types for the DAO organization.
 
 
 # Decision Mechanism
 ## Transaction Classification
 DAO transactions are divided into internal project affairs, routine DAO affairs, important DAO affairs, and major DAO affairs.
-Internal project affairs are decided by the project leader or designated person, while routine DAO affairs are voted on by the committee. Important and major DAO affairs are decided by all DANDT holders. The difference between important and major affairs is the minimum voter turnout rate required for the DAO vote (the number of liquid DANDT participating in the vote). The minimum voter turnout rate for important affairs is 30% of liquid DANDT, while major affairs require a minimum voter turnout rate of 40%.
+Internal project affairs are decided by the project leader or designated person, while routine DAO affairs are voted on by the committee. Important and major DAO affairs are decided by all BST holders. The difference between important and major affairs is the minimum voter turnout rate required for the DAO vote (the number of liquid BST participating in the vote). The minimum voter turnout rate for important affairs is 30% of liquid BST, while major affairs require a minimum voter turnout rate of 40%.
 
 ## DAO Voting
 The design of the voting mechanism is a hot topic in the implementation of DAOs, and we hope to find a mechanism that is:
@@ -76,16 +74,16 @@ The design of the voting mechanism is a hot topic in the implementation of DAOs,
 2. Provides some incentives for voting
 
 
-Mortgaging DANDT can obtain DAO votes (2000 DANDT can be mortgaged for one vote). These votes are automatically redeemed for DANDT upon use (abstaining is also considered use). Certain DANDT that are in a locked state (not allowed to be traded) can also be mortgaged to obtain votes, but these votes cannot be transferred.
+Mortgaging BST can obtain DAO votes (2000 BST can be mortgaged for one vote). These votes are automatically redeemed for BST upon use (abstaining is also considered use). Certain BST that are in a locked state (not allowed to be traded) can also be mortgaged to obtain votes, but these votes cannot be transferred.
 Please note that using your vote means voting on the proposal and waiting for the proposal to end (which usually takes 14 days).
 
 
 ## Decision-making Process
 All DAO transactions, except for internal affairs, follow the process below:
 
-1. Proposal: Only committee members are eligible to initiate proposals, but non-committee members can make proposals by mortgaging DANDT. The amount of DANDT required for different types of issues varies.
+1. Proposal: Only committee members are eligible to initiate proposals, but non-committee members can make proposals by mortgaging BST. The amount of BST required for different types of issues varies.
 2. Proposals can have a designated deadline for voting (not less than 14 days; major proposals require at least 21 days). Once all committee members have voted on routine DAO affairs, the automatic result will take effect.
-3. After the proposal reaches the voting deadline, there are three possible outcomes: agreement, rejection, or failure to meet the minimum voter turnout rate (if the proposal was initiated through pledging DANDT, the tokens will be returned to the proposer).
+3. After the proposal reaches the voting deadline, there are three possible outcomes: agreement, rejection, or failure to meet the minimum voter turnout rate (if the proposal was initiated through pledging BST, the tokens will be returned to the proposer).
 4. Some proposals are "contract proposals," such as changing parameters in a particular contract. Once these proposals are approved, they will be executed automatically.
 5. For non-contract proposals, after approval, they will enter the execution phase and be assigned to specific individuals for processing.
 6. Once the proposer has completed the proposal operation, they can mark the proposal as completed.
@@ -118,7 +116,7 @@ After a marketing activity ends, it will be evaluated as terminated, failed, goo
 The CFO must be a committee member.
 Their main duties include budget preparation, asset custody system design, and proposing financial-related proposals. (Note that the CFO and the committee accountant are not the same person and do not have a superior-subordinate relationship.)
 ## DAN Developer
-Any developer who contributes more than 100 points to the OpenDAN project automatically becomes a DAN Developer (lifetime tenure).
+Any developer who contributes more than 100 points to the Buckyos project automatically becomes a BuckyDAO Developer (lifetime tenure).
 
 ### Dismissal
 1. Voluntary withdrawal.
@@ -126,7 +124,7 @@ Any developer who contributes more than 100 points to the OpenDAN project automa
 
 
 ## CoreDAN Developer
-OpenDAN is an open-source organization where engineers are the primary members. CoreDAN Developers are the core contributors to OpenDAN's development and also full-time participants in the DAO.
+Buckyos is an open-source organization where engineers are the primary members. Core Buckyos Developers are the core contributors to Buckyos's development and also full-time participants in the DAO.
 As such, they receive fixed income every two weeks based on their current level and the DAO's financial allocation. The project manager can assign work to CoreDAN Developers, and they can also hold other DAO positions.
 
 ### Appointment
@@ -172,13 +170,13 @@ Financial expenditures are divided into phase budget allocations and ad-hoc proj
 
 
 # Project Development Process
-OpenDAN is an open-source organization, and therefore project development process is the primary workflow. The DAO follows the principle of prioritizing efficiency in the early stage and stability and fairness in the later stage. At the level of DAO rules, specific work is delegated to relevant responsible persons instead of designing too many details.
+Buckyos is an open-source organization, and therefore project development process is the primary workflow. The DAO follows the principle of prioritizing efficiency in the early stage and stability and fairness in the later stage. At the level of DAO rules, specific work is delegated to relevant responsible persons instead of designing too many details.
 
 ## Basic Process
 1. Project Planning: Based on the Roadmap plan, the committee discusses the number of projects needed to achieve the goals of the current stage as much as possible and discusses it at the committee meeting. Once the project planning is approved, the project moves into project preparation, where the key goal is to select the project manager. The project manager must be a Core DAN Developer.
 2. Project Initiation: After determining the project manager, the project manager initiates the project initiation. The format of the initiation document is not limited, but the most important thing is the budget package (where those who contribute to the project receive their mining income from), the project personnel, and the start and end dates.
 3. Discussion and Approval: After the project manager submits the initiation document, the committee discusses (emphasized) and votes to approve it. For important projects, DAO vote approval is required according to significant transaction requirements.
-4. Actual Plan Designation: The project manager begins to confirm the actual plan of the project, with the main work being the list of participants and specific task design. When designing tasks, it is necessary to design the contribution value. Guidance for contribution value design is provided in the OpenDAN Project Management Manual.
+4. Actual Plan Designation: The project manager begins to confirm the actual plan of the project, with the main work being the list of participants and specific task design. When designing tasks, it is necessary to design the contribution value. Guidance for contribution value design is provided in the Buckyos Project Management Manual.
 5. Project Execution: Enter the execution phase, where the goal is to complete all tasks and have the project manager mark the project as completed.
 6. Project Acceptance: If the project manager marks the project as completed, it enters the acceptance stage. Regular projects are accepted by the committee, while important projects are accepted by DAO voting. The acceptance levels are: fail, poor, good, or excellent.
 7. Project team members receive token rewards based on contribution value. The basic formula is the actual project budget * (personal contribution value/total contribution value). Actual project budget = initial project budget * acceptance level.

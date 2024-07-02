@@ -30,7 +30,7 @@ const InvestmentInfo: React.FC<{ decimals: number }> = ({ decimals }) => {
       <dd>
         Current price:
         <span className='mx-1 font-bold'> {rate} </span>
-        USDT per DANDT
+        USDT per BST
       </dd>
       <dd>
         Maximum limit per investor: {latestInvestment.maxAssetPerInvestor} USDT
