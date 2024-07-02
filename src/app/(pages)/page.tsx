@@ -20,7 +20,7 @@ function Participate() {
         Developers are welcome to visit our
         <a
           className='text-cyfs-green ml-1'
-          href='https://github.com/fiatrete/OpenDAN-Personal-AI-OS'
+          href='https://github.com/buckyos/buckyos'
           target='_blank'
         >
           project homepage
@@ -42,15 +42,13 @@ export default function Home() {
       <Participate />
       <FundingEntrance />
 
-      {/* <Word1 /> */}
-
       <div className='mt-16'>
         <div className='text-3xl font-medium my-6'>
           Shape the Future, One Token at a Time!
         </div>
 
         <div className='leading-10'>
-          <p>🎉 Welcome to OpenDAN 🎉</p>
+          <p>🎉 Welcome to Buckyos 🎉</p>
 
           <p>
             Ever imagined a place where passion meets innovation? Welcome
@@ -58,7 +56,7 @@ export default function Home() {
           </p>
 
           <p>
-            🔥 Tokens Not Just Tinkering: Here at OpenDAN, our DAO Tokens are
+            🔥 Tokens Not Just Tinkering: Here at Buckyos, our DAO Tokens are
             more than just digital bits. They&apos;re a testament to your
             commitment, talent, and the value you bring. Dive in for the love of
             tech, but stay for the rewards you rightly deserve.

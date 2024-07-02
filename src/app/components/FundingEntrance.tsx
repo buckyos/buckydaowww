@@ -83,10 +83,12 @@ const FundingEntrance = () => {
       </div>
 
       <div className='mt-10 text-sm leading-6  pl-12'>
-        <div className='leading-10 text-base'>Why Invest in OpenDAN Token?</div>
+        <div className='leading-10 text-base'>
+          Why Invest in Buckyos Source Token?
+        </div>
         <p>
           <strong className='mr-1'>Support Without Coding:</strong>
-          Help OpenDAN grow, reaching more users and developers.
+          Help Buckyos grow, reaching more users and developers.
         </p>
         <p>
           <strong className='mr-1'>Transparent & Secure:</strong>
@@ -94,7 +96,7 @@ const FundingEntrance = () => {
         </p>
         <p>
           <strong className='mr-1'>Share & Decide:</strong>
-          Profit from OpenDAN&apos;s success and participate in governance.
+          Profit from Buckyos&apos;s success and participate in governance.
         </p>
       </div>
     </div>
