@@ -49,7 +49,7 @@ export async function PostUserExtraInfo(
 }
 
 // 绑定钱包地址
-export async function bindAddress(sign: string, jwt: string) {
+export async function bindAddress(sign: string, jwt: string): Promise<number> {
   const resp = await fetch('/api/user/bind', {
     method: 'POST',
     body: JSON.stringify({ sign }),
@@ -57,8 +57,9 @@ export async function bindAddress(sign: string, jwt: string) {
       'DAO-TOKEN': jwt,
     },
   })
-  const data = (await resp.json()) as MemberResponse
-  return data
+  return resp.status
+  // const data = (await resp.json()) as MemberResponse
+  // return data
 }
 
 // 更新提案信息
