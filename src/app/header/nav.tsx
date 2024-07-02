@@ -41,16 +41,16 @@ const Nav = () => {
         Proposals
       </div>
 
-      <div
-        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
-        onClick={() => {
-          router.push('/projects')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
-      >
-        Projects
-      </div>
+      {/* <div */}
+      {/*   className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer' */}
+      {/*   onClick={() => { */}
+      {/*     router.push('/projects') */}
+      {/*     // setIsMenuOpened(false) */}
+      {/*   }} */}
+      {/*   aria-hidden */}
+      {/* > */}
+      {/*   Projects */}
+      {/* </div> */}
 
       <div className='block md:hidden'>{/* <WalletConnector /> */}</div>
     </nav>

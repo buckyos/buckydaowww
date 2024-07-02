@@ -1,10 +1,9 @@
 'use client'
-import useUserStore from '@hooks/useUserStore'
 import { useState } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import CreateProposalModal from '@components/proposal/CreateProposalModal'
 import CreateTransferModal from '@components/proposal/CreateTransferModal'
-import { useCommittee } from '@hooks/index'
+import { useCommittee, useUserStore } from '@hooks/index'
 import { message } from 'antd'
 import UpgradeContractModal from '@components/modal/UpgradeContractModal'
 

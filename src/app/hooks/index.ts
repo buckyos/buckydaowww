@@ -7,7 +7,7 @@ import { useAsyncEffect } from 'ahooks'
 import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
 
-export function useBindWalletAddress() {
+function useBindWalletAddress() {
   const { isConnect, user, updateUser, jwt } = useUserStore((state) => ({
     isConnect: state.isConnect,
     user: state.user,
@@ -40,7 +40,7 @@ export function useBindWalletAddress() {
   }
 }
 
-export function useLockToken(ownerAddress: string) {
+function useLockToken(ownerAddress: string) {
   const { lockupAddress, tokenAddress } = useContractStore((state) => {
     return {
       lockupAddress: state.lockupAddress,
@@ -87,7 +87,7 @@ export function useLockToken(ownerAddress: string) {
 }
 
 // 是否是委员会成员
-export function useCommittee(user: User) {
+function useCommittee(user: User) {
   const { getComitteeContract, decimals } = useContractStore((state) => ({
     getComitteeContract: state.getComitteeContract,
     decimals: state.decimals,
@@ -115,7 +115,7 @@ export function useCommittee(user: User) {
 }
 
 // 查询项目详情
-export function useGetProjectQuery(id: string) {
+function useGetProjectQuery(id: string) {
   // state
   const [data, setData] = useState<ProjectItem>()
   const [isLoading, setIsLoading] = useState(true)
@@ -128,4 +128,12 @@ export function useGetProjectQuery(id: string) {
   }, [])
 
   return { data, isLoading }
+}
+
+export {
+  useLockToken,
+  useCommittee,
+  useBindWalletAddress,
+  useUserStore,
+  useGetProjectQuery,
 }
