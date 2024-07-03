@@ -1,6 +1,5 @@
 'use client'
 import { Dispatch, SetStateAction, useState } from 'react'
-import TextArea from 'antd/es/input/TextArea'
 import { StoreValue } from 'antd/es/form/interface'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import {
@@ -19,11 +18,7 @@ import { toBigInt } from 'ethers'
 import dayjs from 'dayjs'
 import useUserStore from '@hooks/useUserStore'
 import { createInvestmentExtra } from '@services/index'
-
-enum InvestmentPriceType {
-  Fixed, // 固定价格融资
-  Floating, // 浮动价格融资
-}
+import { createWhitelistInvestment } from '@contracts/index'
 
 const WhitelistInvestmentModal: React.FC<{
   showModal: boolean
@@ -37,92 +32,9 @@ const WhitelistInvestmentModal: React.FC<{
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
-    const proposalDuration = values.proposalDuration * 24 * 60 * 60
-    const daoTokenDecimals = contract.decimals
-    const assetTokenDecimals = 18
-    const totalTokenAmount = unwrapUnits(
-      values.totalTokenAmount,
-      daoTokenDecimals,
-    )
-    const goalAssetAmount = parseToBigInt(
-      unwrapUnits(values.goalAssetAmount, assetTokenDecimals),
-    )
-    const priceType = InvestmentPriceType.Fixed
-    const tokenExchangeRate = parseToBigInt(
-      unwrapUnits(values.tokenExchangeRate, daoTokenDecimals),
-    )
-    const assetExchangeRate = parseToBigInt(
-      unwrapUnits(values.assetExchangeRate, assetTokenDecimals),
-    )
-    const startTime = 0n // 0: 投票结束后可以直接开始融资
-    const endTime = toBigInt(dayjs(values.endTime).unix())
-    const onlyWhitelist = true
-    // TODO
-    const minAssetPerInvestor = 500000n
-    const maxAssetPerInvestor = 1000000n
-    const title = values.title
-    const content = values.content
+    await createWhitelistInvestment(values)
 
-    // 判断货币转换后的数量 totalTokenAmount >= goalAssetAmount
-    if (
-      (totalTokenAmount * assetExchangeRate) / tokenExchangeRate <
-      goalAssetAmount
-    ) {
-      message.warning('Total amount must greater than Target amount')
-      setIsSubmitting(false)
-      return
-    }
-
-    // 访问合约,创建投资
-    const investmentData: InvestmentParamsDefine = {
-      totalTokenAmount,
-      priceType,
-      tokenExchangeRate,
-      assetExchangeRate,
-      startTime,
-      endTime,
-      minAssetPerInvestor,
-      maxAssetPerInvestor,
-      goalAssetAmount,
-      assetAddress: contract.mainAddress,
-      onlyWhitelist,
-    }
-    setloadingTx(true)
-    console.log('🍻 investmentData :', investmentData)
-    const investmentContract = await contract.getInvestMentContract()
-    const tx = await investmentContract.createInvestment(
-      proposalDuration,
-      investmentData,
-    )
-    console.log('🍻 contract createInvestment result :', tx)
-
-    const receipt = await tx.wait(1, 60000)
-
-    if (receipt?.status !== 1) {
-      console.warn('transaction status:', receipt?.status, tx)
-      message.error(`Create Investment failed[3][${receipt?.status}]`)
-      setloadingTx(false)
-      setIsSubmitting(false)
-      return
-    }
-    // 访问后端
-    console.log('🍻 receipt :', receipt)
-    const result = await createInvestmentExtra(
-      user.jwt,
-      title,
-      content,
-      receipt.hash,
-    )
-    console.log('🍻 createInvestmentExtra service result :', result)
-
-    if (result.code !== 0) {
-      message.error('Create Investment failed[4], please try again later')
-    } else {
-      message.success('Create Investment success')
-      setShowModal(false)
-    }
-
-    setloadingTx(false)
+    // setloadingTx(false)
     setIsSubmitting(false)
   }
 
