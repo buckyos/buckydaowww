@@ -7,12 +7,18 @@ import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal
 
 export default function Investment() {
   const user = useUserStore()
-  const { isCommittee } = useCommittee(user.user)
+  const { isCommittee, isUnknown } = useCommittee(user.user)
   const [showModal, setShowModal] = useState(false)
 
   const onShowCreateInvestmentModal = async () => {
     if (!user.isLogin()) {
       message.error('error: please login first')
+      return
+    }
+    if (isUnknown) {
+      message.warning(
+        'loading committee status from contract, please try again later',
+      )
       return
     }
 

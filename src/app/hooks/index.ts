@@ -6,6 +6,7 @@ import { bindAddress, getProjectDetail } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
 import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
+import { useCommitteeStore, CommitteeType } from './useCommittee'
 
 function useBindWalletAddress() {
   const { isConnect, user, updateUser, jwt } = useUserStore((state) => ({
@@ -90,25 +91,31 @@ function useCommittee(user: User) {
     getComitteeContract: state.getComitteeContract,
     decimals: state.decimals,
   }))
-  const [_isCommittee, setIsCommittee] = useState<boolean>(false)
+
+  const { update, ensureFetched, state } = useCommitteeStore()
+  // const [_isCommittee, setIsCommittee] = useState<boolean>(false)
   useAsyncEffect(async () => {
     console.log('useCommittee user', user)
     if (!user.address) {
       // message.error('Please connect wallet first')
       return
     }
+    if (ensureFetched()) {
+      console.log('useCommittee ensureFetched')
+      return
+    }
+
     const contract = await getComitteeContract()
-    // console.log('contract', contract, user.address)
-    // 这里是user表的, 可能和钱包地址不一致
+    // 需要注意,这里是user表的, 可能和钱包地址不一致
     const isMember = await contract.isMember(user.address)
     console.log('isCommitteeMember: ', isMember, user.address)
-    if (isMember) {
-      setIsCommittee(true)
-    }
+
+    update(isMember ? CommitteeType.committee : CommitteeType.normal)
   }, [user])
 
   return {
-    isCommittee: _isCommittee,
+    isCommittee: state === CommitteeType.committee,
+    isUnknown: state === CommitteeType.unknown,
     decimals,
   }
 }
@@ -135,4 +142,5 @@ export {
   useBindWalletAddress,
   useUserStore,
   useGetProjectQuery,
+  useCommitteeStore,
 }
