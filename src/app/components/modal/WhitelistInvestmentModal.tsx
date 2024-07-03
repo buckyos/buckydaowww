@@ -12,13 +12,14 @@ import {
   message,
   Spin,
 } from 'antd'
-import useContractStore from '@hooks/useContract'
+import locale from 'antd/es/date-picker/locale/en_US'
+import dayjs, { Dayjs } from 'dayjs'
 // import { unwrapUnits, parseToBigInt } from '@utils/numberConverter'
 // import { toBigInt } from 'ethers'
-import dayjs, { Dayjs } from 'dayjs'
-import useUserStore from '@hooks/useUserStore'
+// import useUserStore from '@hooks/useUserStore'
 // import { createInvestmentExtra } from '@services/index'
 import { createWhitelistInvestment } from '@contracts/index'
+import useContractStore from '@hooks/useContract'
 
 // 禁止选择今天之前的日期
 function disabledDate(current: Dayjs) {
@@ -228,6 +229,7 @@ const WhitelistInvestmentModal: React.FC<{
             <DatePicker
               className='w-full'
               placeholder='Investment second end time'
+              locale={locale}
               disabledDate={disabledDate}
             />
           </Form.Item>
