@@ -12,7 +12,7 @@ import {
   message,
   Spin,
 } from 'antd'
-import locale from 'antd/es/date-picker/locale/en_US'
+// import locale from 'antd/es/date-picker/locale/en_US'
 import dayjs, { Dayjs } from 'dayjs'
 // import { unwrapUnits, parseToBigInt } from '@utils/numberConverter'
 // import { toBigInt } from 'ethers'
@@ -24,7 +24,7 @@ import useContractStore from '@hooks/useContract'
 // 禁止选择今天之前的日期
 function disabledDate(current: Dayjs) {
   // Can not select days before today and today
-  console.log('current :', current, dayjs().startOf('day'))
+  // console.log('current :', current, dayjs().startOf('day'))
   return current && current <= dayjs().startOf('day')
 }
 
@@ -214,7 +214,11 @@ const WhitelistInvestmentModal: React.FC<{
               },
             ]}
           >
-            <DatePicker className='w-full' placeholder='Investment end time' />
+            <DatePicker
+              className='w-full'
+              placeholder='Investment end time'
+              disabledDate={disabledDate}
+            />
           </Form.Item>
 
           <Form.Item
@@ -229,7 +233,6 @@ const WhitelistInvestmentModal: React.FC<{
             <DatePicker
               className='w-full'
               placeholder='Investment second end time'
-              locale={locale}
               disabledDate={disabledDate}
             />
           </Form.Item>
