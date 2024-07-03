@@ -7,7 +7,6 @@ import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal
 
 export default function Investment() {
   const user = useUserStore()
-  useState(false)
   const { isCommittee } = useCommittee(user.user)
   const [showModal, setShowModal] = useState(false)
 

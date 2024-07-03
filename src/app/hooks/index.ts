@@ -24,10 +24,8 @@ function useBindWalletAddress() {
 
     const signature = await signer.signMessage(jwt)
     console.log('🍻 signature :', signature, signature.toString())
-    const result = await bindAddress(signature, jwt)
-    console.log('🍻 bind result :', result)
-
-    if (result == 200) {
+    const status = await bindAddress(signature, jwt)
+    if (status == 200) {
       console.log('🍻 refetch userinfo  ')
       updateUser()
     }
@@ -94,8 +92,9 @@ function useCommittee(user: User) {
   }))
   const [_isCommittee, setIsCommittee] = useState<boolean>(false)
   useAsyncEffect(async () => {
+    console.log('useCommittee user', user)
     if (!user.address) {
-      message.error('Please connect wallet first')
+      // message.error('Please connect wallet first')
       return
     }
     const contract = await getComitteeContract()
@@ -106,7 +105,7 @@ function useCommittee(user: User) {
     if (isMember) {
       setIsCommittee(true)
     }
-  }, [user.address])
+  }, [user])
 
   return {
     isCommittee: _isCommittee,
