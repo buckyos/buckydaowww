@@ -2,6 +2,7 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 import TextArea from 'antd/es/input/TextArea'
 import { StoreValue } from 'antd/es/form/interface'
+import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import {
   Modal,
   Form,
@@ -125,6 +126,13 @@ const WhitelistInvestmentModal: React.FC<{
     setIsSubmitting(false)
   }
 
+  let formListInitValues = [
+    {
+      address: '',
+      percent: '',
+    },
+  ]
+
   return (
     <Modal
       title='Create proposal'
@@ -152,9 +160,70 @@ const WhitelistInvestmentModal: React.FC<{
           >
             <Input className='' placeholder='title' />
           </Form.Item>
-          <Form.Item name='category'>
-            <Input className='' disabled />
-          </Form.Item>
+
+          <Form.List name='whitelist' initialValue={formListInitValues}>
+            {(fields, { add, remove }) => (
+              <>
+                <div>
+                  {fields.map(({ key, name }, index) => {
+                    return (
+                      <div
+                        key={key}
+                        className='flex items-center justify-between gap-10'
+                      >
+                        <Form.Item
+                          className='w-full'
+                          name={[name, 'address']}
+                          rules={[
+                            {
+                              required: true,
+                              message: 'address is required',
+                            },
+                          ]}
+                        >
+                          <Input placeholder='Address ' />
+                        </Form.Item>
+                        <Form.Item
+                          name={[name, 'percent']}
+                          className='w-full'
+                          rules={[
+                            {
+                              required: true,
+                              message: 'percent is required',
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            style={{ width: '100%' }}
+                            placeholder='The percent of target address can take '
+                          />
+                        </Form.Item>
+
+                        <MinusCircleOutlined
+                          style={{ fontSize: '20px' }}
+                          className='dynamic-delete-button mb-6 mr-6'
+                          onClick={() => {
+                            if (fields.length <= 1) {
+                              message.error(
+                                'At least input one whitelist address',
+                              )
+                            } else {
+                              remove(index)
+                            }
+                          }}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+                <Form.Item>
+                  <Button onClick={() => add()} icon={<PlusOutlined />}>
+                    Add one more whitelist address
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
 
           <Form.Item
             name='proposalDuration'
