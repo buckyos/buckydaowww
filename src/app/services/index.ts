@@ -193,11 +193,11 @@ export async function getInvestments() {
 }
 
 // 获取合约基本信息（地址）
-export async function getContractInfo() {
+export async function getContractInfo(): Promise<ContractInfomationResponse> {
   const resp = await fetch('/api/contract/info', {
     method: 'GET',
   })
-  const data = (await resp.json()) as ContractInfomationResponse
+  const data = await resp.json()
   return data
 }
 

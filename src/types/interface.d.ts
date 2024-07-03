@@ -176,6 +176,7 @@ interface ContractInfomationResponse {
   main: string
   project: string
   token: string
+  twostep_investment: string
 }
 
 interface InvestmentParamsDefine {

@@ -5,8 +5,6 @@ import { abis } from '@contracts/abis'
 import { persist } from 'zustand/middleware'
 import { message } from 'antd'
 import { getContractInfo } from '@services/index'
-// import { MetaMaskSDK } from '@metamask/sdk'
-// import detectEthereumProvider from '@metamask/detect-provider'
 
 interface ContractStoreDefine {
   chainId: number
@@ -16,6 +14,7 @@ interface ContractStoreDefine {
   projectAddress: string
   investmentAddress: string
   lockupAddress: string
+  twostepInvestmentAddress: string
   totalSupply: number
   totalReleased: number
   totalUnreleased: number
@@ -27,42 +26,23 @@ interface ContractStoreDefine {
   getComitteeContract: () => Promise<ethers.Contract>
   getSignerComitteeContract: () => Promise<ethers.Contract>
   getInvestMentContract: () => Promise<ethers.Contract>
+  getTwoStepInvestMentContract: () => Promise<ethers.Contract>
 }
 
 //
 export async function getProvider() {
   if (window.ethereum) {
     try {
-      //   const MMSDK = new MetaMaskSDK({
-      //     dappMetadata: {
-      //       name: 'Source Dao',
-      //       url: window.location.host,
-      //     },
-      //   })
-      //   await MMSDK.init()
-
-      // const ethereum = MMSDK.getProvider()
-      // console.log('🌍🌍🌍 useContractStore getProvider', ethereum)
-      // const ethersProvider = new ethers.Web3Provider(provider)
-      // let ethersProvider = new ethers.BrowserProvider(provider as any)
-      // await ethereum.request({ method: 'eth_requestAccounts' })
-      // await window.ethereum.enable()
-      // const provider = new ethers.BrowserProvider(ethereum)
       const provider = new ethers.BrowserProvider(window.ethereum)
       return provider
     } catch (e) {
       message.error((e as any).toString())
       throw new Error('user reject connect wallet')
     }
-
-    // const ethersProvider = new ethers.BrowserProvider(provider as any)
-    // return ethersProvider
   } else {
     message.error('Please install MetaMask first')
     console.log('MetaMask not installed; using read-only defaults')
     throw new Error('MetaMask not installed; using read-only defaults')
-    // let provider = ethers.getDefaultProvider()
-    // return provider
   }
 }
 
@@ -79,6 +59,7 @@ const useContractStore = create<ContractStoreDefine>()(
       projectAddress: '',
       investmentAddress: '',
       lockupAddress: '',
+      twostepInvestmentAddress: '',
       totalSupply: 0,
       totalReleased: 0,
       totalUnreleased: 0,
@@ -110,10 +91,12 @@ const useContractStore = create<ContractStoreDefine>()(
           committeeAddress: result.committee,
           projectAddress: result.project,
           investmentAddress: result.investment,
+          twostepInvestmentAddress: result.twostep_investment,
           lockupAddress: result.lockup,
           expiration: expirationSetter,
         })
       },
+      // 获取委员会合约实例
       async getComitteeContract() {
         let provider = await getProvider()
         let address = get().committeeAddress
@@ -128,9 +111,20 @@ const useContractStore = create<ContractStoreDefine>()(
         return contract
       },
 
+      // 获取投资合约实例
       async getInvestMentContract() {
         let provider = await getProvider()
         let address = get().investmentAddress
+
+        const signer = await provider.getSigner()
+        const contract = new ethers.Contract(address, abis, signer)
+        return contract
+      },
+
+      // 获取两步投资合约实例
+      async getTwoStepInvestMentContract() {
+        let provider = await getProvider()
+        let address = get().twostepInvestmentAddress
 
         const signer = await provider.getSigner()
         const contract = new ethers.Contract(address, abis, signer)
