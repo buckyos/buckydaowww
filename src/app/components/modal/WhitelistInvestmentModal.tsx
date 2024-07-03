@@ -227,50 +227,19 @@ const WhitelistInvestmentModal: React.FC<{
           </Form.List>
 
           <Form.Item
-            name='proposalDuration'
+            name='tokenAddress'
             rules={[
               {
                 required: true,
-                message: 'Please input duration of proposal ',
+                message: 'Please input token address',
               },
             ]}
           >
-            <InputNumber
-              min={1}
-              className='w-full'
-              placeholder='duration of proposal'
-              addonAfter='Days'
-            />
-          </Form.Item>
-          <Form.Item
-            name='endTime'
-            rules={[
-              {
-                required: true,
-                message: 'Please input investment end time ',
-              },
-            ]}
-          >
-            <DatePicker className='w-full' placeholder='Investment end time' />
-          </Form.Item>
-          <Form.Item
-            name='goalAssetAmount'
-            rules={[
-              {
-                required: true,
-                message: 'Please input target fundarising amount',
-              },
-            ]}
-          >
-            <Input
-              className=''
-              placeholder='Target fundarising amount'
-              addonAfter='USDT'
-            />
+            <Input className='' placeholder="investor's token address" />
           </Form.Item>
 
           <Form.Item
-            name='totalTokenAmount'
+            name='tokenAmount'
             rules={[
               {
                 required: true,
@@ -278,11 +247,7 @@ const WhitelistInvestmentModal: React.FC<{
               },
             ]}
           >
-            <Input
-              className=''
-              placeholder='Number of investment tokens (greater than Target)'
-              addonAfter='CDT'
-            />
+            <Input className='' placeholder='Number of investment tokens ' />
           </Form.Item>
 
           <div className='flex justify-between'>
@@ -315,25 +280,41 @@ const WhitelistInvestmentModal: React.FC<{
                   },
                 ]}
               >
-                <InputNumber
-                  min={1}
-                  className='w-36'
-                  placeholder='-'
-                  addonAfter='USDT'
-                />
+                <InputNumber min={1} className='w-36' placeholder='-' />
               </Form.Item>
             </div>
           </div>
-          <Form.Item name='content'>
-            <TextArea
-              className=''
-              placeholder='proposal'
-              autoSize={{ minRows: 3, maxRows: 5 }}
+
+          <Form.Item
+            name='endTime'
+            rules={[
+              {
+                required: true,
+                message: 'Please input investment end time ',
+              },
+            ]}
+          >
+            <DatePicker className='w-full' placeholder='Investment end time' />
+          </Form.Item>
+
+          <Form.Item
+            name='endTime2'
+            rules={[
+              {
+                required: true,
+                message: 'Please input second end time ',
+              },
+            ]}
+          >
+            <DatePicker
+              className='w-full'
+              placeholder='Investment second end time'
             />
           </Form.Item>
+
           <div className='flex justify-center'>
             <Button loading={isSubmitting} type='primary' htmlType='submit'>
-              Create Proposal
+              Create Investment
             </Button>
           </div>
         </Form>
