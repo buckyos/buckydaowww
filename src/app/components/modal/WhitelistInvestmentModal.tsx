@@ -23,7 +23,8 @@ import { createWhitelistInvestment } from '@contracts/index'
 // 禁止选择今天之前的日期
 function disabledDate(current: Dayjs) {
   // Can not select days before today and today
-  return current && current <= dayjs().endOf('day')
+  console.log('current :', current, dayjs().startOf('day'))
+  return current && current <= dayjs().startOf('day')
 }
 
 const WhitelistInvestmentModal: React.FC<{
@@ -33,7 +34,7 @@ const WhitelistInvestmentModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
-  const user = useUserStore()
+  // const user = useUserStore()
 
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
