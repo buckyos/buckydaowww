@@ -135,7 +135,8 @@ const WhitelistInvestmentModal: React.FC<{
 
   return (
     <Modal
-      title='Create proposal'
+      title='Create Whitelist Investment'
+      width={800}
       open={showModal}
       onCancel={() => {
         setShowModal(false)
