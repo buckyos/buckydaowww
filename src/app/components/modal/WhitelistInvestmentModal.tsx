@@ -13,12 +13,18 @@ import {
   Spin,
 } from 'antd'
 import useContractStore from '@hooks/useContract'
-import { unwrapUnits, parseToBigInt } from '@utils/numberConverter'
-import { toBigInt } from 'ethers'
-import dayjs from 'dayjs'
+// import { unwrapUnits, parseToBigInt } from '@utils/numberConverter'
+// import { toBigInt } from 'ethers'
+import dayjs, { Dayjs } from 'dayjs'
 import useUserStore from '@hooks/useUserStore'
-import { createInvestmentExtra } from '@services/index'
+// import { createInvestmentExtra } from '@services/index'
 import { createWhitelistInvestment } from '@contracts/index'
+
+// 禁止选择今天之前的日期
+function disabledDate(current: Dayjs) {
+  // Can not select days before today and today
+  return current && current <= dayjs().endOf('day')
+}
 
 const WhitelistInvestmentModal: React.FC<{
   showModal: boolean
@@ -221,6 +227,7 @@ const WhitelistInvestmentModal: React.FC<{
             <DatePicker
               className='w-full'
               placeholder='Investment second end time'
+              disabledDate={disabledDate}
             />
           </Form.Item>
 
