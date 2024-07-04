@@ -32,19 +32,21 @@ async function createWhitelistInvestment(
   }
 
   const now = dayjs().unix()
-  const step1Duration = toBigInt(dayjs(values.endTime).unix() - now)
-  const step2Duration = toBigInt(dayjs(values.endTime2).unix() - now)
+  const step1Duration = toBigInt(dayjs(values.endTime).unix() - now).toString()
+  const step2Duration = toBigInt(dayjs(values.endTime2).unix() - now).toString()
 
   console.log('🍻 step1Duration :', step1Duration, step2Duration)
 
   const startParams = {
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
-    firstPercent: values.whitelist.map((item: any) => toBigInt(item.percent)),
+    firstPercent: values.whitelist.map((item: any) =>
+      toBigInt(item.percent).toString(),
+    ),
     tokenAddress: getAddress(values.tokenAddress),
-    tokenAmount: toBigInt(values.tokenAmount),
+    tokenAmount: toBigInt(values.tokenAmount).toString(),
     tokenRatio: {
-      tokenAmount: toBigInt(values.assetTokenAmount),
-      daoTokenAmount: toBigInt(values.daoTokenAmount),
+      tokenAmount: toBigInt(values.assetTokenAmount).toString(),
+      daoTokenAmount: toBigInt(values.daoTokenAmount).toString(),
     },
     step1Duration,
     step2Duration,
