@@ -25,4 +25,4 @@ const abis = [
   ...SourceDaoContractUpgradeable,
 ]
 
-export { TwoStepWhitelistInvestment, abis }
+export { TwoStepWhitelistInvestment, abis, erc20 }

@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
 import { getProvider } from '@hooks/useContract'
 import { parseInt } from 'lodash'
+import { erc20 } from './abis'
 
 async function createWhitelistInvestment(
   values: StoreValue,
@@ -33,14 +34,14 @@ async function createWhitelistInvestment(
     return false
   }
 
-  // let provider = await getProvider()
-  // const signer = await provider.getSigner()
-  // const tokenContract = new ethers.Contract(
-  //   values.tokenAddress,
-  //   ,
-  //   signer,
-  // )
-  // return contract
+  // approve token, (eg usdt)
+  let provider = await getProvider()
+  const signer = await provider.getSigner()
+  const tokenContract = new ethers.Contract(values.tokenAddress, erc20, signer)
+  tokenContract.approve(
+    contract.twostepInvestmentAddress,
+    parseUnits(values.tokenAmount.toString(), 18),
+  )
 
   const now = dayjs().unix()
   const step1Duration = toBigInt(dayjs(values.endTime).unix() - now).toString()
