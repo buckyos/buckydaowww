@@ -102,6 +102,10 @@ const useContractStore = create<ContractStoreDefine>()(
       async getTwoStepInvestMentContract() {
         let provider = await getProvider()
         let address = get().twostepInvestmentAddress
+        console.log(
+          '🐼 useContractStore getTwoStepInvestMentContract address',
+          address,
+        )
 
         const signer = await provider.getSigner()
         const contract = new ethers.Contract(

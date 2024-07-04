@@ -42,12 +42,7 @@ const WhitelistInvestmentModal: React.FC<{
     console.log('🍻 values :', values)
     setIsSubmitting(true)
 
-    try {
-      await createWhitelistInvestment(values, contract)
-    } catch (e) {
-      console.error('onCreateInvestment', e)
-      message.error(extractMessage(e))
-    }
+    await createWhitelistInvestment(values, contract)
 
     // setloadingTx(false)
     setIsSubmitting(false)
