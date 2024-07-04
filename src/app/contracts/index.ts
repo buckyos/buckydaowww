@@ -1,6 +1,6 @@
 import { StoreValue } from 'antd/es/form/interface'
 import { message } from 'antd'
-import ethers, { toBigInt, getAddress, parseUnits } from 'ethers'
+import { ethers, toBigInt, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
 import { getProvider } from '@hooks/useContract'
