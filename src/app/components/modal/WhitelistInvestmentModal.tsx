@@ -45,6 +45,7 @@ const WhitelistInvestmentModal: React.FC<{
     try {
       await createWhitelistInvestment(values, contract)
     } catch (e) {
+      console.error('onCreateInvestment', e)
       message.error(extractMessage(e))
     }
 
