@@ -11,7 +11,7 @@ import SourceDaoContractUpgradeable from './Interface.sol/SourceDaoContractUpgra
 import TwoStepWhitelistInvestment from './Interface.sol/TwoStepWhitelistInvestment.json'
 import erc20 from './ERC20.json'
 
-export const abis = [
+const abis = [
   ...erc20,
   ...ISourceDaoCommittee,
   ...IInvestment,
@@ -23,5 +23,6 @@ export const abis = [
   ...ISourceDevGroup,
   ...ISourceTokenLockup,
   ...SourceDaoContractUpgradeable,
-  ...TwoStepWhitelistInvestment,
 ]
+
+export { TwoStepWhitelistInvestment, abis }
