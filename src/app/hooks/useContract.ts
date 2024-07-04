@@ -5,6 +5,7 @@ import { abis, TwoStepWhitelistInvestment } from '@contracts/abis'
 import { persist } from 'zustand/middleware'
 import { message } from 'antd'
 import { getContractInfo } from '@services/index'
+import { assert } from 'console'
 
 //
 export async function getProvider() {
@@ -102,11 +103,6 @@ const useContractStore = create<ContractStoreDefine>()(
       async getTwoStepInvestMentContract() {
         let provider = await getProvider()
         let address = get().twostepInvestmentAddress
-        console.log(
-          '🐼 useContractStore getTwoStepInvestMentContract address',
-          address,
-        )
-
         const signer = await provider.getSigner()
         const contract = new ethers.Contract(
           address,

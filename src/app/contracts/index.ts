@@ -1,8 +1,8 @@
 import { StoreValue } from 'antd/es/form/interface'
 import { message } from 'antd'
-import { toBigInt, getAddress } from 'ethers'
+import { toBigInt, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
-import { extractMessage, transactionWait } from '@utils/index'
+import { transactionWait } from '@utils/index'
 
 async function createWhitelistInvestment(
   values: StoreValue,
@@ -41,7 +41,7 @@ async function createWhitelistInvestment(
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
     firstPercent: values.whitelist.map((item: any) => item.percent),
     tokenAddress: values.tokenAddress,
-    tokenAmount: values.tokenAmount,
+    tokenAmount: parseUnits(values.tokenAmount, 0),
     tokenRatio: {
       tokenAmount: values.assetTokenAmount,
       daoTokenAmount: values.daoTokenAmount,
