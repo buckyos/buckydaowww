@@ -38,7 +38,7 @@ const WhitelistInvestmentModal: React.FC<{
   const contract = useContractStore()
   // const user = useUserStore()
 
-  const onCreateProposal = async (values: StoreValue) => {
+  const onCreateInvestment = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
 
@@ -71,23 +71,12 @@ const WhitelistInvestmentModal: React.FC<{
     >
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
-          onFinish={onCreateProposal}
+          onFinish={onCreateInvestment}
           className='mt-6'
           name='create-proposal'
           style={{ width: '100%' }}
           autoComplete='off'
-          initialValues={{
-            category: 'investment',
-            remember: true,
-          }}
         >
-          <Form.Item
-            name='title'
-            rules={[{ required: true, message: 'Please input title ' }]}
-          >
-            <Input className='' placeholder='title' />
-          </Form.Item>
-
           <Form.List name='whitelist' initialValue={formListInitValues}>
             {(fields, { add, remove }) => (
               <>
