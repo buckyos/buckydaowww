@@ -36,14 +36,17 @@ const WhitelistInvestmentModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
-  // const user = useUserStore()
 
   const onCreateInvestment = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
 
     try {
-      await createWhitelistInvestment(values, contract)
+      const result = await createWhitelistInvestment(values, contract)
+      if (result) {
+        message.success('Create Investment success')
+        setShowModal(false)
+      }
     } catch (e) {
       console.error('onCreateInvestment', e)
       message.error(extractMessage(e))
