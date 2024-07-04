@@ -39,14 +39,12 @@ async function createWhitelistInvestment(
 
   const startParams = {
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
-    firstPercent: values.whitelist.map((item: any) =>
-      parseUnits(item.percent, 0),
-    ),
-    tokenAddress: values.tokenAddress,
-    tokenAmount: parseUnits(values.tokenAmount, 0),
+    firstPercent: values.whitelist.map((item: any) => toBigInt(item.percent)),
+    tokenAddress: getAddress(values.tokenAddress),
+    tokenAmount: toBigInt(values.tokenAmount),
     tokenRatio: {
-      tokenAmount: parseUnits(values.assetTokenAmount, 0),
-      daoTokenAmount: parseUnits(values.daoTokenAmount, 0),
+      tokenAmount: toBigInt(values.assetTokenAmount),
+      daoTokenAmount: toBigInt(values.daoTokenAmount),
     },
     step1Duration,
     step2Duration,
