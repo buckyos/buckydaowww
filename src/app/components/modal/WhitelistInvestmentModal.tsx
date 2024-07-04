@@ -20,6 +20,7 @@ import dayjs, { Dayjs } from 'dayjs'
 // import { createInvestmentExtra } from '@services/index'
 import { createWhitelistInvestment } from '@contracts/index'
 import useContractStore from '@hooks/useContract'
+import { extractMessage } from '@utils/index'
 
 // 禁止选择今天之前的日期
 function disabledDate(current: Dayjs) {
@@ -40,7 +41,12 @@ const WhitelistInvestmentModal: React.FC<{
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
-    await createWhitelistInvestment(values)
+
+    try {
+      await createWhitelistInvestment(values, contract)
+    } catch (e) {
+      message.error(extractMessage(e))
+    }
 
     // setloadingTx(false)
     setIsSubmitting(false)
@@ -174,7 +180,7 @@ const WhitelistInvestmentModal: React.FC<{
             <label className='mt-1'>exchange rate</label>
             <div className='flex '>
               <Form.Item
-                name='tokenExchangeRate'
+                name='daoTokenAmount'
                 rules={[
                   {
                     required: true,
@@ -192,7 +198,7 @@ const WhitelistInvestmentModal: React.FC<{
               <span className='mx-3 mt-1'>=</span>
 
               <Form.Item
-                name='assetExchangeRate'
+                name='assetTokenAmount'
                 rules={[
                   {
                     required: true,

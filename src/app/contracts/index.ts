@@ -1,9 +1,13 @@
 import { StoreValue } from 'antd/es/form/interface'
 import { message } from 'antd'
-import { toBigInt } from 'ethers'
+import { toBigInt, getAddress } from 'ethers'
 import dayjs from 'dayjs'
+import { extractMessage, transactionWait } from '@utils/index'
 
-async function createWhitelistInvestment(values: StoreValue) {
+async function createWhitelistInvestment(
+  values: StoreValue,
+  contract: ContractStoreDefine,
+) {
   console.log('🍻 createWhitelistInvestment values :', values)
   // const title = values.title
   // const content = values.content
@@ -32,6 +36,33 @@ async function createWhitelistInvestment(values: StoreValue) {
   const step2Duration = toBigInt(dayjs(values.endTime2).unix() - now)
 
   console.log('🍻 step1Duration :', step1Duration, step2Duration)
+
+  const startParams = {
+    whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
+    firstPercent: values.whitelist.map((item: any) => item.percent),
+    tokenAddress: values.tokenAddress,
+    tokenAmount: values.tokenAmount,
+    tokenRatio: {
+      tokenAmount: values.assetTokenAmount,
+      daoTokenAmount: values.daoTokenAmount,
+    },
+    step1Duration,
+    step2Duration,
+  }
+  console.log('🍻 createWhitelistInvestment startParams :', startParams)
+
+  const twoStepInvestmentContract =
+    await contract.getTwoStepInvestMentContract()
+
+  const tx = await twoStepInvestmentContract.startInvestment(startParams)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`settlement project version failed[3][${receipt?.status}]`)
+    return false
+  }
+
+  return true
 }
 
 export { createWhitelistInvestment }
