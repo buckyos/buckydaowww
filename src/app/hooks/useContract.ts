@@ -5,7 +5,6 @@ import { abis, TwoStepWhitelistInvestment } from '@contracts/abis'
 import { persist } from 'zustand/middleware'
 import { message } from 'antd'
 import { getContractInfo } from '@services/index'
-import { assert } from 'console'
 
 //
 export async function getProvider() {

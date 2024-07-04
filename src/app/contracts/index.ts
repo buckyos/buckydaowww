@@ -1,8 +1,10 @@
 import { StoreValue } from 'antd/es/form/interface'
 import { message } from 'antd'
-import { toBigInt, getAddress, parseUnits } from 'ethers'
+import ethers, { toBigInt, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
+import { getProvider } from '@hooks/useContract'
+import { parseInt } from 'lodash'
 
 async function createWhitelistInvestment(
   values: StoreValue,
@@ -31,6 +33,15 @@ async function createWhitelistInvestment(
     return false
   }
 
+  // let provider = await getProvider()
+  // const signer = await provider.getSigner()
+  // const tokenContract = new ethers.Contract(
+  //   values.tokenAddress,
+  //   ,
+  //   signer,
+  // )
+  // return contract
+
   const now = dayjs().unix()
   const step1Duration = toBigInt(dayjs(values.endTime).unix() - now).toString()
   const step2Duration = toBigInt(dayjs(values.endTime2).unix() - now).toString()
@@ -39,9 +50,7 @@ async function createWhitelistInvestment(
 
   const startParams = {
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
-    firstPercent: values.whitelist.map((item: any) =>
-      toBigInt(item.percent).toString(),
-    ),
+    firstPercent: values.whitelist.map((item: any) => parseInt(item.percent)),
     tokenAddress: getAddress(values.tokenAddress),
     tokenAmount: toBigInt(values.tokenAmount).toString(),
     tokenRatio: {
