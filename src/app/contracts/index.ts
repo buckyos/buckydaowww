@@ -34,14 +34,26 @@ async function createWhitelistInvestment(
     return false
   }
 
-  // approve token, (eg usdt)
-  let provider = await getProvider()
-  const signer = await provider.getSigner()
-  const tokenContract = new ethers.Contract(values.tokenAddress, erc20, signer)
-  tokenContract.approve(
-    contract.twostepInvestmentAddress,
-    parseUnits(values.tokenAmount.toString(), 18),
-  )
+  {
+    // approve token, (eg usdt)
+    let provider = await getProvider()
+    const signer = await provider.getSigner()
+    const tokenContract = new ethers.Contract(
+      values.tokenAddress,
+      erc20,
+      signer,
+    )
+    const tx = await tokenContract.approve(
+      contract.twostepInvestmentAddress,
+      parseUnits(values.tokenAmount.toString(), 18),
+    )
+    const receipt = await transactionWait(tx)
+    if (receipt?.status !== 1) {
+      message.error('token approve failed')
+      console.warn('transaction status:', receipt?.status, tx)
+      return false
+    }
+  }
 
   const now = dayjs().unix()
   const step1Duration = toBigInt(dayjs(values.endTime).unix() - now).toString()
