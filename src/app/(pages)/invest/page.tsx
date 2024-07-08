@@ -66,18 +66,20 @@ export default function Investment() {
             aria-hidden
             key={item.id}
           >
-            <div>Investment ID: {item.id}</div>
-            <div>Step 1 duration: {item.step1EndTime}</div>
-            <div>Step 2 duration: {item.step2EndTime}</div>
-            <div>Token Address: {item.tokenAddress}</div>
-            <div>Token Amount: {item.daoTokenAmount}</div>
-            <div>
-              Token Ratio: {item.tokenRatio.daoAmount} ={' '}
-              {item.tokenRatio.tokenAmount}
-            </div>
+            <div className='w-full flex flex-col gap-1'>
+              <div>Investment ID: {item.id}</div>
+              <div>Step 1 duration: {item.step1EndTime}</div>
+              <div>Step 2 duration: {item.step2EndTime}</div>
+              <div>Token Address: {item.tokenAddress}</div>
+              <div>Token Amount: {item.daoTokenAmount}</div>
+              <div>
+                Token Ratio: {item.tokenRatio.daoAmount} ={' '}
+                {item.tokenRatio.tokenAmount}
+              </div>
 
-            <div>Investment {item.investedAmount}</div>
-            <div>Investor {item.investor}</div>
+              <div>Investment {item.investedAmount}</div>
+              <div>Investor {item.investor}</div>
+            </div>
           </div>
         ))}
       </div>

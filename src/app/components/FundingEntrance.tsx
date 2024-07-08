@@ -11,19 +11,19 @@ const FundingEntrance = () => {
   const { latestInvestment } = useInvestment()
 
   const handleFundingButtonClicked = () => {
-    if (latestInvestment === null) {
-      message.info(
-        'There is currently no investment, please create a proposal first',
-        10,
-      )
-      router.push('/proposals')
-      setTimeout(() => {
-        window.scrollTo(0, 0)
-      }, 0)
-      return
-    }
-
-    router.push('/funding')
+    // if (latestInvestment === null) {
+    //   message.info(
+    //     'There is currently no investment, please create a proposal first',
+    //     10,
+    //   )
+    //   router.push('/proposals')
+    //   setTimeout(() => {
+    //     window.scrollTo(0, 0)
+    //   }, 0)
+    //   return
+    // }
+    //
+    router.push('/invest')
   }
 
   const latestInvestmentEndTimeDisplay = () => {
