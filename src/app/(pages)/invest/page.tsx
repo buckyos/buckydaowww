@@ -72,7 +72,8 @@ export default function Investment() {
               <div>Step 1 duration: {item.step1EndTime}</div>
               <div>Step 2 duration: {item.step2EndTime}</div>
               <div>Token Address: {item.tokenAddress}</div>
-              <div>Token Amount: {item.daoTokenAmount}</div>
+              <div>Token Amount: {item.totalAmount}</div>
+              <div>DAO Token Amount: {item.daoTokenAmount}</div>
               <div>
                 Token Ratio: {item.tokenRatio.daoAmount} ={' '}
                 {item.tokenRatio.tokenAmount}
