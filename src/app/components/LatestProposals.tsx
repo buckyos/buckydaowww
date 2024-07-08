@@ -7,7 +7,7 @@ import { Button, Empty, message, Pagination } from 'antd'
 import images from '@images'
 import { useAsyncEffect } from 'ahooks'
 import ProposalCard from './ProposalCard'
-import { fetchMembers } from '@services/index'
+import { fetchMembers, getProposals } from '@services/index'
 
 type LastestProposalsProps = {
   showButton: boolean
@@ -30,8 +30,7 @@ const LatestProposals: React.FC<LastestProposalsProps> = ({
   }
 
   useAsyncEffect(async () => {
-    const resp = await fetch(`/api/proposal?pageNo=${page}&pageSize=10`)
-    const result = await resp.json()
+    const result = await getProposals(page, 10)
     if (result.code !== 0) {
       message.error('Get proposal failed')
     } else {

@@ -8,6 +8,15 @@ interface CommonResponse<T> {
   data: T
 }
 
+// MARK
+type CommonListResponse<T> = CommonResponse<{
+  items: T[]
+  pageNo: number
+  pageSize: number
+  totalPages: number
+  totalSize: number
+}>
+
 interface DaoTokenAmountCardItem {
   title: string
   amount: number
@@ -264,4 +273,28 @@ interface ContractStoreDefine {
   getSignerComitteeContract: () => Promise<ethers.Contract>
   getInvestMentContract: () => Promise<ethers.Contract>
   getTwoStepInvestMentContract: () => Promise<ethers.Contract>
+}
+
+interface TwoStepTokenRatio {
+  daoAmount: number
+  tokenAmount: number
+}
+
+interface TwoStepWhitelist {
+  [address: string]: [number, string]
+}
+
+interface TwoStepInvestmentData {
+  daoTokenAmount: string
+  extra: string
+  id: number
+  investedAmount: string
+  investor: string
+  step1EndTime: number
+  step2EndTime: number
+  title: string
+  tokenAddress: string
+  tokenRatio: TwoStepTokenRatio
+  totalAmount: string
+  whitelist: TwoStepWhitelist
 }

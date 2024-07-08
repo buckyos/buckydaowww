@@ -221,6 +221,25 @@ export async function getProjectDetail(
   return data
 }
 
+// 获取提案列表
+export async function getProposals(
+  page: number,
+  size: number,
+): Promise<CommonListResponse<ProposalResponseData>> {
+  const resp = await fetch(`/api/proposal?pageNo=${page}&pageSize=${size}`)
+  const data = await resp.json()
+  return data
+}
+
+// 获取两步投资的列表
+export async function getTwoStepInvestment(): Promise<
+  CommonListResponse<TwoStepInvestmentData>
+> {
+  const resp = await fetch('/api/twostep')
+  const data = await resp.json()
+  return data
+}
+
 // 项目下面的版本列表
 export async function getProjectVersions(project_name: string) {
   //  `/project/${params.pname}`
