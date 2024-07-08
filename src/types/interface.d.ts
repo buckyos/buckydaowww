@@ -288,6 +288,7 @@ interface TwoStepInvestmentData {
   daoTokenAmount: string
   extra: string
   id: number
+  txHash: string
   investedAmount: string
   investor: string
   step1EndTime: number

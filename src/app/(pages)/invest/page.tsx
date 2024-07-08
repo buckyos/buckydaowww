@@ -67,6 +67,7 @@ export default function Investment() {
             key={item.id}
           >
             <div className='w-full flex flex-col gap-1'>
+              <div>Tx hash: {item.txHash}</div>
               <div>Investment ID: {item.id}</div>
               <div>Step 1 duration: {item.step1EndTime}</div>
               <div>Step 2 duration: {item.step2EndTime}</div>
