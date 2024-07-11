@@ -143,4 +143,5 @@ export {
   useUserStore,
   useGetProjectQuery,
   useCommitteeStore,
+  useContractStore,
 }

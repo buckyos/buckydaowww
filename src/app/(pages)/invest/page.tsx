@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useState, Fragment } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { useCommittee, useUserStore } from '@hooks/index'
@@ -15,7 +16,11 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
     <div className='grid grid-cols-1 gap-[18px] md:grid-cols-2'>
       {data.map((item, key) => {
         const items: DescriptionsProps['items'] = [
-          { key: '1', label: 'Tx', children: item.txHash },
+          {
+            key: '1',
+            label: 'Tx',
+            children: <Link href={'invest/${item.id}'}>item.txHash</Link>,
+          },
           { key: '2', label: 'ID', children: item.id },
           { key: '3', label: 'Step 1 duration', children: item.step1EndTime },
           { key: '4', label: 'Step 2 duration', children: item.step2EndTime },
