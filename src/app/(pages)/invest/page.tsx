@@ -105,9 +105,11 @@ export default function Investment() {
 
       <div className='mt-10'></div>
 
-      {loading && <Spin>Loading...</Spin>}
-      {!loading && data.length === 0 && <div>No data</div>}
-      {!loading && data.length != 0 && <WhitelistInvestments data={data} />}
+      <div className='flex-center'>
+        {loading && <Spin>Loading...</Spin>}
+        {!loading && data.length === 0 && <div>No data</div>}
+        {!loading && data.length != 0 && <WhitelistInvestments data={data} />}
+      </div>
     </>
   )
 }
