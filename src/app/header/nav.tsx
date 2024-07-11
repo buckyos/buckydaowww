@@ -41,6 +41,17 @@ const Nav = () => {
         Proposals
       </div>
 
+      <div
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
+        onClick={() => {
+          router.push('/invest')
+          // setIsMenuOpened(false)
+        }}
+        aria-hidden
+      >
+        Investments
+      </div>
+
       {/* <div */}
       {/*   className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer' */}
       {/*   onClick={() => { */}

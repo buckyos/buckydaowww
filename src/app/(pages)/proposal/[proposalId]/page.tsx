@@ -246,6 +246,7 @@ export default function ProposalDetailPage() {
   }
 
   const voteInProgress = supportPercent < 50 && rejectPercent < 50
+  console.log('voteInProgress', voteInProgress, supportPercent, rejectPercent)
 
   return (
     <>
