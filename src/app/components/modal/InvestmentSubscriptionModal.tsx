@@ -35,7 +35,7 @@ const InvestmentSubscriptionModal: React.FC<{
 
   return (
     <Modal
-      title='Create Whitelist Investment'
+      title='Subscribe Investment Shares'
       width={800}
       open={showModal}
       onCancel={() => {
