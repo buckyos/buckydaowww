@@ -19,7 +19,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
           {
             key: '1',
             label: 'Tx',
-            children: <Link href={'invest/${item.id}'}>{item.txHash}</Link>,
+            children: <Link href={`invest/${item.id}`}>{item.txHash}</Link>,
           },
           { key: '2', label: 'ID', children: item.id },
           { key: '3', label: 'Step 1 duration', children: item.step1EndTime },
