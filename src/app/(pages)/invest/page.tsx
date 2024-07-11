@@ -37,7 +37,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
 
         return (
           <Fragment key={key}>
-            <Descriptions bordered items={items} />
+            <Descriptions bordered items={items} column={1} />
           </Fragment>
         )
       })}
