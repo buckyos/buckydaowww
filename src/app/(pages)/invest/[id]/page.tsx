@@ -1,7 +1,9 @@
 'use client'
+import Link from 'next/link'
 import { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { useParams } from 'next/navigation'
+import { Breadcrumb } from 'antd'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 
@@ -26,6 +28,13 @@ const InvestDetailPage = () => {
         showModal={showModal}
         setShowModal={setShowModal}
       />
+
+      <Breadcrumb>
+        <Breadcrumb.Item>
+          <Link href='/invest'>Investment</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>{id}</Breadcrumb.Item>
+      </Breadcrumb>
 
       <div>invest ID {id}</div>
 
