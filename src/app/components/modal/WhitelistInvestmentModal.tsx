@@ -12,12 +12,7 @@ import {
   message,
   Spin,
 } from 'antd'
-// import locale from 'antd/es/date-picker/locale/en_US'
 import dayjs, { Dayjs } from 'dayjs'
-// import { unwrapUnits, parseToBigInt } from '@utils/numberConverter'
-// import { toBigInt } from 'ethers'
-// import useUserStore from '@hooks/useUserStore'
-// import { createInvestmentExtra } from '@services/index'
 import { createWhitelistInvestment } from '@contracts/index'
 import useContractStore from '@hooks/useContract'
 import { extractMessage } from '@utils/index'

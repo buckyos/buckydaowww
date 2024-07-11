@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState, Fragment } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { useCommittee, useUserStore } from '@hooks/index'
-import { message, Descriptions } from 'antd'
+import { message, Descriptions, Spin } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { useAsyncEffect } from 'ahooks'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
@@ -55,12 +55,15 @@ export default function Investment() {
   const { isCommittee, isUnknown } = useCommittee(user.user)
   const [showModal, setShowModal] = useState(false)
   const [data, setData] = useState<TwoStepInvestmentData[]>([])
+  const [loading, setLoading] = useState(false)
 
   useAsyncEffect(async () => {
+    setLoading(true)
     const result = await getTwoStepInvestment()
     if (result.code === 0) {
       setData(result.data.items)
     }
+    setLoading(false)
   }, [])
 
   const onShowCreateInvestmentModal = async () => {
@@ -102,7 +105,9 @@ export default function Investment() {
 
       <div className='mt-10'></div>
 
-      <WhitelistInvestments data={data} />
+      {loading && <Spin>Loading...</Spin>}
+      {!loading && data.length === 0 && <div>No data</div>}
+      {!loading && data.length != 0 && <WhitelistInvestments data={data} />}
     </>
   )
 }
