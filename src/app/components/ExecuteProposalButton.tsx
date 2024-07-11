@@ -8,7 +8,12 @@ import useContractStore, {
   contractProxyContract,
 } from '@hooks/useContract'
 import _ from 'lodash'
-import { getProposalType, proposalTypeMap, transactionWait } from '@utils/index'
+import {
+  extractMessage,
+  getProposalType,
+  proposalTypeMap,
+  transactionWait,
+} from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { ProposalState } from '@vars/index'
 
@@ -32,25 +37,37 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       message.error('You are not a committee member')
       return
     }
-    const proposalType = getProposalType(proposal)
-    if (proposalType === proposalTypeMap.releaseTokens) {
-      await executeReleaseToken()
-    } else if (proposalType === proposalTypeMap.CreateVersion) {
-      await executeCreateVersion('Execute create version proposal success')
-    } else if (proposalType === proposalTypeMap.SettlementVersion) {
-      await executeCreateVersion('Execute settlement version proposal success')
-    } else if (proposalType === proposalTypeMap.UpgradeContract) {
-      await executeUpgradeContract()
-    } else {
-      message.error('This proposal type error')
+
+    try {
+      const proposalType = getProposalType(proposal)
+      if (proposalType === proposalTypeMap.releaseTokens) {
+        await executeReleaseToken()
+      } else if (proposalType === proposalTypeMap.CreateVersion) {
+        await executeCreateVersion('Execute create version proposal success')
+      } else if (proposalType === proposalTypeMap.SettlementVersion) {
+        await executeCreateVersion(
+          'Execute settlement version proposal success',
+        )
+      } else if (proposalType === proposalTypeMap.UpgradeContract) {
+        await executeUpgradeContract()
+      } else {
+        message.error('This proposal type error')
+      }
+    } catch (e) {
+      const msg = extractMessage(e)
+      message.error(msg)
     }
+
     setLoading(false)
   }
 
   const executeUpgradeContract = async () => {
     const proxyContract = await contractProxyContract(proposal.params[0])
     console.log('🍻 proposal :', proxyContract)
-    const tx = await proxyContract.upgradeTo(proposal.params[1])
+    const tx = await proxyContract.upgradeToAndCall(
+      proposal.params[1],
+      new Uint8Array(0),
+    )
     const receipt = await transactionWait(tx)
     if (receipt?.status !== 1) {
       console.warn('transaction status:', receipt?.status, tx)
