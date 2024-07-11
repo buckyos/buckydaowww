@@ -1,11 +1,49 @@
 'use client'
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { useCommittee, useUserStore } from '@hooks/index'
-import { message } from 'antd'
+import { message, Descriptions } from 'antd'
+import type { DescriptionsProps } from 'antd'
 import { useAsyncEffect } from 'ahooks'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
 import { getTwoStepInvestment } from '@services/index'
+
+const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
+  data,
+}) => {
+  return (
+    <div className='grid grid-cols-1 gap-[18px] md:grid-cols-2'>
+      {data.map((item, key) => {
+        const items: DescriptionsProps['items'] = [
+          { key: '1', label: 'Tx', children: item.txHash },
+          { key: '2', label: 'ID', children: item.id },
+          { key: '3', label: 'Step 1 duration', children: item.step1EndTime },
+          { key: '4', label: 'Step 2 duration', children: item.step2EndTime },
+          { key: '5', label: 'Token Address', children: item.tokenAddress },
+          { key: '6', label: 'Token Amount', children: item.totalAmount },
+          {
+            key: '7',
+            label: 'DAO Token Amount',
+            children: item.daoTokenAmount,
+          },
+          {
+            key: '8',
+            label: 'Token Ratio',
+            children: `${item.tokenRatio.daoAmount} = ${item.tokenRatio.tokenAmount}`,
+          },
+          { key: '9', label: 'Investment', children: item.investedAmount },
+          { key: '10', label: 'Investor', children: item.investor },
+        ]
+
+        return (
+          <Fragment key={key}>
+            <Descriptions bordered items={items} />
+          </Fragment>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function Investment() {
   const user = useUserStore()
@@ -59,32 +97,7 @@ export default function Investment() {
 
       <div className='mt-10'></div>
 
-      <div className='grid grid-cols-1 gap-[18px] md:grid-cols-2'>
-        {data.map((item) => (
-          <div
-            className='flex items-center border border-solid rounded-lg border-[#F0F0F0] p-4 cursor-pointer'
-            aria-hidden
-            key={item.id}
-          >
-            <div className='w-full flex flex-col gap-1'>
-              <div>Tx hash: {item.txHash}</div>
-              <div>Investment ID: {item.id}</div>
-              <div>Step 1 duration: {item.step1EndTime}</div>
-              <div>Step 2 duration: {item.step2EndTime}</div>
-              <div>Token Address: {item.tokenAddress}</div>
-              <div>Token Amount: {item.totalAmount}</div>
-              <div>DAO Token Amount: {item.daoTokenAmount}</div>
-              <div>
-                Token Ratio: {item.tokenRatio.daoAmount} ={' '}
-                {item.tokenRatio.tokenAmount}
-              </div>
-
-              <div>Investment {item.investedAmount}</div>
-              <div>Investor {item.investor}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <WhitelistInvestments data={data} />
     </>
   )
 }
