@@ -3,23 +3,69 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { useParams } from 'next/navigation'
-import { Breadcrumb } from 'antd'
+import { Breadcrumb, Descriptions, Spin } from 'antd'
+import type { DescriptionsProps } from 'antd'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
+
+const InvestDetailPageContent = () => {
+  const { id } = useParams()
+  const [data, setData] = useState<TwoStepInvestmentData>()
+
+  useAsyncEffect(async () => {
+    if (typeof id == 'string' && id != '') {
+      const result = await getTwoStepInvestmentDetail(id)
+      console.log('🍻 result :', result)
+      if (result.code == 0) {
+        setData(result.data)
+      }
+    }
+  }, [id])
+
+  if (!data) {
+    return (
+      <div className='flex-center pt-10'>
+        <Spin />
+      </div>
+    )
+  }
+
+  const items: DescriptionsProps['items'] = [
+    {
+      key: '1',
+      label: 'Tx',
+      children: data.txHash,
+    },
+    { key: '2', label: 'ID', children: data.id },
+    { key: '3', label: 'Step 1 duration', children: data.step1EndTime },
+    { key: '4', label: 'Step 2 duration', children: data.step2EndTime },
+    { key: '5', label: 'Token Address', children: data.tokenAddress },
+    { key: '6', label: 'Token Amount', children: data.totalAmount },
+    {
+      key: '7',
+      label: 'DAO Token Amount',
+      children: data.daoTokenAmount,
+    },
+    {
+      key: '8',
+      label: 'Token Ratio',
+      children: `${data.tokenRatio.daoAmount} = ${data.tokenRatio.tokenAmount}`,
+    },
+    { key: '9', label: 'Investment', children: data.investedAmount },
+    { key: '10', label: 'Investor', children: data.investor },
+  ]
+
+  return <Descriptions bordered items={items} column={1} />
+}
 
 // project detail page render fn
 const InvestDetailPage = () => {
   const { id } = useParams()
   const [showModal, setShowModal] = useState(false)
 
-  useAsyncEffect(async () => {
-    if (typeof id == 'string' && id != '') {
-      const result = await getTwoStepInvestmentDetail(id)
-      console.log('🍻 result :', result)
-    }
-  }, [id])
-
-  const onSubscribe = async () => {}
+  const onSubscribe = async () => {
+    setShowModal(true)
+  }
 
   //
   return (
@@ -36,7 +82,9 @@ const InvestDetailPage = () => {
         <Breadcrumb.Item>{id}</Breadcrumb.Item>
       </Breadcrumb>
 
-      <div>invest ID {id}</div>
+      <div className='py-2'>
+        <InvestDetailPageContent />
+      </div>
 
       <div className='flex-center'>
         <div className='flex items-center mt-10 gap-4'>
