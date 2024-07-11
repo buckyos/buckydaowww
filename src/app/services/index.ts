@@ -240,6 +240,15 @@ export async function getTwoStepInvestment(): Promise<
   return data
 }
 
+// 获取两步投资的详情
+export async function getTwoStepInvestmentDetail(
+  id: string,
+): Promise<CommonResponse<TwoStepInvestmentData>> {
+  const resp = await fetch('/api/twostep/' + id)
+  const data = await resp.json()
+  return data
+}
+
 // 项目下面的版本列表
 export async function getProjectVersions(project_name: string) {
   //  `/project/${params.pname}`
