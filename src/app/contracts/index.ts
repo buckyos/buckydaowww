@@ -17,7 +17,8 @@ async function subscribeInvestmentShare(
   const twoStepInvestmentContract =
     await contract.getTwoStepInvestMentContract()
 
-  const amount = parseUnits(values.tokenAmount.toString(), 18)
+  // const amount = parseUnits(values.tokenAmount.toString(), 18)
+  const amount = values.tokenAmount.toString()
   const tx = await twoStepInvestmentContract.invest(id, amount)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
