@@ -7,6 +7,29 @@ import { getProvider } from '@hooks/useContract'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 
+async function subscribeInvestmentShare(
+  values: StoreValue,
+  contract: ContractStoreDefine,
+  id: string,
+) {
+  console.log('🍻 subscribeInvestmentShare values :', values)
+
+  return false
+  const twoStepInvestmentContract =
+    await contract.getTwoStepInvestMentContract()
+
+  const amount = toBigInt(values.amount).toString()
+  const tx = await twoStepInvestmentContract.invest(id, amount)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`settlement project version failed[3][${receipt?.status}]`)
+    return false
+  }
+
+  return true
+}
+
 async function createWhitelistInvestment(
   values: StoreValue,
   contract: ContractStoreDefine,
@@ -98,4 +121,4 @@ async function createWhitelistInvestment(
   return true
 }
 
-export { createWhitelistInvestment }
+export { createWhitelistInvestment, subscribeInvestmentShare }

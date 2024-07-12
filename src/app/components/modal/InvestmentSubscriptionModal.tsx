@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
-import { createWhitelistInvestment } from '@contracts/index'
+import { subscribeInvestmentShare } from '@contracts/index'
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
@@ -59,12 +59,18 @@ const InvestmentSubscriptionModal: React.FC<{
     setSymbol(symbol)
   }, [data, user])
 
+  // 认购投资份额
   const onSubscribe = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
+    setloadingTx(true)
 
     try {
-      const result = await createWhitelistInvestment(values, contract)
+      const result = await subscribeInvestmentShare(
+        values,
+        contract,
+        data!.id.toString(),
+      )
       if (result) {
         message.success('Create Investment success')
         setShowModal(false)
@@ -74,7 +80,7 @@ const InvestmentSubscriptionModal: React.FC<{
       message.error(extractMessage(e))
     }
 
-    // setloadingTx(false)
+    setloadingTx(false)
     setIsSubmitting(false)
   }
 
@@ -118,7 +124,7 @@ const InvestmentSubscriptionModal: React.FC<{
             ]}
           >
             <InputNumber
-              className='w-60'
+              className='w-72'
               min={0}
               max={maxTokenAmount}
               placeholder='Input number of token to subscribe the investment shares'
