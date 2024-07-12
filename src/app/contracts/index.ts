@@ -47,7 +47,7 @@ async function createWhitelistInvestment(
       values.tokenAddress,
       contract.twostepInvestmentAddress,
     )
-    console.log('🍻 contract allow :', allow.toString(), values.tokenAmount)
+    console.log('🍻 contract allow :', allow, values.tokenAmount)
     if (allow < values.tokenAmount) {
       // 额度不足， 让用户授权额度
       const tx = await tokenContract.approve(

@@ -8,20 +8,9 @@ import type { DescriptionsProps } from 'antd'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 
-const InvestDetailPageContent = () => {
-  const { id } = useParams()
-  const [data, setData] = useState<TwoStepInvestmentData>()
-
-  useAsyncEffect(async () => {
-    if (typeof id == 'string' && id != '') {
-      const result = await getTwoStepInvestmentDetail(id)
-      console.log('🍻 result :', result)
-      if (result.code == 0) {
-        setData(result.data)
-      }
-    }
-  }, [id])
-
+const InvestDetailPageContent: React.FC<{
+  data?: TwoStepInvestmentData
+}> = ({ data }) => {
   if (!data) {
     return (
       <div className='flex-center pt-10'>
@@ -62,10 +51,21 @@ const InvestDetailPageContent = () => {
 const InvestDetailPage = () => {
   const { id } = useParams()
   const [showModal, setShowModal] = useState(false)
+  const [data, setData] = useState<TwoStepInvestmentData>()
 
   const onSubscribe = async () => {
     setShowModal(true)
   }
+
+  useAsyncEffect(async () => {
+    if (typeof id == 'string' && id != '') {
+      const result = await getTwoStepInvestmentDetail(id)
+      console.log('🍻 result :', result)
+      if (result.code == 0) {
+        setData(result.data)
+      }
+    }
+  }, [id])
 
   //
   return (
@@ -73,6 +73,7 @@ const InvestDetailPage = () => {
       <InvestmentSubscriptionModal
         showModal={showModal}
         setShowModal={setShowModal}
+        data={data}
       />
 
       <Breadcrumb>
@@ -83,7 +84,7 @@ const InvestDetailPage = () => {
       </Breadcrumb>
 
       <div className='py-2'>
-        <InvestDetailPageContent />
+        <InvestDetailPageContent data={data} />
       </div>
 
       <div className='flex-center'>

@@ -1,18 +1,47 @@
 'use client'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useEffect, Dispatch, SetStateAction, useState } from 'react'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
 import { createWhitelistInvestment } from '@contracts/index'
-import useContractStore from '@hooks/useContract'
+import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
+import { parseInt } from 'lodash'
 
 const InvestmentSubscriptionModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
-}> = ({ showModal, setShowModal }) => {
+  data?: TwoStepInvestmentData
+}> = ({ showModal, setShowModal, data }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
+  const [maxTokenAmount, setMaxTokenAmount] = useState(0)
+  const { user } = useUserStore()
+
+  useEffect(() => {
+    if (!data || !user.address) {
+      return
+    }
+    console.log('🍻 cout max token amount data :', data)
+
+    let maxTokenAmount = 0
+    const now = Date.now()
+    const totalAmount = parseInt(data.totalAmount)
+
+    if (now < data.step1EndTime) {
+      const percent = data.whitelist[user.address][0]
+      const hadSubscribe = parseInt(data.whitelist[user.address][1])
+      // still in step 1, check limit first.
+      maxTokenAmount = (totalAmount * percent) / 100 - hadSubscribe
+    } else {
+      maxTokenAmount = totalAmount - parseInt(data.investedAmount)
+    }
+
+    let maxDaoTokenAmount =
+      (maxTokenAmount * data.tokenRatio.daoAmount) / data.tokenRatio.tokenAmount
+
+    setMaxTokenAmount(maxDaoTokenAmount)
+  }, [data, user])
 
   const onSubscribe = async (values: StoreValue) => {
     console.log('🍻 values :', values)
@@ -43,6 +72,10 @@ const InvestmentSubscriptionModal: React.FC<{
       }}
       footer={null}
     >
+      <div>
+        The max remaining token you can subscribe to is
+        {maxTokenAmount}
+      </div>
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
           onFinish={onSubscribe}
