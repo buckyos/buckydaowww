@@ -7,6 +7,7 @@ import { Breadcrumb, Descriptions, Spin } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
+import _ from 'lodash'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
@@ -41,7 +42,22 @@ const InvestDetailPageContent: React.FC<{
       children: `${data.tokenRatio.daoAmount} = ${data.tokenRatio.tokenAmount}`,
     },
     { key: '9', label: 'Investment', children: data.investedAmount },
-    { key: '10', label: 'Investor', children: data.investor },
+    { label: 'Investor', children: data.investor },
+    {
+      label: 'whitelist',
+      children: (
+        <div>
+          {_.map(data.whitelist, (value, key) => {
+            return (
+              <div className='flex' key={key}>
+                <div>address: {value[0]}</div>
+                <div>subscribed: {value[1]}</div>
+              </div>
+            )
+          })}
+        </div>
+      ),
+    },
   ]
 
   return <Descriptions bordered items={items} column={1} />
