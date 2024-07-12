@@ -8,6 +8,7 @@ import type { DescriptionsProps } from 'antd'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 import _ from 'lodash'
+import dayjs from 'dayjs'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
@@ -27,8 +28,16 @@ const InvestDetailPageContent: React.FC<{
       children: data.txHash,
     },
     { key: '2', label: 'ID', children: data.id },
-    { key: '3', label: 'Step 1 duration', children: data.step1EndTime },
-    { key: '4', label: 'Step 2 duration', children: data.step2EndTime },
+    {
+      key: '3',
+      label: 'Step 1 duration',
+      children: dayjs(data.step1EndTime).format('YYYY-MM-DD'),
+    },
+    {
+      key: '4',
+      label: 'Step 2 duration',
+      children: dayjs(data.step2EndTime).format('YYYY-MM-DD'),
+    },
     { key: '5', label: 'Token Address', children: data.tokenAddress },
     { key: '6', label: 'Token Amount', children: data.totalAmount },
     {
