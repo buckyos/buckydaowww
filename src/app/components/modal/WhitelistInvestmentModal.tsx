@@ -237,14 +237,9 @@ const WhitelistInvestmentModal: React.FC<{
           <Form.Item
             name='canEndEarly'
             label='Could terminated early'
-            rules={[
-              {
-                required: true,
-                message: '',
-              },
-            ]}
+            valuePropName='checked'
           >
-            <Checkbox className='' defaultChecked={true} />
+            <Checkbox />
           </Form.Item>
 
           <div className='flex justify-center'>
