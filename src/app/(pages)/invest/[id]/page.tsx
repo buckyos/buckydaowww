@@ -50,7 +50,8 @@ const InvestDetailPageContent: React.FC<{
           {_.map(data.whitelist, (value, key) => {
             return (
               <div className='flex' key={key}>
-                <div>address: {value[0]}</div>
+                <div>address: {key}</div>
+                <div>percent: {value[0]}</div>
                 <div>subscribed: {value[1]}</div>
               </div>
             )
