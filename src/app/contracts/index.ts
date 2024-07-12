@@ -3,7 +3,7 @@ import { message } from 'antd'
 import { ethers, toBigInt, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
-import { getProvider } from '@hooks/useContract'
+import { getProvider, getTokenContract } from '@hooks/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 
@@ -13,12 +13,27 @@ async function subscribeInvestmentShare(
   id: string,
 ) {
   console.log('🍻 subscribeInvestmentShare values :', values)
+  const amount = values.tokenAmount.toString()
 
+  // 授权token
+  {
+    const daoTokenContract = await getTokenContract(contract.tokenAddress)
+    const tx = await daoTokenContract.approve(
+      contract.twostepInvestmentAddress,
+      parseUnits(amount, 18),
+    )
+    const receipt = await transactionWait(tx)
+    if (receipt?.status !== 1) {
+      message.error('token approve failed')
+      console.warn('transaction status:', receipt?.status, tx)
+      return false
+    }
+  }
+
+  // 认购份额
   const twoStepInvestmentContract =
     await contract.getTwoStepInvestMentContract()
-
   // const amount = parseUnits(values.tokenAmount.toString(), 18)
-  const amount = values.tokenAmount.toString()
   const tx = await twoStepInvestmentContract.invest(id, amount)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
