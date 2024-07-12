@@ -78,6 +78,7 @@ const WhitelistInvestmentModal: React.FC<{
           name='create-proposal'
           style={{ width: '100%' }}
           autoComplete='off'
+          initialValues={{ canEndEarly: true }}
         >
           <Form.List name='whitelist' initialValue={formListInitValues}>
             {(fields, { add, remove }) => (

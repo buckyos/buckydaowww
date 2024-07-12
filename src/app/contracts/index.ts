@@ -43,15 +43,25 @@ async function createWhitelistInvestment(
       erc20,
       signer,
     )
-    const tx = await tokenContract.approve(
+
+    // 查看授权额度
+    const allow = await tokenContract.allowance(
+      values.tokenContract,
       contract.twostepInvestmentAddress,
-      parseUnits(values.tokenAmount.toString(), 18),
     )
-    const receipt = await transactionWait(tx)
-    if (receipt?.status !== 1) {
-      message.error('token approve failed')
-      console.warn('transaction status:', receipt?.status, tx)
-      return false
+    console.log('🍻 contract allow :', allow.toString(), values.tokenAmount)
+    if (allow < values.tokenAmount) {
+      // 额度不足， 让用户授权额度
+      const tx = await tokenContract.approve(
+        contract.twostepInvestmentAddress,
+        parseUnits(values.tokenAmount.toString(), 18),
+      )
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        message.error('token approve failed')
+        console.warn('transaction status:', receipt?.status, tx)
+        return false
+      }
     }
   }
 
