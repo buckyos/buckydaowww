@@ -62,6 +62,10 @@ const InvestmentSubscriptionModal: React.FC<{
     setIsSubmitting(false)
   }
 
+  if (!data) {
+    return null
+  }
+
   return (
     <Modal
       title='Subscribe Investment Shares'
@@ -74,7 +78,10 @@ const InvestmentSubscriptionModal: React.FC<{
     >
       <div>
         The max remaining token you can subscribe to is
-        {maxTokenAmount}
+        {maxTokenAmount} {contract.symbol}
+      </div>
+      <div>
+        1 {contract.symbol} = {data.tokenRatio.daoAmount} DAO
       </div>
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
@@ -86,14 +93,18 @@ const InvestmentSubscriptionModal: React.FC<{
         >
           <Form.Item
             name='tokenAmount'
+            label='Subscribe Shares'
             rules={[
               {
                 required: true,
-                message: 'Please input number of investment tokens',
+                message: 'Please input number of tokens',
               },
             ]}
           >
-            <InputNumber min={1} placeholder='-' />
+            <InputNumber
+              min={0}
+              placeholder='Input number of token to subscribe the investment shares'
+            />
           </Form.Item>
 
           <div className='flex justify-center'>
