@@ -14,16 +14,15 @@ async function subscribeInvestmentShare(
 ) {
   console.log('🍻 subscribeInvestmentShare values :', values)
 
-  return false
   const twoStepInvestmentContract =
     await contract.getTwoStepInvestMentContract()
 
-  const amount = toBigInt(values.amount).toString()
+  const amount = parseUnits(values.amount, 18)
   const tx = await twoStepInvestmentContract.invest(id, amount)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
     console.warn('transaction status:', receipt?.status, tx)
-    message.error(`settlement project version failed[3][${receipt?.status}]`)
+    message.error(`Subscribe invest shares failed [${receipt?.status}]`)
     return false
   }
 
@@ -114,7 +113,7 @@ async function createWhitelistInvestment(
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
     console.warn('transaction status:', receipt?.status, tx)
-    message.error(`settlement project version failed[3][${receipt?.status}]`)
+    message.error(`Create whitelist investment failed [${receipt?.status}]`)
     return false
   }
 
