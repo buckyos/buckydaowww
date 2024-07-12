@@ -33,9 +33,11 @@ const WhitelistInvestmentModal: React.FC<{
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
 
+  // 创建白名单投资
   const onCreateInvestment = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
+    setloadingTx(true)
 
     try {
       const result = await createWhitelistInvestment(values, contract)
@@ -48,8 +50,8 @@ const WhitelistInvestmentModal: React.FC<{
       message.error(extractMessage(e))
     }
 
-    // setloadingTx(false)
     setIsSubmitting(false)
+    setloadingTx(false)
   }
 
   let formListInitValues = [
@@ -242,7 +244,7 @@ const WhitelistInvestmentModal: React.FC<{
               },
             ]}
           >
-            <Checkbox className='' />
+            <Checkbox className='' defaultChecked={true} />
           </Form.Item>
 
           <div className='flex justify-center'>
