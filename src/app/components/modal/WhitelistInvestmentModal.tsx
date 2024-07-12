@@ -232,9 +232,9 @@ const WhitelistInvestmentModal: React.FC<{
             />
           </Form.Item>
 
-          <div>Could terminated early</div>
           <Form.Item
             name='canEndEarly'
+            label='Could terminated early'
             rules={[
               {
                 required: true,
