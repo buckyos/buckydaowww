@@ -335,6 +335,16 @@
             "internalType": "uint256",
             "name": "step2EndTime",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "canEndEarly",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "end",
+            "type": "bool"
           }
         ],
         "internalType": "struct ITwoStepWhitelistInvestment.InvestmentInfo",
@@ -476,6 +486,11 @@
             "internalType": "uint256",
             "name": "step2Duration",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "canEndEarly",
+            "type": "bool"
           }
         ],
         "internalType": "struct ITwoStepWhitelistInvestment.startInvestmentParam",

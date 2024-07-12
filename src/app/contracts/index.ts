@@ -12,13 +12,11 @@ async function createWhitelistInvestment(
   contract: ContractStoreDefine,
 ) {
   console.log('🍻 createWhitelistInvestment values :', values)
-  // const title = values.title
-  // const content = values.content
-  //
+
   const totlePercent = values.whitelist.reduce((acc: number, cur: any) => {
     return acc + cur.percent
   }, 0)
-  console.log('🍻 totlePercent :', totlePercent)
+  // console.log('🍻 totlePercent :', totlePercent)
   if (totlePercent !== 100) {
     message.error('error: total percent must be 100')
     return false
@@ -46,7 +44,7 @@ async function createWhitelistInvestment(
 
     // 查看授权额度
     const allow = await tokenContract.allowance(
-      values.tokenContract,
+      values.tokenAddress,
       contract.twostepInvestmentAddress,
     )
     console.log('🍻 contract allow :', allow.toString(), values.tokenAmount)
