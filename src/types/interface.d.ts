@@ -298,4 +298,5 @@ interface TwoStepInvestmentData {
   tokenRatio: TwoStepTokenRatio
   totalAmount: string
   whitelist: TwoStepWhitelist
+  canEndEarly: boolean
 }

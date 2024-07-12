@@ -11,6 +11,7 @@ import {
   Button,
   message,
   Spin,
+  Checkbox,
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { createWhitelistInvestment } from '@contracts/index'
@@ -96,7 +97,7 @@ const WhitelistInvestmentModal: React.FC<{
                             },
                           ]}
                         >
-                          <Input placeholder='Address ' />
+                          <Input placeholder='Whitelist address' />
                         </Form.Item>
                         <Form.Item
                           name={[name, 'percent']}
@@ -229,6 +230,19 @@ const WhitelistInvestmentModal: React.FC<{
               placeholder='Investment second end time'
               disabledDate={disabledDate}
             />
+          </Form.Item>
+
+          <div>Could terminated early</div>
+          <Form.Item
+            name='canEndEarly'
+            rules={[
+              {
+                required: true,
+                message: '',
+              },
+            ]}
+          >
+            <Checkbox className='' />
           </Form.Item>
 
           <div className='flex justify-center'>
