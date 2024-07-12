@@ -1,11 +1,15 @@
 'use client'
-import { useEffect, Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
 import { createWhitelistInvestment } from '@contracts/index'
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
+import { ethers } from 'ethers'
+import { erc20 } from '@contracts/abis'
+import { getProvider } from '@hooks/index'
 
 const InvestmentSubscriptionModal: React.FC<{
   showModal: boolean
@@ -17,13 +21,15 @@ const InvestmentSubscriptionModal: React.FC<{
   const contract = useContractStore()
   const [maxTokenAmount, setMaxTokenAmount] = useState(0)
   const { user } = useUserStore()
+  const [symbol, setSymbol] = useState('')
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     if (!data || !user.address) {
       return
     }
     console.log('🍻 cout max token amount data :', data)
 
+    // 计算最大可认购的token数量
     let maxTokenAmount = 0
     const now = Date.now()
     const totalAmount = parseInt(data.totalAmount)
@@ -41,6 +47,16 @@ const InvestmentSubscriptionModal: React.FC<{
       (maxTokenAmount * data.tokenRatio.daoAmount) / data.tokenRatio.tokenAmount
 
     setMaxTokenAmount(maxDaoTokenAmount)
+
+    // 获取token 的symbol
+    let provider = await getProvider()
+    const tokenContract = new ethers.Contract(
+      contract.tokenAddress,
+      erc20,
+      provider,
+    )
+    const symbol = await tokenContract.symbol()
+    setSymbol(symbol)
   }, [data, user])
 
   const onSubscribe = async (values: StoreValue) => {
@@ -81,7 +97,7 @@ const InvestmentSubscriptionModal: React.FC<{
         {maxTokenAmount} {contract.symbol}
       </div>
       <div>
-        1 {contract.symbol} = {data.tokenRatio.daoAmount} DAO
+        1 {contract.symbol} = {data.tokenRatio.daoAmount} {symbol}
       </div>
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
@@ -103,6 +119,7 @@ const InvestmentSubscriptionModal: React.FC<{
           >
             <InputNumber
               min={0}
+              max={maxTokenAmount}
               placeholder='Input number of token to subscribe the investment shares'
             />
           </Form.Item>

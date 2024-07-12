@@ -1,12 +1,18 @@
 import { useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
-import useContractStore, { getProvider } from '@hooks/useContract'
+import useContractStore from '@hooks/useContract'
 import { bindAddress, getProjectDetail } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
 import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
 import { useCommitteeStore, CommitteeType } from './useCommittee'
+import {
+  getProvider,
+  getTokenContract,
+  getProjectContract,
+  contractProxyContract,
+} from './function'
 
 function useBindWalletAddress() {
   const { isConnect, user, updateUser, jwt } = useUserStore((state) => ({
@@ -144,4 +150,8 @@ export {
   useGetProjectQuery,
   useCommitteeStore,
   useContractStore,
+  getProvider,
+  getTokenContract,
+  getProjectContract,
+  contractProxyContract,
 }
