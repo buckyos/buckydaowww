@@ -3,25 +3,14 @@ import { create } from 'zustand'
 import { ethers } from 'ethers'
 import { abis, TwoStepWhitelistInvestment } from '@contracts/abis'
 import { persist } from 'zustand/middleware'
-import { message } from 'antd'
 import { getContractInfo } from '@services/index'
 
-//
-export async function getProvider() {
-  if (window.ethereum) {
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      return provider
-    } catch (e) {
-      message.error((e as any).toString())
-      throw new Error('user reject connect wallet')
-    }
-  } else {
-    message.error('Please install MetaMask first')
-    console.log('MetaMask not installed; using read-only defaults')
-    throw new Error('MetaMask not installed; using read-only defaults')
-  }
-}
+import {
+  getProvider,
+  getTokenContract,
+  getProjectContract,
+  contractProxyContract,
+} from './function'
 
 // 过期时间 5分钟
 const EXPIRATION_DURATION = 5 * 60 * 1000
@@ -161,28 +150,10 @@ const useContractStore = create<ContractStoreDefine>()(
   ),
 )
 
-export async function getTokenContract(address: string) {
-  let provider = await getProvider()
-  const signer = await provider.getSigner()
-  const contract = new ethers.Contract(address, abis, signer)
-  return contract
-}
-
-export async function getProjectContract(contractStrore: ContractStoreDefine) {
-  const address = contractStrore.projectAddress
-  // console.log('🐼 getProjectContract', address)
-  let provider = await getProvider()
-  const signer = await provider.getSigner()
-  const contract = new ethers.Contract(address, abis, signer)
-  return contract
-}
-
-// for upgrade contract
-export async function contractProxyContract(contractProxyAddress: string) {
-  let provider = await getProvider()
-  const signer = await provider.getSigner()
-  const contract = new ethers.Contract(contractProxyAddress, abis, signer)
-  return contract
-}
-
 export default useContractStore
+export {
+  getProvider,
+  getTokenContract,
+  getProjectContract,
+  contractProxyContract,
+}

@@ -90,6 +90,7 @@ const useUserStore = create<UserStoreDefine>()(
           },
           jwt: '',
         })
+        localStorage.removeItem('committee-type')
       },
     }),
     { name: 'user-store' },
