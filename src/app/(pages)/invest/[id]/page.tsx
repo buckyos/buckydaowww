@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { useParams } from 'next/navigation'
-import { Breadcrumb, Descriptions, Spin } from 'antd'
+import { Breadcrumb, Descriptions, Spin, Tag } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
@@ -50,9 +50,15 @@ const InvestDetailPageContent: React.FC<{
           {_.map(data.whitelist, (value, key) => {
             return (
               <div className='flex' key={key}>
-                <div>address: {key}</div>
-                <div>percent: {value[0]}</div>
-                <div>subscribed: {value[1]}</div>
+                <div>
+                  <Tag>address</Tag> {key}
+                </div>
+                <div>
+                  <Tag>percent</Tag> {value[0]}
+                </div>
+                <div>
+                  <Tag>subscribed</Tag> {value[1]}
+                </div>
               </div>
             )
           })}
