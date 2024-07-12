@@ -49,15 +49,18 @@ const InvestDetailPageContent: React.FC<{
         <div>
           {_.map(data.whitelist, (value, key) => {
             return (
-              <div className='flex' key={key}>
+              <div className='flex gap-2' key={key}>
                 <div>
-                  <Tag>address</Tag> {key}
+                  <Tag>address</Tag>
+                  {key}
                 </div>
                 <div>
-                  <Tag>percent</Tag> {value[0]}
+                  <Tag>percent</Tag>
+                  {value[0]}
                 </div>
                 <div>
-                  <Tag>subscribed</Tag> {value[1]}
+                  <Tag>subscribed</Tag>
+                  {value[1]}
                 </div>
               </div>
             )
