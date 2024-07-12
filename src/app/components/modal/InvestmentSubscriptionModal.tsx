@@ -118,6 +118,7 @@ const InvestmentSubscriptionModal: React.FC<{
             ]}
           >
             <InputNumber
+              className='w-60'
               min={0}
               max={maxTokenAmount}
               placeholder='Input number of token to subscribe the investment shares'
