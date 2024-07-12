@@ -80,6 +80,7 @@ async function createWhitelistInvestment(
     },
     step1Duration,
     step2Duration,
+    canEndEarly: values.canEndEarly,
   }
   console.log('🍻 createWhitelistInvestment startParams :', startParams)
 
