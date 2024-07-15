@@ -5,10 +5,12 @@ import { useAsyncEffect } from 'ahooks'
 import { useParams } from 'next/navigation'
 import { Breadcrumb, Descriptions, Spin, Tag } from 'antd'
 import type { DescriptionsProps } from 'antd'
-import { getTwoStepInvestmentDetail } from '@services/index'
-import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 import _ from 'lodash'
 import dayjs from 'dayjs'
+
+import { getTwoStepInvestmentDetail } from '@services/index'
+import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
+import { useUserStore } from '@hooks/index'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
@@ -87,10 +89,14 @@ const InvestDetailPage = () => {
   const { id } = useParams()
   const [showModal, setShowModal] = useState(false)
   const [data, setData] = useState<TwoStepInvestmentData>()
+  const { user } = useUserStore()
+  const [isInvestor, setIsInvestor] = useState(false)
 
   const onSubscribe = async () => {
     setShowModal(true)
   }
+
+  const onEndInvestment = async () => {}
 
   useAsyncEffect(async () => {
     if (typeof id == 'string' && id != '') {
@@ -98,9 +104,13 @@ const InvestDetailPage = () => {
       console.log('🍻 result :', result)
       if (result.code == 0) {
         setData(result.data)
+
+        const isInvestor = user.address == result.data.investor
+        console.log('🍻 isInvestor :', isInvestor)
+        setIsInvestor(isInvestor)
       }
     }
-  }, [id])
+  }, [id, user])
 
   //
   return (
@@ -117,6 +127,21 @@ const InvestDetailPage = () => {
         </Breadcrumb.Item>
         <Breadcrumb.Item>{id}</Breadcrumb.Item>
       </Breadcrumb>
+
+      <div className='mt-4'>
+        {isInvestor && (
+          <div className='flex'>
+            <div>Investor can end the invest and get the dao token.</div>
+
+            <div
+              onClick={onEndInvestment}
+              className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-8 px-4 rounded-lg cursor-pointer text-sm'
+            >
+              End investment
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className='py-2'>
         <InvestDetailPageContent data={data} />
