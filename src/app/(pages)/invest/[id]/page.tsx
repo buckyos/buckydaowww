@@ -35,7 +35,7 @@ const InvestDetailPageContent: React.FC<{
     },
     {
       label: 'Status',
-      children: data.end ? <Tag>End'</Tag> : <Tag>'Processing'</Tag>,
+      children: data.end ? <Tag>End</Tag> : <Tag>Processing</Tag>,
     },
 
     {
