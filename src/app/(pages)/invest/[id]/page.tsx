@@ -35,7 +35,7 @@ const InvestDetailPageContent: React.FC<{
     },
     {
       label: 'Status',
-      children: data.end ? 'End' : 'Processing',
+      children: data.end ? <Tag>End'</Tag> : <Tag>'Processing'</Tag>,
     },
 
     {
@@ -101,7 +101,7 @@ const InvestDetailPage = () => {
 
   const onSubscribe = async () => {
     if (data!.end) {
-      message.error('Investment already end')
+      message.info('Investment already end')
       return
     }
 
@@ -110,7 +110,7 @@ const InvestDetailPage = () => {
 
   const onEndInvestment = async () => {
     if (data?.end) {
-      message.error('Investment already end')
+      message.info('Investment already end')
       return
     }
 
