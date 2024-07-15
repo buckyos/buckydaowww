@@ -7,6 +7,20 @@ import { getProvider, getTokenContract } from '@hooks/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 
+async function endInvestment(id: string, contract: ContractStoreDefine) {
+  const twoStepInvestmentContract =
+    await contract.getTwoStepInvestMentContract()
+  const tx = await twoStepInvestmentContract.endInvestment(id)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`End investment failed [${receipt?.status}]`)
+    return false
+  }
+
+  return true
+}
+
 async function subscribeInvestmentShare(
   values: StoreValue,
   contract: ContractStoreDefine,
@@ -136,4 +150,4 @@ async function createWhitelistInvestment(
   return true
 }
 
-export { createWhitelistInvestment, subscribeInvestmentShare }
+export { createWhitelistInvestment, subscribeInvestmentShare, endInvestment }

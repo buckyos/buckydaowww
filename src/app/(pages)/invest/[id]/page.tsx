@@ -3,14 +3,15 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { useParams } from 'next/navigation'
-import { Breadcrumb, Descriptions, Spin, Tag } from 'antd'
+import { Breadcrumb, Descriptions, Spin, Tag, Modal, message } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import _ from 'lodash'
 import dayjs from 'dayjs'
 
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
-import { useUserStore } from '@hooks/index'
+import { useUserStore, useContractStore } from '@hooks/index'
+import { endInvestment } from '@contracts/index'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
@@ -91,12 +92,27 @@ const InvestDetailPage = () => {
   const [data, setData] = useState<TwoStepInvestmentData>()
   const { user } = useUserStore()
   const [isInvestor, setIsInvestor] = useState(false)
+  const contract = useContractStore()
 
   const onSubscribe = async () => {
     setShowModal(true)
   }
 
-  const onEndInvestment = async () => {}
+  const onEndInvestment = async () => {
+    Modal.confirm({
+      title: 'Are you sure to end the investment?',
+      onOk: async () => {
+        console.log('🍻 onEndInvestment data :', data)
+        // end investment
+        if (data && data.id) {
+          const result = await endInvestment(data.id.toString(), contract)
+          if (result) {
+            message.success('End investment success')
+          }
+        }
+      },
+    })
+  }
 
   useAsyncEffect(async () => {
     if (typeof id == 'string' && id != '') {
