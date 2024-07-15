@@ -27,8 +27,8 @@ function Participate() {
         </a>
         . Here, you can share code, build and use software, participate in
         discussions, and follow our updates. We also invite you to follow our
-        Twitter for latest news and updates. The current MVP (Minimum Viable
-        Product) version is now available for use.
+        Twitter for latest news and updates. The current PoC (Proof of Concept)
+        version is now available for demo and evaluation.
       </p>
     </>
   )
@@ -83,6 +83,13 @@ export default function Home() {
             Done with your masterpiece? Time for rewards! But a quick check:
             Does it match our set standards? Excellence is our shared goal, and
             only the best gets the gold star.
+          </p>
+
+          <p>
+            <strong>Intrigued? </strong>
+            Buckyos is not just a platform; it&apos;s a revolution. And guess
+            what? You&apos;re at the helm. So, power up, dive in, and let&apos;s
+            craft the AI future together! 🚀
           </p>
         </div>
       </div>
