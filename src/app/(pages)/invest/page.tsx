@@ -6,6 +6,7 @@ import { useCommittee, useUserStore } from '@hooks/index'
 import { message, Descriptions, Spin } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { useAsyncEffect } from 'ahooks'
+import dayjs from 'dayjs'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
 import { getTwoStepInvestment } from '@services/index'
 
@@ -22,8 +23,14 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
             children: <Link href={`invest/${item.id}`}>{item.txHash}</Link>,
           },
           { key: '2', label: 'ID', children: item.id },
-          { key: '3', label: 'Step 1 duration', children: item.step1EndTime },
-          { key: '4', label: 'Step 2 duration', children: item.step2EndTime },
+          {
+            label: 'Step 1 duration',
+            children: dayjs(item.step1EndTime * 1000).format('YYYY-MM-DD'),
+          },
+          {
+            label: 'Step 2 duration',
+            children: dayjs(item.step2EndTime * 1000).format('YYYY-MM-DD'),
+          },
           { key: '5', label: 'Token Address', children: item.tokenAddress },
           { key: '6', label: 'Token Amount', children: item.totalAmount },
           {
