@@ -23,13 +23,13 @@ export default function GovernanceIntroducing() {
 
 # DAO Token Economics
 
-- **Total supply**: 1 billion
+- **Total supply**: 2.1 billion
 - **Can increase supply**: YES (equity increase model); 1 billion tokens will be released upon achieving the original goal as planned. Afterward, additional tokens can be issued with authorization based on milestone versions.
 
 ## BST allocation
 
-1. Initial team (20%)
-2. Mining through development  (51%)
+1. Initial team (5%)
+2. Mining through development  (66%)
 3. Marketing (9%)
 4. Investors (20%)
 
@@ -39,7 +39,7 @@ All tokens are currently in a waiting-to-be-released state according to the abov
 
 ### Obtaining Tokens through Investment
 
-When DAN reaches a certain stage as planned, financing can be initiated based on the roadmap: selling unreleased BST using financing contracts. The conditions for each round of financing will differ, and tokens obtained from investment may have locking conditions.
+When reaches a certain stage as planned, financing can be initiated based on the roadmap: selling unreleased BST using financing contracts. The conditions for each round of financing will differ, and tokens obtained from investment may have locking conditions.
 
 ## Token Rights
 
@@ -115,7 +115,7 @@ After a marketing activity ends, it will be evaluated as terminated, failed, goo
 ## CFO
 The CFO must be a committee member.
 Their main duties include budget preparation, asset custody system design, and proposing financial-related proposals. (Note that the CFO and the committee accountant are not the same person and do not have a superior-subordinate relationship.)
-## DAN Developer
+## Developer
 Any developer who contributes more than 100 points to the Buckyos project automatically becomes a BuckyDAO Developer (lifetime tenure).
 
 ### Dismissal
@@ -123,19 +123,19 @@ Any developer who contributes more than 100 points to the Buckyos project automa
 2. Removal through a major proposal.
 
 
-## CoreDAN Developer
+## Core Developer
 Buckyos is an open-source organization where engineers are the primary members. Core Buckyos Developers are the core contributors to Buckyos's development and also full-time participants in the DAO.
-As such, they receive fixed income every two weeks based on their current level and the DAO's financial allocation. The project manager can assign work to CoreDAN Developers, and they can also hold other DAO positions.
+As such, they receive fixed income every two weeks based on their current level and the DAO's financial allocation. The project manager can assign work to Core Developers, and they can also hold other DAO positions.
 
 ### Appointment
-Any DAN Developer can apply to become a CoreDAN Developer.
-The qualification will take effect at the designated time after approval by the committee, serving a term of two years (with automatic reappointment allowed). CoreDAN Developers are evaluated every two months, and they pass the evaluation if they complete any of the following tasks:
+Any Developer can apply to become a Core Buckyos Developer.
+The qualification will take effect at the designated time after approval by the committee, serving a term of two years (with automatic reappointment allowed). Core Developers are evaluated every two months, and they pass the evaluation if they complete any of the following tasks:
 
 1. All assigned tasks have been accepted.
 2. Contributions exceed 70% of the required contributions for their level.
 3. Contributions exceed the average for the current period.
 ### Dismissal
-Voluntary resignation with committee approval or failure to pass three evaluations during one term (two years) result in automatic dismissal. The committee can also remove CoreDAN Developers through a resolution.
+Voluntary resignation with committee approval or failure to pass three evaluations during one term (two years) result in automatic dismissal. The committee can also remove Core Developers through a resolution.
 
 # Financial Management
 ## Financial Process
@@ -147,7 +147,7 @@ Voluntary resignation with committee approval or failure to pass three evaluatio
 ## Types of Funding
 Financial expenditures are divided into phase budget allocations and ad-hoc project allocations:
 1. Phase budget allocations include the necessary funding for marketing, development, administration, etc., and are proposed by the Secretary-General of the Committee. The budget for each phase is subject to an important transaction voting process.
-2. Ad-hoc project allocations are used for non-routine or emergency project expenses outside the quarterly budget. They are initiated by committee members or Core DAN Developers, voted on by a majority of committee members, and publicly disclosed. The amount of ad-hoc allocation should be within the scope of the current financial system design.
+2. Ad-hoc project allocations are used for non-routine or emergency project expenses outside the quarterly budget. They are initiated by committee members or Core Developers, voted on by a majority of committee members, and publicly disclosed. The amount of ad-hoc allocation should be within the scope of the current financial system design.
 
 ## Financial Record Keeping
 1. The committee has a CFO responsible for recording, managing, and supervising financial records and accounts, ensuring accuracy and completeness.
@@ -173,7 +173,7 @@ Financial expenditures are divided into phase budget allocations and ad-hoc proj
 Buckyos is an open-source organization, and therefore project development process is the primary workflow. The DAO follows the principle of prioritizing efficiency in the early stage and stability and fairness in the later stage. At the level of DAO rules, specific work is delegated to relevant responsible persons instead of designing too many details.
 
 ## Basic Process
-1. Project Planning: Based on the Roadmap plan, the committee discusses the number of projects needed to achieve the goals of the current stage as much as possible and discusses it at the committee meeting. Once the project planning is approved, the project moves into project preparation, where the key goal is to select the project manager. The project manager must be a Core DAN Developer.
+1. Project Planning: Based on the Roadmap plan, the committee discusses the number of projects needed to achieve the goals of the current stage as much as possible and discusses it at the committee meeting. Once the project planning is approved, the project moves into project preparation, where the key goal is to select the project manager. The project manager must be a Core Developer.
 2. Project Initiation: After determining the project manager, the project manager initiates the project initiation. The format of the initiation document is not limited, but the most important thing is the budget package (where those who contribute to the project receive their mining income from), the project personnel, and the start and end dates.
 3. Discussion and Approval: After the project manager submits the initiation document, the committee discusses (emphasized) and votes to approve it. For important projects, DAO vote approval is required according to significant transaction requirements.
 4. Actual Plan Designation: The project manager begins to confirm the actual plan of the project, with the main work being the list of participants and specific task design. When designing tasks, it is necessary to design the contribution value. Guidance for contribution value design is provided in the Buckyos Project Management Manual.

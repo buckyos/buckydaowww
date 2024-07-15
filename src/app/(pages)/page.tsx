@@ -84,13 +84,6 @@ export default function Home() {
             Does it match our set standards? Excellence is our shared goal, and
             only the best gets the gold star.
           </p>
-
-          <p>
-            <strong>Intrigued? </strong>
-            OpenDAN is not just a platform; it&apos;s a revolution. And guess
-            what? You&apos;re at the helm. So, power up, dive in, and let&apos;s
-            craft the AI future together! 🚀
-          </p>
         </div>
       </div>
       <div className='mt-9'>
