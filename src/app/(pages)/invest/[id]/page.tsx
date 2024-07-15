@@ -130,7 +130,7 @@ const InvestDetailPage = () => {
 
       <div className='mt-4'>
         {isInvestor && (
-          <div className='flex items-center py-2'>
+          <div className='flex items-center py-2 gap-4'>
             <div>Investor can end the invest and get the dao token.</div>
             <div
               onClick={onEndInvestment}
