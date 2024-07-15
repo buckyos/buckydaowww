@@ -34,12 +34,12 @@ const InvestDetailPageContent: React.FC<{
     {
       key: '3',
       label: 'Step 1 duration',
-      children: dayjs(data.step1EndTime).format('YYYY-MM-DD'),
+      children: dayjs(data.step1EndTime * 1000).format('YYYY-MM-DD'),
     },
     {
       key: '4',
       label: 'Step 2 duration',
-      children: dayjs(data.step2EndTime).format('YYYY-MM-DD'),
+      children: dayjs(data.step2EndTime * 1000).format('YYYY-MM-DD'),
     },
     { key: '5', label: 'Token Address', children: data.tokenAddress },
     { key: '6', label: 'Token Amount', children: data.totalAmount },
