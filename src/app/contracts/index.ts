@@ -7,6 +7,14 @@ import { getProvider, getTokenContract } from '@hooks/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 
+// 获取token 的symbol
+async function getSymbol(tokenAddress: string): Promise<string> {
+  let provider = await getProvider()
+  const tokenContract = new ethers.Contract(tokenAddress, erc20, provider)
+  const symbol = await tokenContract.symbol()
+  return symbol
+}
+
 async function endInvestment(id: string, contract: ContractStoreDefine) {
   const twoStepInvestmentContract =
     await contract.getTwoStepInvestMentContract()
@@ -150,4 +158,9 @@ async function createWhitelistInvestment(
   return true
 }
 
-export { createWhitelistInvestment, subscribeInvestmentShare, endInvestment }
+export {
+  getSymbol,
+  createWhitelistInvestment,
+  subscribeInvestmentShare,
+  endInvestment,
+}

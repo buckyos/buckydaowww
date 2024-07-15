@@ -2,13 +2,14 @@
 import Link from 'next/link'
 import { useState, Fragment } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
-import { useCommittee, useUserStore } from '@hooks/index'
 import { message, Descriptions, Spin } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { useAsyncEffect } from 'ahooks'
 import dayjs from 'dayjs'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
 import { getTwoStepInvestment } from '@services/index'
+import { useCommittee, useUserStore } from '@hooks/index'
+// import { getSymbol } from '@contracts/index'
 
 const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
   data,

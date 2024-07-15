@@ -3,13 +3,10 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
-import { subscribeInvestmentShare } from '@contracts/index'
+import { subscribeInvestmentShare, getSymbol } from '@contracts/index'
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
-import { ethers } from 'ethers'
-import { erc20 } from '@contracts/abis'
-import { getProvider } from '@hooks/index'
 
 const InvestmentSubscriptionModal: React.FC<{
   showModal: boolean
@@ -48,14 +45,8 @@ const InvestmentSubscriptionModal: React.FC<{
 
     setMaxTokenAmount(maxDaoTokenAmount)
 
-    // 获取token 的symbol
-    let provider = await getProvider()
-    const tokenContract = new ethers.Contract(
-      contract.tokenAddress,
-      erc20,
-      provider,
-    )
-    const symbol = await tokenContract.symbol()
+    // 获取投资token的symbol
+    const symbol = await getSymbol(contract.tokenAddress)
     setSymbol(symbol)
   }, [data, user])
 
