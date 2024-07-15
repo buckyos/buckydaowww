@@ -26,18 +26,23 @@ const InvestDetailPageContent: React.FC<{
 
   const items: DescriptionsProps['items'] = [
     {
-      key: '1',
       label: 'Tx',
       children: data.txHash,
     },
-    { key: '2', label: 'ID', children: data.id },
     {
-      key: '3',
+      label: 'ID',
+      children: data.id,
+    },
+    {
+      label: 'Status',
+      children: data.end ? 'End' : 'Processing',
+    },
+
+    {
       label: 'Step 1 duration',
       children: dayjs(data.step1EndTime * 1000).format('YYYY-MM-DD'),
     },
     {
-      key: '4',
       label: 'Step 2 duration',
       children: dayjs(data.step2EndTime * 1000).format('YYYY-MM-DD'),
     },
@@ -95,10 +100,20 @@ const InvestDetailPage = () => {
   const contract = useContractStore()
 
   const onSubscribe = async () => {
+    if (data!.end) {
+      message.error('Investment already end')
+      return
+    }
+
     setShowModal(true)
   }
 
   const onEndInvestment = async () => {
+    if (data?.end) {
+      message.error('Investment already end')
+      return
+    }
+
     Modal.confirm({
       title: 'Are you sure to end the investment?',
       onOk: async () => {

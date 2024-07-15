@@ -299,4 +299,5 @@ interface TwoStepInvestmentData {
   totalAmount: string
   whitelist: TwoStepWhitelist
   canEndEarly: boolean
+  end: boolean
 }
