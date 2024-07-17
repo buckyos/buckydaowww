@@ -8,6 +8,29 @@ import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
 
+// 计算最大可认购的token数量
+function countMaxTokenAmount(data: TwoStepInvestmentData, address: string) {
+  let maxTokenAmount = 0
+  const now = Date.now()
+  const totalAmount = parseInt(data.totalAmount)
+
+  if (now < data.step1EndTime) {
+    const currentUser = data.whitelist[address]
+    const percent = currentUser[0]
+    const hadSubscribe = parseInt(currentUser[1])
+    // still in step 1, check limit first.
+    maxTokenAmount = (totalAmount * percent) / 100 - hadSubscribe
+  } else {
+    maxTokenAmount = totalAmount - parseInt(data.investedAmount)
+  }
+
+  let maxDaoTokenAmount =
+    (maxTokenAmount * data.tokenRatio.daoAmount) / data.tokenRatio.tokenAmount
+
+  return maxDaoTokenAmount
+}
+
+// 认购投资份额 弹窗
 const InvestmentSubscriptionModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
@@ -26,23 +49,7 @@ const InvestmentSubscriptionModal: React.FC<{
     }
     console.log('🍻 cout max token amount data :', data)
 
-    // 计算最大可认购的token数量
-    let maxTokenAmount = 0
-    const now = Date.now()
-    const totalAmount = parseInt(data.totalAmount)
-
-    if (now < data.step1EndTime) {
-      const percent = data.whitelist[user.address][0]
-      const hadSubscribe = parseInt(data.whitelist[user.address][1])
-      // still in step 1, check limit first.
-      maxTokenAmount = (totalAmount * percent) / 100 - hadSubscribe
-    } else {
-      maxTokenAmount = totalAmount - parseInt(data.investedAmount)
-    }
-
-    let maxDaoTokenAmount =
-      (maxTokenAmount * data.tokenRatio.daoAmount) / data.tokenRatio.tokenAmount
-
+    const maxDaoTokenAmount = countMaxTokenAmount(data, user.address)
     setMaxTokenAmount(maxDaoTokenAmount)
 
     // 获取投资token的symbol
