@@ -11,6 +11,7 @@ import { getTwoStepInvestment } from '@services/index'
 import { useCommittee, useUserStore } from '@hooks/index'
 // import { getSymbol } from '@contracts/index'
 
+// 投资列表(grid)
 const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
   data,
 }) => {
@@ -58,7 +59,8 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
   )
 }
 
-export default function Investment() {
+// main page
+export default function InvestmentPage() {
   const user = useUserStore()
   const { isCommittee, isUnknown } = useCommittee(user.user)
   const [showModal, setShowModal] = useState(false)
@@ -79,17 +81,20 @@ export default function Investment() {
       message.error('error: please login first')
       return
     }
-    if (isUnknown) {
-      message.warning(
-        'loading committee status from contract, please try again later',
-      )
-      return
-    }
 
-    if (!isCommittee) {
-      message.error('You are not a committee member')
-      return
-    }
+    // 不需要委员会成员身份，但是如果没有限制，也会有问题
+    // 后面再看看吧
+    // if (isUnknown) {
+    //   message.warning(
+    //     'loading committee status from contract, please try again later',
+    //   )
+    //   return
+    // }
+    //
+    // if (!isCommittee) {
+    //   message.error('You are not a committee member')
+    //   return
+    // }
     setShowModal(true)
   }
 

@@ -14,7 +14,7 @@ const Nav = () => {
         }}
         aria-hidden
       >
-        <div>Governance introducing</div>
+        <div>Governance</div>
         <div className='-rotate-45'>
           <SwapRightOutlined />
         </div>
@@ -28,7 +28,7 @@ const Nav = () => {
         }}
         aria-hidden
       >
-        Members
+        Member
       </div>
       <div
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
@@ -38,7 +38,7 @@ const Nav = () => {
         }}
         aria-hidden
       >
-        Proposals
+        Proposal
       </div>
 
       <div
@@ -49,19 +49,19 @@ const Nav = () => {
         }}
         aria-hidden
       >
-        Investments
+        Investment
       </div>
 
-      {/* <div */}
-      {/*   className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer' */}
-      {/*   onClick={() => { */}
-      {/*     router.push('/projects') */}
-      {/*     // setIsMenuOpened(false) */}
-      {/*   }} */}
-      {/*   aria-hidden */}
-      {/* > */}
-      {/*   Projects */}
-      {/* </div> */}
+      <div
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
+        onClick={() => {
+          router.push('/projects')
+          // setIsMenuOpened(false)
+        }}
+        aria-hidden
+      >
+        Project
+      </div>
 
       <div className='block md:hidden'>{/* <WalletConnector /> */}</div>
     </nav>
