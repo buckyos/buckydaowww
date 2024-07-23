@@ -216,16 +216,16 @@ export async function getContractInfo(): Promise<ContractInfomationResponse> {
 export async function getProjectDetail(
   projectId: string,
 ): Promise<CommonResponse<ProjectItem>> {
-  if (projectId == '1') {
-    return {
-      code: 0,
-      msg: '',
-      data: {
-        project_id: '1',
-        ...project_data,
-      },
-    }
-  }
+  // if (projectId == '1') {
+  //   return {
+  //     code: 0,
+  //     msg: '',
+  //     data: {
+  //       project_id: '1',
+  //       ...project_data,
+  //     },
+  //   }
+  // }
 
   const resp = await fetch(`/api/project/${projectId}`)
   const data = await resp.json()
