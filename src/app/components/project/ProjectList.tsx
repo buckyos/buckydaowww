@@ -46,7 +46,7 @@ export default function ProjectList() {
           >
             <div
               onClick={() => {
-                router.push(`/projects/${item.project_id}`)
+                router.push(`/projects/${item.id}`)
               }}
               className='text-cyfs-green font-bold hover:underline cursor-pointer'
             >
