@@ -2,9 +2,7 @@
 import ProjectList from '@components/project/ProjectList'
 import { Timeline } from 'antd'
 
-// TODO 版本详情页
-// TODO 项目详情页
-export default function ProjectsPage() {
+const ProjectRoadmap = () => {
   return (
     <>
       <div className='text-2xl font-medium my-20'>
@@ -39,7 +37,14 @@ export default function ProjectsPage() {
           ]}
         />
       </div>
+    </>
+  )
+}
 
+export default function ProjectsPage() {
+  return (
+    <>
+      {/* <ProjectRoadmap /> */}
       <div className='text-2xl font-medium my-6'>Project Dashboard</div>
       <ProjectList />
     </>

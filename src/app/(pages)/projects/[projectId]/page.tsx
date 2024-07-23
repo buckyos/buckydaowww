@@ -16,18 +16,6 @@ const ProjectDetail = () => {
       <ProjectInfo project={project} loading={isLoading} />
       <Versions project_name={project?.project_name} />
 
-      {/* <p className=''>project description: {project?.github_url}</p> */}
-
-      {/* <ProjectLogLine project_logs={project?.project_logs} /> */}
-
-      {/* <div className='mt-10'>status</div> */}
-      {/* <ProjectActionCallingLeader /> */}
-      {/* <ProjectActionInDevelopment /> */}
-      {/* <ProjectActionComplete /> */}
-
-      {/* <div>Release</div> */}
-      {/* <div>Verified</div> */}
-
       <CreateVersionModal />
     </>
   )

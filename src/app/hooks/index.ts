@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
-import { bindAddress, getProjectDetail } from '@services/index'
+import { bindAddress, fetchRepositoryList } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
 import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
@@ -133,10 +133,20 @@ function useGetProjectQuery(id: string) {
   const [isLoading, setIsLoading] = useState(true)
   //  const [error, setError] = useState<Error>()
   useAsyncEffect(async () => {
-    getProjectDetail(id).then((result) => {
-      setData(result.data)
-      setIsLoading(false)
-    })
+    // 没有单独的项目详情接口,
+    // 需要先获取项目列表,然后再找到对应的项目
+    const result = await fetchRepositoryList()
+    if (result.code == 0) {
+      const project = result.data
+        .map((item) => {
+          return JSON.parse(item.detail) as ProjectItem
+        })
+        .find((item) => item.id == id)
+      if (project) {
+        setData(project)
+      }
+    }
+    setIsLoading(false)
   }, [])
 
   return { data, isLoading }

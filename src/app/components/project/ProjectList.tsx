@@ -29,19 +29,19 @@ export default function ProjectList() {
 
   return (
     <div className='border border-solid border-gray-100 rounded-xl py-10 px-2 shadow-gray-200 min-h-[400px]'>
-      <div className='grid grid-cols-4 text-center font-bold mb-4'>
+      <div className='grid grid-cols-6 text-center font-bold mb-4'>
         <div>Project name</div>
         <div>Date</div>
-        {/* <div>Version</div> */}
         <div>Repo</div>
+        <div>Stage</div>
+        <div>Version</div>
         <div>Status</div>
-        <div></div>
       </div>
 
       {projects.map((item) => {
         return (
           <div
-            className='grid grid-cols-4 text-center py-4 text-black-primary'
+            className='grid grid-cols-6 text-center py-4 text-black-primary'
             key={item.project_name}
           >
             <div
@@ -60,17 +60,12 @@ export default function ProjectList() {
                 </a>
               </div>
             </div>
+
+            <div>{item.current_version}</div>
+            <div>{item.stage}</div>
             <div className='flex-center'>
               <Tag text={item.state} color='green' />
             </div>
-            {/* <div> */}
-            {/*   <a */}
-            {/*     className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg cursor-pointer text-sm' */}
-            {/*     onClick={onCreateVersion} */}
-            {/*   > */}
-            {/*     create version */}
-            {/*   </a> */}
-            {/* </div> */}
           </div>
         )
       })}

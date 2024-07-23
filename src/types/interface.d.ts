@@ -144,6 +144,7 @@ interface RepositoryItem {
 }
 
 interface ProjectItem {
+  id: string
   project_id: string
   project_name: string
   state: string
