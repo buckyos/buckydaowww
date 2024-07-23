@@ -144,6 +144,7 @@ interface ProjectItem {
   state: string
   date: string
   current_version: string
+  stage: string
   github_url: string
   descption: string
   project_logs?: ProjectLogsDefine[]

@@ -14,24 +14,35 @@ export async function fetchProposalId(proposalId: string) {
   return data
 }
 
-export async function fetchProjectList(): Promise<ProjectItem[]> {
-  const resp = await fetch('/api/project')
-  const result = await resp.json()
-
-  // 这个OPENDAN aios项目固定
-  if (result.data.items.length == 0) {
-    return [
-      {
-        project_id: '1',
-        ...project_data,
-      },
-    ]
-  } else {
-    return result.data.items
-  }
+// 获取项目（仓库）列表
+export async function fetchRepositoryList(): Promise<
+  CommonResponse<ProjectItem[]>
+> {
+  const resp = await fetch('/api/repo/detail')
+  const data = await resp.json()
+  return data
 }
 
+// 获取项目（版本）列表
+// export async function fetchProjectList(): Promise<ProjectItem[]> {
+//   const resp = await fetch('/api/project')
+//   const result = await resp.json()
 //
+//   // 这个OPENDAN aios项目固定
+//   if (result.data.items.length == 0) {
+//     return [
+//       {
+//         project_id: '1',
+//         ...project_data,
+//       },
+//     ]
+//   } else {
+//     return result.data.items
+//   }
+// }
+
+// edit user info
+// 修改用户信息
 export async function PostUserExtraInfo(
   jwt: string,
   job: string,

@@ -4,14 +4,20 @@ import { useAsyncEffect } from 'ahooks'
 import { useState } from 'react'
 import Tag from '@components/Tag'
 import { GithubOutlined } from '@ant-design/icons'
-import { fetchProjectList } from '@services/index'
+import { fetchRepositoryList } from '@services/index'
+import { message } from 'antd'
 
 export default function ProjectList() {
   const [projects, setProjects] = useState<ProjectItem[]>([])
   const router = useRouter()
   useAsyncEffect(async () => {
-    const projects = await fetchProjectList()
-    setProjects(projects)
+    const result = await fetchRepositoryList()
+    if (result.code == 0) {
+      console.log('ProjectList result', result)
+      setProjects(projects)
+    } else {
+      message.error(result.msg)
+    }
   }, [])
 
   // const onCreateVersion = () => {
