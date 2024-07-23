@@ -138,6 +138,11 @@ interface CreateVersionDefine {
   descption: string
 }
 
+interface RepositoryItem {
+  name: string
+  detail: string
+}
+
 interface ProjectItem {
   project_id: string
   project_name: string

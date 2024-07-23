@@ -13,8 +13,11 @@ export default function ProjectList() {
   useAsyncEffect(async () => {
     const result = await fetchRepositoryList()
     if (result.code == 0) {
-      console.log('ProjectList result', result)
-      setProjects(projects)
+      const data = result.data.map((item) => {
+        return JSON.parse(item.detail) as ProjectItem
+      })
+      console.log('ProjectList result', result, data)
+      setProjects(data)
     } else {
       message.error(result.msg)
     }

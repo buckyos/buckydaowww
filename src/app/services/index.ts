@@ -16,7 +16,7 @@ export async function fetchProposalId(proposalId: string) {
 
 // 获取项目（仓库）列表
 export async function fetchRepositoryList(): Promise<
-  CommonResponse<ProjectItem[]>
+  CommonResponse<RepositoryItem[]>
 > {
   const resp = await fetch('/api/repo/detail')
   const data = await resp.json()
