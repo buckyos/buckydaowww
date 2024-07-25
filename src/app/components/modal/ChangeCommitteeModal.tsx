@@ -9,6 +9,7 @@ import useUserStore from '@hooks/useUserStore'
 import { extractMessage, transactionWait } from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { fetchMembers } from '@services/index'
+import _ from 'lodash'
 
 const ChangeCommitteeModal: React.FC<{
   showModal: boolean
@@ -33,7 +34,18 @@ const ChangeCommitteeModal: React.FC<{
 
   const onChnageCommitteeProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
+    // 检查委员会地址不重复
+    const addresses = (values.committee as CommitteeMember[]).map(
+      (item) => item.address,
+    )
+    const hasDuplicates = _.uniq(addresses).length !== addresses.length
+    if (hasDuplicates) {
+      message.error('Committee address cannot be repeated')
+      return
+    }
+
     setIsSubmitting(true)
+
     // const fn = async () => {
     //   const comitteeContract = await contract.getSignerComitteeContract()
     //   const tx = await comitteeContract.perpareContractUpgrade(
@@ -100,7 +112,12 @@ const ChangeCommitteeModal: React.FC<{
           )}
 
           {committee.length > 0 && (
-            <Form.List name='committee' initialValue={committee}>
+            <Form.List
+              name='committee'
+              initialValue={committee.map((item) => ({
+                address: item.address,
+              }))}
+            >
               {(fields, { add, remove }) => (
                 <>
                   <div>
@@ -149,9 +166,12 @@ const ChangeCommitteeModal: React.FC<{
               )}
             </Form.List>
           )}
-          <Button loading={isSubmitting} type='primary' htmlType='submit'>
-            Change Committee
-          </Button>
+
+          <div className='flex justify-center'>
+            <Button loading={isSubmitting} type='primary' htmlType='submit'>
+              Change Committee
+            </Button>
+          </div>
         </Form>
       </Spin>
     </Modal>
