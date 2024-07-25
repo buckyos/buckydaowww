@@ -93,67 +93,65 @@ const ChangeCommitteeModal: React.FC<{
           style={{ width: '100%' }}
           autoComplete='off'
         >
-          <div className='flex justify-center'>
-            {loading && (
-              <div className='flex-center py-10'>
-                <Spin />
-              </div>
-            )}
+          {loading && (
+            <div className='flex-center py-10'>
+              <Spin />
+            </div>
+          )}
 
-            {committee.length > 0 && (
-              <Form.List name='committee' initialValue={committee}>
-                {(fields, { add, remove }) => (
-                  <>
-                    <div>
-                      {fields.map(({ key, name }, index) => {
-                        return (
-                          <div
-                            key={key}
-                            className='flex items-center justify-between gap-10'
+          {committee.length > 0 && (
+            <Form.List name='committee' initialValue={committee}>
+              {(fields, { add, remove }) => (
+                <>
+                  <div>
+                    {fields.map(({ key, name }, index) => {
+                      return (
+                        <div
+                          key={key}
+                          className='flex items-center justify-between gap-10'
+                        >
+                          <Form.Item
+                            className='w-full'
+                            name={[name, 'address']}
+                            rules={[
+                              {
+                                required: true,
+                                message: 'committee address is required',
+                              },
+                            ]}
                           >
-                            <Form.Item
-                              className='w-full'
-                              name={[name, 'address']}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: 'committee address is required',
-                                },
-                              ]}
-                            >
-                              <Input placeholder='Committee Address ' />
-                            </Form.Item>
+                            <Input placeholder='Committee Address ' />
+                          </Form.Item>
 
-                            <MinusCircleOutlined
-                              style={{ fontSize: '20px' }}
-                              className='dynamic-delete-button mb-6 mr-6'
-                              onClick={() => {
-                                if (fields.length < 3) {
-                                  message.error(
-                                    'At least three committee members must be ensured.',
-                                  )
-                                } else {
-                                  remove(index)
-                                }
-                              }}
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <Form.Item>
-                      <Button onClick={() => add()} icon={<PlusOutlined />}>
-                        Add committee
-                      </Button>
-                    </Form.Item>
-                  </>
-                )}
-              </Form.List>
-            )}
-            <Button loading={isSubmitting} type='primary' htmlType='submit'>
-              Change Committee
-            </Button>
-          </div>
+                          <MinusCircleOutlined
+                            style={{ fontSize: '20px' }}
+                            className='dynamic-delete-button mb-6 mr-6'
+                            onClick={() => {
+                              if (fields.length < 3) {
+                                message.error(
+                                  'At least three committee members must be ensured.',
+                                )
+                              } else {
+                                remove(index)
+                              }
+                            }}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <Form.Item>
+                    <Button onClick={() => add()} icon={<PlusOutlined />}>
+                      Add committee
+                    </Button>
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
+          )}
+          <Button loading={isSubmitting} type='primary' htmlType='submit'>
+            Change Committee
+          </Button>
         </Form>
       </Spin>
     </Modal>
