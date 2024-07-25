@@ -17,8 +17,8 @@ const ChangeCommitteeModal: React.FC<{
 }> = ({ showModal, setShowModal }) => {
   const [committee, setCommittee] = useState<CommitteeMember[]>([])
   const [loading, setLoading] = useState(false)
-
   const [isSubmitting, setIsSubmitting] = useState(false)
+
   const contract = useContractStore()
   const user = useUserStore()
 
@@ -34,6 +34,7 @@ const ChangeCommitteeModal: React.FC<{
 
   const onChnageCommitteeProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
+
     // 检查委员会地址不重复
     const addresses = (values.committee as CommitteeMember[]).map(
       (item) => item.address,
@@ -41,6 +42,12 @@ const ChangeCommitteeModal: React.FC<{
     const hasDuplicates = _.uniq(addresses).length !== addresses.length
     if (hasDuplicates) {
       message.error('Committee address cannot be repeated')
+      return
+    }
+
+    // 检查委员会成员数量
+    if (addresses.length < 3) {
+      message.error('At least three committee members must be ensured.')
       return
     }
 
