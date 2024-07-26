@@ -8,6 +8,9 @@ import { proposalSetExtraAndParams } from '@services/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 
+// proposal 投票
+export * from './vote'
+
 async function chnageCommitteeProposal(
   values: StoreValue,
   contract: ContractStoreDefine,
@@ -64,6 +67,7 @@ async function getSymbol(tokenAddress: string): Promise<string> {
   return symbol
 }
 
+// 结束两步投资
 async function endInvestment(id: string, contract: ContractStoreDefine) {
   const twoStepInvestmentContract =
     await contract.getTwoStepInvestMentContract()
@@ -78,6 +82,7 @@ async function endInvestment(id: string, contract: ContractStoreDefine) {
   return true
 }
 
+// 认购份额(白名单)
 async function subscribeInvestmentShare(
   values: StoreValue,
   contract: ContractStoreDefine,
@@ -116,6 +121,7 @@ async function subscribeInvestmentShare(
   return true
 }
 
+// 创建白名单投资
 async function createWhitelistInvestment(
   values: StoreValue,
   contract: ContractStoreDefine,
@@ -172,6 +178,7 @@ async function createWhitelistInvestment(
     }
   }
 
+  // 结束时间
   const now = dayjs().unix()
   const step1Duration = toBigInt(dayjs(values.endTime).unix() - now).toString()
   const step2Duration = toBigInt(dayjs(values.endTime2).unix() - now).toString()
@@ -193,9 +200,9 @@ async function createWhitelistInvestment(
   }
   console.log('🍻 createWhitelistInvestment startParams :', startParams)
 
+  // 启动两步投资
   const twoStepInvestmentContract =
     await contract.getTwoStepInvestMentContract()
-
   const tx = await twoStepInvestmentContract.startInvestment(startParams)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {

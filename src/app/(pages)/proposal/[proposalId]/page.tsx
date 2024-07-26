@@ -28,6 +28,7 @@ import {
   proposalTypeMap,
 } from '@utils/index'
 import { useUserStore, useContractStore } from '@hooks/index'
+import { voteChangeCommittee, voteUpgradeContract } from '@contracts/index'
 
 dayjs.extend(relativeTime)
 
@@ -142,18 +143,19 @@ export default function ProposalDetailPage() {
     ])
     return tx
   }
-  const voteUpgradeContract = async () => {
-    const committeeContract = await contract.getSignerComitteeContract()
-    const contractProxyAddress = proposal?.params[0]
-    const implAddress = proposal?.params[1]
-    const upgradeContract = proposal?.params[2]
-    const tx = await committeeContract.support(proposalId, [
-      ethers.zeroPadValue(contractProxyAddress as string, 32),
-      ethers.zeroPadValue(implAddress as string, 32),
-      ethers.encodeBytes32String(upgradeContract),
-    ])
-    return tx
-  }
+  // deprecated
+  // const voteUpgradeContract = async () => {
+  //   const committeeContract = await contract.getSignerComitteeContract()
+  //   const contractProxyAddress = proposal?.params[0]
+  //   const implAddress = proposal?.params[1]
+  //   const upgradeContract = proposal?.params[2]
+  //   const tx = await committeeContract.support(proposalId, [
+  //     ethers.zeroPadValue(contractProxyAddress as string, 32),
+  //     ethers.zeroPadValue(implAddress as string, 32),
+  //     ethers.encodeBytes32String(upgradeContract),
+  //   ])
+  //   return tx
+  // }
 
   const voteSupportInvestment = async () => {
     console.log('handleSupport', proposal?.investment)
@@ -190,7 +192,9 @@ export default function ProposalDetailPage() {
     } else if (proposalType === proposalTypeMap.SettlementVersion) {
       tx = await voteSupportSettlementVersion()
     } else if (proposalType === proposalTypeMap.UpgradeContract) {
-      tx = await voteUpgradeContract()
+      tx = await voteUpgradeContract(contract, proposalId, proposal?.params!)
+    } else if (proposalType === proposalTypeMap.ChangeCommittee) {
+      tx = await voteChangeCommittee(contract, proposalId, proposal?.params!)
     } else {
       message.error('not support proposal type: ' + proposalType)
       return

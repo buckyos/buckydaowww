@@ -67,7 +67,7 @@ const getProposalType = (proposal: ProposalResponseData) => {
   if (proposalType === 'upgradeContract') {
     return proposalTypeMap.UpgradeContract
   }
-  if (proposalType === 'setCommittees') {
+  if (proposalType === proposalTypeMap.ChangeCommittee) {
     return proposalTypeMap.ChangeCommittee
   }
 
