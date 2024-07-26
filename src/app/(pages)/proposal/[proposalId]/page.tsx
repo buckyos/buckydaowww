@@ -205,8 +205,8 @@ export default function ProposalDetailPage() {
     }
 
     const receipt = await transactionWait(tx)
+    setSupportLoading(false)
     if (receipt?.status !== 1) {
-      setSupportLoading(false)
       message.error('Failed to vote')
       return
     }
