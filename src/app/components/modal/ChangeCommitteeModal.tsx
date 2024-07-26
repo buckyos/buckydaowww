@@ -1,14 +1,14 @@
 'use client'
 import { Dispatch, SetStateAction, useState } from 'react'
+import TextArea from 'antd/es/input/TextArea'
 import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin } from 'antd'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
-import useContractStore from '@hooks/useContract'
-import useUserStore from '@hooks/useUserStore'
-import { extractMessage, transactionWait } from '@utils/index'
-import { proposalSetExtraAndParams } from '@services/index'
+import { useContractStore, useUserStore } from '@hooks/index'
+import { extractMessage } from '@utils/index'
 import { fetchMembers } from '@services/index'
+import { chnageCommitteeProposal } from '@contracts/index'
 import _ from 'lodash'
 
 const ChangeCommitteeModal: React.FC<{
@@ -53,40 +53,8 @@ const ChangeCommitteeModal: React.FC<{
 
     setIsSubmitting(true)
 
-    // const fn = async () => {
-    //   const comitteeContract = await contract.getSignerComitteeContract()
-    //   const tx = await comitteeContract.perpareContractUpgrade(
-    //     values.contractProxyAddress,
-    //     values.implAddress,
-    //   )
-    //
-    //   const receipt = await transactionWait(tx)
-    //   if (receipt?.status !== 1) {
-    //     console.warn('transaction status:', receipt?.status, tx)
-    //     message.error(
-    //       `Create upgrade contract proposal failed[3][${receipt?.status}]`,
-    //     )
-    //     return
-    //   }
-    //   const result = await proposalSetExtraAndParams(
-    //     user.jwt,
-    //     [values.contractProxyAddress, values.implAddress, 'upgradeContract'],
-    //     values.title,
-    //     values.content,
-    //     receipt.hash,
-    //   )
-    //   if (result.code !== 0) {
-    //     message.error(
-    //       'Create upgrade contract proposal failed[4], please try again later',
-    //     )
-    //   } else {
-    //     message.success('Create upgrade contract proposal success')
-    //     setShowModal(false)
-    //   }
-    // }
-
     try {
-      // await fn()
+      await chnageCommitteeProposal(values, contract, user.jwt)
     } catch (e) {
       let msg = extractMessage(e)
       message.error(`Create proposal failed[1][${msg}]`, 10)
@@ -112,6 +80,21 @@ const ChangeCommitteeModal: React.FC<{
           style={{ width: '100%' }}
           autoComplete='off'
         >
+          <Form.Item
+            name='title'
+            rules={[{ required: true, message: 'Please input title ' }]}
+          >
+            <Input className='' placeholder='title' />
+          </Form.Item>
+
+          <Form.Item name='content'>
+            <TextArea
+              className=''
+              placeholder='proposal'
+              autoSize={{ minRows: 3, maxRows: 5 }}
+            />
+          </Form.Item>
+
           {loading && (
             <div className='flex-center py-10'>
               <Spin />

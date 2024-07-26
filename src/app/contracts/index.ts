@@ -4,8 +4,57 @@ import { ethers, toBigInt, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
 import { getProvider, getTokenContract } from '@hooks/index'
+import { proposalSetExtraAndParams } from '@services/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
+
+async function chnageCommitteeProposal(
+  values: StoreValue,
+  contract: ContractStoreDefine,
+  jwt: string,
+) {
+  const addresses = (values.committee as CommitteeMember[]).map(
+    (item) => item.address,
+  )
+  const title = values.title
+  if (!title) {
+    message.error('Please enter a title')
+    return false
+  }
+  const content = values.content
+
+  // create proposal
+  const comitteeContract = await contract.getSignerComitteeContract()
+  const tx = await comitteeContract.prepareSetCommittees(addresses)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(
+      `Create upgrade contract proposal failed[3][${receipt?.status}]`,
+    )
+    return false
+  }
+
+  // make vote params
+  const params = addresses.map((addr) => ethers.zeroPadValue(addr, 32))
+  params.push(ethers.encodeBytes32String('setCommittees'))
+
+  const result = await proposalSetExtraAndParams(
+    jwt,
+    params,
+    title,
+    content,
+    receipt.hash,
+  )
+  if (result.code !== 0) {
+    message.error(
+      'Create change committee proposal failed, please try again later',
+    )
+    return false
+  }
+
+  return true
+}
 
 // 获取token 的symbol
 async function getSymbol(tokenAddress: string): Promise<string> {
@@ -163,4 +212,5 @@ export {
   createWhitelistInvestment,
   subscribeInvestmentShare,
   endInvestment,
+  chnageCommitteeProposal,
 }

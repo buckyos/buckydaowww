@@ -16,6 +16,25 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "oldMembers",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "newMembers",
+        "type": "address[]"
+      }
+    ],
+    "name": "MemberChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "member",
@@ -352,6 +371,25 @@
   {
     "inputs": [
       {
+        "internalType": "address[]",
+        "name": "newCommittees",
+        "type": "address[]"
+      }
+    ],
+    "name": "prepareSetCommittees",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "proposalId",
         "type": "uint256"
@@ -467,6 +505,24 @@
       }
     ],
     "name": "removeCommitteeMember",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "newCommittees",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCommittees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
