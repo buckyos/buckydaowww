@@ -16,6 +16,7 @@ import {
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { ProposalState } from '@vars/index'
+import { executeChangeCommittee } from '@contracts/index'
 
 interface ExecuteProposalButtonProps {
   proposal: ProposalResponseData
@@ -50,6 +51,16 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
         )
       } else if (proposalType === proposalTypeMap.UpgradeContract) {
         await executeUpgradeContract()
+      } else if (proposalType === proposalTypeMap.ChangeCommittee) {
+        await executeChangeCommittee(
+          contract,
+          proposal.id,
+          // remove the last element which is the type of the proposal
+          proposal.params.filter(
+            (_, index) => index < proposal.params.length - 1,
+          ) as string[],
+          'Execute change committee proposal success',
+        )
       } else {
         message.error('This proposal type error')
       }

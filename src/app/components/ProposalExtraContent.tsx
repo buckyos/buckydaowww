@@ -22,7 +22,7 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
       {proposalType === proposalTypeMap.ChangeCommittee && (
         <>
           <div className='pt-20'>
-            <div className='text-3xl'>New Committe list:</div>
+            <div className='text-3xl'>New Committee list:</div>
 
             {proposal.params.map((paddedAddress: string, index: number) => {
               // 数组最后一个是类型，不是地址

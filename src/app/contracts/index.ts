@@ -8,8 +8,8 @@ import { proposalSetExtraAndParams } from '@services/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 
-// proposal 投票
-export * from './vote'
+export * from './vote' // proposal 投票
+export * from './execute'
 
 async function chnageCommitteeProposal(
   values: StoreValue,
