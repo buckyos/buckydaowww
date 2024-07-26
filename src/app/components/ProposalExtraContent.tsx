@@ -1,4 +1,6 @@
+'use client'
 import { Tag } from 'antd'
+import { getAddress } from 'ethers'
 import { wrapUnits } from '@utils/numberConverter'
 import _ from 'lodash'
 import { getProposalType, proposalTypeMap } from '@utils/index'
@@ -22,8 +24,8 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
           <div className='pt-20'>
             <div className='text-3xl'>New Committe list:</div>
 
-            {proposal.params.map((item: string, index: number) => {
-              // 数组最后一个是类型，不是�址
+            {proposal.params.map((paddedAddress: string, index: number) => {
+              // 数组最后一个是类型，不是地址
               if (index == proposal.params.length - 1) {
                 return null
               }
@@ -31,7 +33,7 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
               return (
                 <div key={index} className='mt-4'>
                   <Tag>Committe Address:</Tag>
-                  <div>{item}</div>
+                  <div>{getAddress(paddedAddress.replace(/^0x0*/, '0x'))}</div>
                 </div>
               )
             })}
