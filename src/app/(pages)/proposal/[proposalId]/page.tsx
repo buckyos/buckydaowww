@@ -63,6 +63,7 @@ export default function ProposalDetailPage() {
   const [proposal, setProposal] = useState<ProposalResponseData>()
   const [isVote, setIsVote] = useState(false)
   const [supportLoading, setSupportLoading] = useState(false)
+  const [rejectLoading, setRejectLoading] = useState(false)
   // const [committeeCount, setCommitteeLength] = useState<number>(0)
   const [supportPercent, setSupportPercent] = useState<number>(0)
   const [rejectPercent, setRejectPercent] = useState<number>(0)
@@ -219,6 +220,7 @@ export default function ProposalDetailPage() {
   })
 
   const handleReject = errorWrap(async () => {
+    setRejectLoading(true)
     const committeeContract = await contract.getSignerComitteeContract()
     const proposalType = getProposalType(proposal!)
     let tx
@@ -235,11 +237,13 @@ export default function ProposalDetailPage() {
         ethers.encodeBytes32String('abortInvestment'),
       ])
     } else {
+      setRejectLoading(false)
       message.error('not support proposal type: ' + proposalType)
       return
     }
     console.log('result', tx)
     const receipt = await tx.wait(1, 60000)
+    setRejectLoading(false)
     if (receipt?.status !== 1) {
       message.error('Failed to vote')
       return
@@ -299,7 +303,12 @@ export default function ProposalDetailPage() {
                 >
                   Agree
                 </Button>
-                <Button onClick={handleReject} className='' disabled={!isVote}>
+                <Button
+                  onClick={handleReject}
+                  className=''
+                  loading={rejectLoading}
+                  disabled={!isVote}
+                >
                   Disagree
                 </Button>
               </div>
