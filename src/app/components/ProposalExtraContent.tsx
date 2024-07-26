@@ -6,6 +6,9 @@ import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
 import VersionDescription from '@components/VersionDesciption'
 
+// 提起的内容区，额外的内容
+// 应该拆开每一个类型单独的组件
+// 暂时先这样
 const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
   proposal,
 }) => {
@@ -14,6 +17,27 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
 
   return (
     <>
+      {proposalType === proposalTypeMap.ChangeCommittee && (
+        <>
+          <div className='pt-20'>
+            <div className='text-3xl'>New Committe list:</div>
+
+            {proposal.params.map((item: string, index: number) => {
+              // 数组最后一个是类型，不是�址
+              if (index == proposal.params.length - 1) {
+                return null
+              }
+
+              return (
+                <div key={index} className='mt-4'>
+                  <Tag>Committe Address:</Tag>
+                  <div>{item}</div>
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
       {proposalType === proposalTypeMap.releaseTokens && (
         <>
           <div className='pt-20'>
