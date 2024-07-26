@@ -2,6 +2,7 @@ import { nowTimestamp, timeago } from '@utils/time'
 import { ethers } from 'ethers'
 import _ from 'lodash'
 import { message } from 'antd'
+import { decodeIfEncoded } from '@utils/encode'
 
 const proposalExpiredTimeDisplay = (expired: number) => {
   const prefix =
@@ -50,12 +51,13 @@ enum proposalTypeMap {
   releaseTokens = 'releaseTokens',
   SettlementVersion = 'acceptProject',
   UpgradeContract = 'upgradeContract',
+  ChangeCommittee = 'setCommittees',
   unknown = '',
 }
 
 // 获取提案类型
 const getProposalType = (proposal: ProposalResponseData) => {
-  const proposalType = _.last(proposal.params)
+  const proposalType = decodeIfEncoded(_.last(proposal.params))
   if (proposalType === 'releaseTokens') {
     return proposalTypeMap.releaseTokens
   }
@@ -64,6 +66,9 @@ const getProposalType = (proposal: ProposalResponseData) => {
   }
   if (proposalType === 'upgradeContract') {
     return proposalTypeMap.UpgradeContract
+  }
+  if (proposalType === 'setCommittees') {
+    return proposalTypeMap.ChangeCommittee
   }
 
   if (!!proposal.investment) {

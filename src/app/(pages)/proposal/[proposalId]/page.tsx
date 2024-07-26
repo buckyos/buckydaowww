@@ -1,6 +1,5 @@
 'use client'
-import useUserStore from '@hooks/useUserStore'
-import useContractStore from '@hooks/useContract'
+import { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { useParams } from 'next/navigation'
 import {
@@ -8,12 +7,10 @@ import {
   fetchMembers,
   // updateProposalInfomation,
 } from '@services/index'
-import { useState } from 'react'
 import { Button, Progress, Tag, message } from 'antd'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ethers } from 'ethers'
-import { zeroPadLeft } from '@utils/index'
 import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
 import { solidityPackedKeccak256 } from 'ethers'
 import _ from 'lodash'
@@ -22,12 +19,15 @@ import UpdateProposalModal from '@components/proposal/UpdateProposalModal'
 import ProposalExtraContent from '@components/ProposalExtraContent'
 import ProposalStateLine from '@components/ProposalStateLine'
 import ProposalType from '@components/proposal/ProposalType'
-import { extractMessage, transactionWait } from '@utils/index'
 import {
+  zeroPadLeft,
+  extractMessage,
+  transactionWait,
   getProposalType,
   checkProposalVote,
   proposalTypeMap,
 } from '@utils/index'
+import { useUserStore, useContractStore } from '@hooks/index'
 
 dayjs.extend(relativeTime)
 
