@@ -54,7 +54,16 @@ const ChangeCommitteeModal: React.FC<{
     setIsSubmitting(true)
 
     try {
-      await chnageCommitteeProposal(values, contract, user.jwt)
+      // 提交委员会变更提案
+      const isOk = await chnageCommitteeProposal(values, contract, user.jwt)
+      if (isOk) {
+        message.success(
+          'Change committee proposal submitted successfully, reloading...',
+        )
+        setTimeout(() => {
+          setShowModal(false)
+        }, 1500)
+      }
     } catch (e) {
       let msg = extractMessage(e)
       message.error(`Create proposal failed[1][${msg}]`, 10)
