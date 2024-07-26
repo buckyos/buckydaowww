@@ -21,7 +21,7 @@ async function chnageCommitteeProposal(
     message.error('Please enter a title')
     return false
   }
-  const content = values.content
+  const content = values.content || ''
 
   // create proposal
   const comitteeContract = await contract.getSignerComitteeContract()
