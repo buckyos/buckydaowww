@@ -46,10 +46,10 @@ const ChangeCommitteeModal: React.FC<{
     }
 
     // 检查委员会成员数量
-    if (addresses.length < 3) {
-      message.error('At least three committee members must be ensured.')
-      return
-    }
+    // if (addresses.length < 3) {
+    //   message.error('At least three committee members must be ensured.')
+    //   return
+    // }
 
     setIsSubmitting(true)
 
