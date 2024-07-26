@@ -62,6 +62,7 @@ export default function ProposalDetailPage() {
 
   const [proposal, setProposal] = useState<ProposalResponseData>()
   const [isVote, setIsVote] = useState(false)
+  const [supportLoading, setSupportLoading] = useState(false)
   // const [committeeCount, setCommitteeLength] = useState<number>(0)
   const [supportPercent, setSupportPercent] = useState<number>(0)
   const [rejectPercent, setRejectPercent] = useState<number>(0)
@@ -80,6 +81,7 @@ export default function ProposalDetailPage() {
   }
 
   useAsyncEffect(async () => {
+    // 获取提案信息
     const proposal = await fetchData()
     const data = await fetchMembers()
     const memberCount = data.data.length
@@ -181,6 +183,7 @@ export default function ProposalDetailPage() {
 
   // 投赞成票
   const handleSupport = errorWrap(async () => {
+    setSupportLoading(true)
     const proposalType = getProposalType(proposal!)
     let tx
     if (proposalType === proposalTypeMap.releaseTokens) {
@@ -196,15 +199,18 @@ export default function ProposalDetailPage() {
     } else if (proposalType === proposalTypeMap.ChangeCommittee) {
       tx = await voteChangeCommittee(contract, proposalId, proposal?.params!)
     } else {
+      setSupportLoading(false)
       message.error('not support proposal type: ' + proposalType)
       return
     }
 
     const receipt = await transactionWait(tx)
     if (receipt?.status !== 1) {
+      setSupportLoading(false)
       message.error('Failed to vote')
       return
     }
+
     message.success('Vote successfully. windwo refreshing...')
     _.delay(() => {
       window.location.reload()
@@ -288,6 +294,7 @@ export default function ProposalDetailPage() {
                   type='primary'
                   onClick={handleSupport}
                   className=''
+                  loading={supportLoading}
                   disabled={!isVote}
                 >
                   Agree
