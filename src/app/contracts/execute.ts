@@ -7,6 +7,7 @@ async function executeChangeCommittee(
   committeeList: string[],
   msg: string,
 ) {
+  console.log('🌍🌍🌍 executeChangeCommittee', contract, id, committeeList, msg)
   const committeeContract = await contract.getSignerComitteeContract()
 
   const tx = await committeeContract.setCommittees(committeeList, id)
