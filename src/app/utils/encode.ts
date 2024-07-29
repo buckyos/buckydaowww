@@ -1,4 +1,4 @@
-import { encodeBytes32String, decodeBytes32String } from 'ethers'
+import { getAddress, encodeBytes32String, decodeBytes32String } from 'ethers'
 
 // 判断字符串是否被 ethers.encodeBytes32String 编码过
 function isEncodedString(encodedString: string) {
@@ -39,4 +39,9 @@ function decodeIfEncoded(inputString: string) {
   }
 }
 
-export { decodeIfEncoded }
+// 还原 zeroPadValue 处理过的地址
+function decodePaddedAddress(paddedAddress: string) {
+  return getAddress(paddedAddress.replace(/^0x0*/, '0x'))
+}
+
+export { decodeIfEncoded, decodePaddedAddress }
