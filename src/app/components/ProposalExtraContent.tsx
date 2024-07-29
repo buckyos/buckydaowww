@@ -1,9 +1,12 @@
 'use client'
 import { Tag } from 'antd'
-import { getAddress } from 'ethers'
 import { wrapUnits } from '@utils/numberConverter'
 import _ from 'lodash'
-import { getProposalType, proposalTypeMap } from '@utils/index'
+import {
+  getProposalType,
+  proposalTypeMap,
+  decodePaddedAddress,
+} from '@utils/index'
 import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
 import VersionDescription from '@components/VersionDesciption'
@@ -33,7 +36,7 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
               return (
                 <div key={index} className='mt-4'>
                   <Tag>Committe Address:</Tag>
-                  <div>{getAddress(paddedAddress.replace(/^0x0*/, '0x'))}</div>
+                  <div>{decodePaddedAddress(paddedAddress)}</div>
                 </div>
               )
             })}

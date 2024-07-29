@@ -13,6 +13,7 @@ import {
   getProposalType,
   proposalTypeMap,
   transactionWait,
+  decodePaddedAddress,
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { ProposalState } from '@vars/index'
@@ -54,11 +55,13 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       } else if (proposalType === proposalTypeMap.ChangeCommittee) {
         await executeChangeCommittee(
           contract,
-          proposal.id,
+          proposal.id.toString(),
           // remove the last element which is the type of the proposal
-          proposal.params.filter(
-            (_, index) => index < proposal.params.length - 1,
-          ) as string[],
+          proposal.params
+            .filter((_, index) => index < proposal.params.length - 1)
+            .map((paddedAddress) =>
+              decodePaddedAddress(paddedAddress),
+            ) as string[],
           'Execute change committee proposal success',
         )
       } else {

@@ -2,7 +2,7 @@ import { nowTimestamp, timeago } from '@utils/time'
 import { ethers } from 'ethers'
 import _ from 'lodash'
 import { message } from 'antd'
-import { decodeIfEncoded } from '@utils/encode'
+import { decodeIfEncoded, decodePaddedAddress } from '@utils/encode'
 
 const proposalExpiredTimeDisplay = (expired: number) => {
   const prefix =
@@ -91,6 +91,7 @@ const checkProposalVote = (proposal: ProposalResponseData) => {
 }
 
 export {
+  decodePaddedAddress,
   transactionWait,
   proposalTypeMap,
   checkProposalVote,
