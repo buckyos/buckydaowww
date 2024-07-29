@@ -1,6 +1,8 @@
 import { transactionWait } from '@utils/index'
 import { message } from 'antd'
+import { contractProxyContract } from '@hooks/index'
 
+// 执行委员会变更
 async function executeChangeCommittee(
   contract: ContractStoreDefine,
   id: string,
@@ -20,4 +22,24 @@ async function executeChangeCommittee(
   return true
 }
 
-export { executeChangeCommittee }
+// 执行合约升级
+async function executeUpgradeContract(
+  contractAddress: string,
+  upgradeAddress: string,
+) {
+  const proxyContract = await contractProxyContract(contractAddress)
+  console.log('🍻 proposal :', proxyContract)
+  const tx = await proxyContract.upgradeToAndCall(
+    upgradeAddress,
+    new Uint8Array(0),
+  )
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`execute failed[3][${receipt?.status}]`)
+    return
+  }
+  message.success('Execute upgrade contract proposal success')
+}
+
+export { executeChangeCommittee, executeUpgradeContract }

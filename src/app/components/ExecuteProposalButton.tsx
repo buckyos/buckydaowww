@@ -17,7 +17,10 @@ import {
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { ProposalState } from '@vars/index'
-import { executeChangeCommittee } from '@contracts/index'
+import {
+  executeChangeCommittee,
+  executeUpgradeContract,
+} from '@contracts/index'
 
 interface ExecuteProposalButtonProps {
   proposal: ProposalResponseData
@@ -51,7 +54,8 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
           'Execute settlement version proposal success',
         )
       } else if (proposalType === proposalTypeMap.UpgradeContract) {
-        await executeUpgradeContract()
+        // await executeUpgradeContract()
+        await executeUpgradeContract(proposal.params[0], proposal.params[1])
       } else if (proposalType === proposalTypeMap.ChangeCommittee) {
         await executeChangeCommittee(
           contract,
@@ -75,21 +79,21 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
     setLoading(false)
   }
 
-  const executeUpgradeContract = async () => {
-    const proxyContract = await contractProxyContract(proposal.params[0])
-    console.log('🍻 proposal :', proxyContract)
-    const tx = await proxyContract.upgradeToAndCall(
-      proposal.params[1],
-      new Uint8Array(0),
-    )
-    const receipt = await transactionWait(tx)
-    if (receipt?.status !== 1) {
-      console.warn('transaction status:', receipt?.status, tx)
-      message.error(`execute failed[3][${receipt?.status}]`)
-      return
-    }
-    message.success('Execute upgrade contract  proposal success')
-  }
+  // const executeUpgradeContract = async () => {
+  //   const proxyContract = await contractProxyContract(proposal.params[0])
+  //   console.log('🍻 proposal :', proxyContract)
+  //   const tx = await proxyContract.upgradeToAndCall(
+  //     proposal.params[1],
+  //     new Uint8Array(0),
+  //   )
+  //   const receipt = await transactionWait(tx)
+  //   if (receipt?.status !== 1) {
+  //     console.warn('transaction status:', receipt?.status, tx)
+  //     message.error(`execute failed[3][${receipt?.status}]`)
+  //     return
+  //   }
+  //   message.success('Execute upgrade contract  proposal success')
+  // }
 
   const executeCreateVersion = async (msg: string) => {
     const projectContract = await getProjectContract(contract)
