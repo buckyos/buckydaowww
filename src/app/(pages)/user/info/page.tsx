@@ -1,14 +1,17 @@
 'use client'
-import useUserStore from '@hooks/useUserStore'
+import { useEffect, useState } from 'react'
 import { Button, Tag, Input, message } from 'antd'
-import { useBindWalletAddress, useLockToken } from '@hooks/index'
-import { parseToFloat, wrapUnits } from '@utils/numberConverter'
-import { useCommittee } from '@hooks/index'
-import useContractStore from '@hooks/useContract'
+import {
+  useCommittee,
+  useContractStore,
+  useBindWalletAddress,
+  useLockToken,
+  useUserStore,
+} from '@hooks/index'
 import TextArea from 'antd/es/input/TextArea'
 import { create } from 'zustand'
 import { PostUserExtraInfo } from '@services/index'
-import { useEffect, useState } from 'react'
+import { parseToFloat, wrapUnits } from '@utils/index'
 
 const useUserinfo = create<{
   job: string
