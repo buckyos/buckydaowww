@@ -28,5 +28,6 @@ next/.env.local
 api.bak
 
 /update.sh
+TODO.md
 
 # next
