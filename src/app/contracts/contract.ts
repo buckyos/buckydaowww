@@ -1,0 +1,103 @@
+import { ethers } from 'ethers'
+import { message } from 'antd'
+import { abis } from '@contracts/abis'
+// NEXT_PUBLIC_COMMITTEE = '0x2fc3186176B80EA829A7952b874F36f7cb8bd184'
+// NEXT_PUBLIC_DIVIDEND = '0x13EE4A506974a54E9eAA905C892Aa91664AaCcbA'
+// NEXT_PUBLIC_INVESTMENT = '0xf2C90A9dB663759668A52a94f616725D84744b67'
+// NEXT_PUBLIC_LOCKUP = '0x23d20B200D0a77138b3B354453F047fBdec68561'
+// NEXT_PUBLIC_MAIN = '0xb91d38d7fAc9618A5480309b8b4b5d675D5Ae472'
+// NEXT_PUBLIC_PROJECT = '0xb3C6876712142bC9161D6D357163E1A3a70179cC'
+// NEXT_PUBLIC_TOKEN = '0x30e066C857B7eBbAB4649a29A01D43962D70e44D'
+// NEXT_PUBLIC_TWOSTEP_INVESTMENT = '0xcBe0797b6206A955e12CD23706b370F8D1CEA34E'
+const COMMITTEE = process.env.NEXT_PUBLIC_COMMITTEE
+const DIVIDEND = process.env.NEXT_PUBLIC_DIVIDEND
+const INVESTMENT = process.env.NEXT_PUBLIC_INVESTMENT
+const LOCKUP = process.env.NEXT_PUBLIC_LOCKUP
+const MAIN = process.env.NEXT_PUBLIC_MAIN
+const PROJECT = process.env.NEXT_PUBLIC_PROJECT
+const TOKEN = process.env.NEXT_PUBLIC_TOKEN
+const TWOSTEP_INVESTMENT = process.env.NEXT_PUBLIC_TWOSTEP_INVESTMENT
+
+console.log('🔡 COMMITTEE contract address', COMMITTEE)
+console.log('🔡 DIVIDEND contract address', DIVIDEND)
+console.log('🔡 INVESTMENT contract address', INVESTMENT)
+console.log('🔡 LOCKUP contract address', LOCKUP)
+console.log('🔡 MAIN contract address', MAIN)
+console.log('🔡 PROJECT contract address', PROJECT)
+console.log('🔡 TOKEN contract address', TOKEN)
+console.log('🔡 TWOSTEP_INVESTMENT contract address', TWOSTEP_INVESTMENT)
+
+// cache contract instance
+const Contracts: {
+  [key: string]: ethers.Contract | undefined
+} = {
+  COMMITTEE: undefined,
+  DIVIDEND: undefined,
+  INVESTMENT: undefined,
+  LOCKUP: undefined,
+  MAIN: undefined,
+  PROJECT: undefined,
+  TOKEN: undefined,
+  TWOSTEP_INVESTMENT: undefined,
+}
+
+function generateContract(abi: any, key?: string, address?: string) {
+  if (address === undefined) throw new Error('address is undefined')
+  if (key === undefined) throw new Error('key is undefined')
+
+  return async function (): Promise<ethers.Contract> {
+    if (Contracts[key] !== undefined) {
+      console.log(key, 'get contract instance ', address)
+      return Contracts[key] as ethers.Contract
+    }
+
+    let provider = getProvider()
+    // const network = await provider.getNetwork()
+    // console.log(network)
+
+    const signer = await provider.getSigner()
+    const contract = new ethers.Contract(address, abi, signer)
+    console.log(key, 'contract initialized', address)
+
+    Contracts[key] = contract
+    return contract
+  }
+}
+
+function getProvider() {
+  if (!window.ethereum) {
+    message.error('Please install MetaMask first')
+    console.log('MetaMask not installed; using read-only defaults')
+    throw new Error('MetaMask not installed')
+    // let provider = ethers.getDefaultProvider(network)
+    // return provider
+  }
+
+  const provider = new ethers.BrowserProvider(window.ethereum)
+  console.log('provider', provider)
+  return provider
+}
+
+const getCommitteeContract = generateContract(abis, 'COMMITTEE', COMMITTEE)
+const getDividendContract = generateContract(abis, 'DIVIDEND', DIVIDEND)
+const getInvestmentContract = generateContract(abis, 'INVESTMENT', INVESTMENT)
+const getLockupContract = generateContract(abis, 'LOCKUP', LOCKUP)
+const getMainContract = generateContract(abis, 'MAIN', MAIN)
+const getProjectContract = generateContract(abis, 'PROJECT', PROJECT)
+const getTokenContract = generateContract(abis, 'TOKEN', TOKEN)
+const getTwoStepInvestmentContract = generateContract(
+  abis,
+  'TWOSTEP_INVESTMENT',
+  TWOSTEP_INVESTMENT,
+)
+
+export {
+  getCommitteeContract,
+  getDividendContract,
+  getInvestmentContract,
+  getLockupContract,
+  getMainContract,
+  getProjectContract,
+  getTokenContract,
+  getTwoStepInvestmentContract,
+}

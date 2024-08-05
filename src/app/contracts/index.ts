@@ -10,6 +10,7 @@ import { erc20 } from './abis'
 
 export * from './vote' // proposal 投票
 export * from './execute'
+export * from './contract'
 
 async function chnageCommitteeProposal(
   values: StoreValue,

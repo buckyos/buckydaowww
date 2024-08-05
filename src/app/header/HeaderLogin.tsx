@@ -1,6 +1,33 @@
 'use client'
+import { useState } from 'react'
 import useUserStore from '@hooks/useUserStore'
 import HeaderUserAvatar from './HeaderUserAvatar'
+import { useAsyncEffect } from 'ahooks'
+import { getTokenContract } from '@contracts/index'
+
+const HeaderRight = () => {
+  const user = useUserStore()
+  const [tokenAmount, setTokenAmount] = useState<number>(0)
+
+  useAsyncEffect(async () => {
+    if (user.user.address) {
+      const instance = await getTokenContract()
+      const token = await instance.balanceOf(user.user.address)
+      setTokenAmount(token)
+    }
+  }, [user])
+  return (
+    <>
+      <div className='flex-center gap-2'>
+        <div className='flex-center'>
+          <div>{tokenAmount ? tokenAmount : 0}</div>
+          <div>BDT</div>
+        </div>
+        <HeaderUserAvatar />
+      </div>
+    </>
+  )
+}
 
 const HeaderLogin = () => {
   const user = useUserStore()
@@ -16,7 +43,7 @@ const HeaderLogin = () => {
   }
 
   if (user.isLogin()) {
-    return <HeaderUserAvatar />
+    return <HeaderRight />
   }
 
   return (
