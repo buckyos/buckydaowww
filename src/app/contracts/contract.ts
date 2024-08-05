@@ -47,7 +47,7 @@ function generateContract(abi: any, key?: string, address?: string) {
 
   return async function (): Promise<ethers.Contract> {
     if (Contracts[key] !== undefined) {
-      console.log(key, 'get contract instance ', address)
+      console.log('[', key, '] get contract instance ', address, 'from cache')
       return Contracts[key] as ethers.Contract
     }
 
@@ -57,7 +57,7 @@ function generateContract(abi: any, key?: string, address?: string) {
 
     const signer = await provider.getSigner()
     const contract = new ethers.Contract(address, abi, signer)
-    console.log(key, 'contract initialized', address)
+    console.log('[', key, '] contract initialized', address)
 
     Contracts[key] = contract
     return contract
