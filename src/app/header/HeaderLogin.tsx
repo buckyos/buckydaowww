@@ -4,16 +4,19 @@ import useUserStore from '@hooks/useUserStore'
 import HeaderUserAvatar from './HeaderUserAvatar'
 import { useAsyncEffect } from 'ahooks'
 import { getTokenContract } from '@contracts/index'
+import { formatUnits } from 'ethers'
+import { Tag } from 'antd'
 
 const HeaderRight = () => {
   const user = useUserStore()
-  const [tokenAmount, setTokenAmount] = useState<number>(0)
+  const [tokenAmount, setTokenAmount] = useState<string>('')
 
   useAsyncEffect(async () => {
     if (user.user.address) {
       const instance = await getTokenContract()
       const token = await instance.balanceOf(user.user.address)
-      setTokenAmount(token)
+      console.log('token', token)
+      setTokenAmount(formatUnits(token, 18))
     }
   }, [user])
   return (
@@ -21,7 +24,7 @@ const HeaderRight = () => {
       <div className='flex-center gap-2'>
         <div className='flex-center'>
           <div>{tokenAmount ? tokenAmount : 0}</div>
-          <div>BDT</div>
+          <Tag>BDT</Tag>
         </div>
         <HeaderUserAvatar />
       </div>
