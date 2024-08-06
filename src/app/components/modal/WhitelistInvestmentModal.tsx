@@ -12,11 +12,13 @@ import {
   message,
   Spin,
   Checkbox,
+  Select,
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { createWhitelistInvestment } from '@contracts/index'
 import useContractStore from '@hooks/useContract'
 import { extractMessage } from '@utils/index'
+const { Option } = Select
 
 // 禁止选择今天之前的日期
 function disabledDate(current: Dayjs) {
@@ -154,7 +156,23 @@ const WhitelistInvestmentModal: React.FC<{
               },
             ]}
           >
-            <Input className='' placeholder="investor's token address" />
+            <Input
+              suffix={
+                <Select
+                  style={{ width: 130 }}
+                  onChange={(value) => {
+                    console.log('🍻 value :', value)
+                  }}
+                >
+                  <Option value={'0xc2132d05d31c914a87c6611c10748aeb04b58e8f'}>
+                    USDT
+                  </Option>
+                  <Option value={''}>clean</Option>
+                </Select>
+              }
+              className=''
+              placeholder="investor's token address"
+            />
           </Form.Item>
 
           <Form.Item
