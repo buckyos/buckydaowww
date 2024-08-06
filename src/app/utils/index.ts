@@ -24,6 +24,13 @@ const zeroPadLeft = (value: number | string | undefined) => {
 function extractMessage(error: unknown) {
   const errorInfo = (error as any).message
   try {
+    // 先正则匹配
+    const regex = /execution reverted: "([^"]+)"/
+    const match = errorInfo.match(regex)
+    if (match) {
+      return match[1]
+    }
+
     let jsonPart = errorInfo.split('{').slice(1).join('{')
     jsonPart = '{' + jsonPart.split('}').slice(0, -1).join('}') + '}'
     // 解析 JSON
