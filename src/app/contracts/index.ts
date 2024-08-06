@@ -193,7 +193,7 @@ async function createWhitelistInvestment(
 
   const startParams = {
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
-    firstPercent: values.whitelist.map((item: any) => parseInt(item.percent)),
+    firstPercent: values.whitelist.map((item: any) => item.percent.toString()),
     tokenAddress: getAddress(values.tokenAddress),
     tokenAmount: toBigInt(values.tokenAmount).toString(),
     tokenRatio: {
