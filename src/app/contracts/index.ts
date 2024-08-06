@@ -129,6 +129,7 @@ async function subscribeInvestmentShare(
 // 创建白名单投资
 async function createWhitelistInvestment(
   values: StoreValue,
+  ownerAddress: string,
   // contract: ContractStoreDefine,
 ) {
   const twoStepInvestmentAddress = getAddressOfTwoStepInvestment()
@@ -164,7 +165,7 @@ async function createWhitelistInvestment(
       signer,
     )
     const allow = await tokenContract.allowance(
-      values.tokenAddress,
+      ownerAddress,
       twoStepInvestmentAddress,
     )
     console.log('🍻 contract allow :', allow, values.tokenAmount)
