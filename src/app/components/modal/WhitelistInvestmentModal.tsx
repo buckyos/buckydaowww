@@ -12,13 +12,12 @@ import {
   message,
   Spin,
   Checkbox,
-  Select,
+  Tag,
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { createWhitelistInvestment } from '@contracts/index'
 import useContractStore from '@hooks/useContract'
 import { extractMessage } from '@utils/index'
-const { Option } = Select
 
 // 禁止选择今天之前的日期
 function disabledDate(current: Dayjs) {
@@ -32,6 +31,7 @@ const WhitelistInvestmentModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
+  const [form] = Form.useForm()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
@@ -156,24 +156,19 @@ const WhitelistInvestmentModal: React.FC<{
               },
             ]}
           >
-            <Input
-              suffix={
-                <Select
-                  style={{ width: 130 }}
-                  onChange={(value) => {
-                    console.log('🍻 value :', value)
-                  }}
-                >
-                  <Option value={'0xc2132d05d31c914a87c6611c10748aeb04b58e8f'}>
-                    USDT
-                  </Option>
-                  <Option value={''}>clean</Option>
-                </Select>
-              }
-              className=''
-              placeholder="investor's token address"
-            />
+            <Input className='' placeholder="investor's token address" />
           </Form.Item>
+          <div className='mb-2'>
+            <Tag
+              onClick={() => {
+                form.setFieldsValue({
+                  tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+                })
+              }}
+            >
+              Fill USDT
+            </Tag>
+          </div>
 
           <Form.Item
             name='tokenAmount'
