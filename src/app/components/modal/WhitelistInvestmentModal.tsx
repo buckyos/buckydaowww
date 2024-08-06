@@ -158,10 +158,11 @@ const WhitelistInvestmentModal: React.FC<{
             ]}
           >
             <Input className='' placeholder="investor's token address" />
-            <div className='mb-2'>
+            <div className='mt-2'>
               <Tag
                 className='cursor-pointer'
                 onClick={() => {
+                  console.log('fill USDT')
                   form.setFieldsValue({
                     tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
                   })
