@@ -186,8 +186,8 @@ async function createWhitelistInvestment(
 
   // 结束时间
   const now = dayjs().unix()
-  const step1Duration = toBigInt(dayjs(values.endTime).unix() - now).toString()
-  const step2Duration = toBigInt(dayjs(values.endTime2).unix() - now).toString()
+  const step1Duration = dayjs(values.endTime).unix() - now
+  const step2Duration = dayjs(values.endTime2).unix() - now
 
   console.log('🍻 step1Duration :', step1Duration, step2Duration)
 
