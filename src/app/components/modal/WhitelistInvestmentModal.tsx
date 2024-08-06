@@ -163,9 +163,10 @@ const WhitelistInvestmentModal: React.FC<{
                 className='cursor-pointer'
                 onClick={() => {
                   console.log('fill USDT')
-                  form.setFieldsValue({
-                    tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-                  })
+                  form.setFieldValue(
+                    'tokenAddress',
+                    '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+                  )
                 }}
               >
                 Fill USDT
