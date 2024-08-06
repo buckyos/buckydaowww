@@ -12,7 +12,6 @@ import {
   message,
   Spin,
   Checkbox,
-  Tag,
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { createWhitelistInvestment } from '@contracts/index'
@@ -31,7 +30,6 @@ const WhitelistInvestmentModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
-  const [form] = Form.useForm()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
@@ -76,13 +74,15 @@ const WhitelistInvestmentModal: React.FC<{
     >
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
-          form={form}
           onFinish={onCreateInvestment}
           className='mt-6'
           name='create-proposal'
           style={{ width: '100%' }}
           autoComplete='off'
-          initialValues={{ canEndEarly: true }}
+          initialValues={{
+            canEndEarly: true,
+            tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+          }}
         >
           <Form.List name='whitelist' initialValue={formListInitValues}>
             {(fields, { add, remove }) => (
@@ -158,20 +158,6 @@ const WhitelistInvestmentModal: React.FC<{
             ]}
           >
             <Input className='' placeholder="investor's token address" />
-            <div className='mt-2'>
-              <Tag
-                className='cursor-pointer'
-                onClick={() => {
-                  console.log('fill USDT')
-                  form.setFieldValue(
-                    'tokenAddress',
-                    '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-                  )
-                }}
-              >
-                Fill USDT
-              </Tag>
-            </div>
           </Form.Item>
 
           <Form.Item
