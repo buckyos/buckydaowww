@@ -15,7 +15,7 @@ import {
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { createWhitelistInvestment } from '@contracts/index'
-import useContractStore from '@hooks/useContract'
+import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 
 // 禁止选择今天之前的日期
@@ -33,6 +33,7 @@ const WhitelistInvestmentModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
+  const user = useUserStore()
 
   // 创建白名单投资
   const onCreateInvestment = async (values: StoreValue) => {
@@ -41,7 +42,7 @@ const WhitelistInvestmentModal: React.FC<{
     setloadingTx(true)
 
     try {
-      const result = await createWhitelistInvestment(values)
+      const result = await createWhitelistInvestment(values, user.user.address)
       if (result) {
         message.success('Create Investment success')
         setShowModal(false)
