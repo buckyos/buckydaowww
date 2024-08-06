@@ -27,6 +27,11 @@ console.log('🔡 PROJECT contract address', PROJECT)
 console.log('🔡 TOKEN contract address', TOKEN)
 console.log('🔡 TWOSTEP_INVESTMENT contract address', TWOSTEP_INVESTMENT)
 
+function getAddressOfTwoStepInvestment() {
+  if (!TWOSTEP_INVESTMENT) throw new Error('TWOSTEP_INVESTMENT is undefined')
+  return TWOSTEP_INVESTMENT
+}
+
 // cache contract instance
 const Contracts: {
   [key: string]: ethers.Contract | undefined
@@ -100,4 +105,7 @@ export {
   getProjectContract,
   getTokenContract,
   getTwoStepInvestmentContract,
+
+  // address
+  getAddressOfTwoStepInvestment,
 }

@@ -7,6 +7,10 @@ import { getProvider, getTokenContract } from '@hooks/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
+import {
+  getTwoStepInvestmentContract,
+  getAddressOfTwoStepInvestment,
+} from '@contracts/index'
 
 export * from './vote' // proposal 投票
 export * from './execute'
@@ -125,8 +129,9 @@ async function subscribeInvestmentShare(
 // 创建白名单投资
 async function createWhitelistInvestment(
   values: StoreValue,
-  contract: ContractStoreDefine,
+  // contract: ContractStoreDefine,
 ) {
+  const twoStepInvestmentAddress = getAddressOfTwoStepInvestment()
   console.log('🍻 createWhitelistInvestment values :', values)
 
   const totlePercent = values.whitelist.reduce((acc: number, cur: any) => {
@@ -149,6 +154,7 @@ async function createWhitelistInvestment(
   }
 
   {
+    // 查看授权额度
     // approve token, (eg usdt)
     let provider = await getProvider()
     const signer = await provider.getSigner()
@@ -157,17 +163,15 @@ async function createWhitelistInvestment(
       erc20,
       signer,
     )
-
-    // 查看授权额度
     const allow = await tokenContract.allowance(
       values.tokenAddress,
-      contract.twostepInvestmentAddress,
+      twoStepInvestmentAddress,
     )
     console.log('🍻 contract allow :', allow, values.tokenAmount)
     if (allow < values.tokenAmount) {
       // 额度不足， 让用户授权额度
       const tx = await tokenContract.approve(
-        contract.twostepInvestmentAddress,
+        twoStepInvestmentAddress,
         parseUnits(values.tokenAmount.toString(), 18),
       )
       const receipt = await transactionWait(tx)
@@ -202,8 +206,7 @@ async function createWhitelistInvestment(
   console.log('🍻 createWhitelistInvestment startParams :', startParams)
 
   // 启动两步投资
-  const twoStepInvestmentContract =
-    await contract.getTwoStepInvestMentContract()
+  const twoStepInvestmentContract = await getTwoStepInvestmentContract() // await contract.getTwoStepInvestMentContract()
   const tx = await twoStepInvestmentContract.startInvestment(startParams)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {

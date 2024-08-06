@@ -25,6 +25,7 @@ function disabledDate(current: Dayjs) {
   return current && current <= dayjs().startOf('day')
 }
 
+// 创建二步投资得弹窗
 const WhitelistInvestmentModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
@@ -40,7 +41,7 @@ const WhitelistInvestmentModal: React.FC<{
     setloadingTx(true)
 
     try {
-      const result = await createWhitelistInvestment(values, contract)
+      const result = await createWhitelistInvestment(values)
       if (result) {
         message.success('Create Investment success')
         setShowModal(false)
