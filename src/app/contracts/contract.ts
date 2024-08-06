@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { message } from 'antd'
-import { abis } from '@contracts/abis'
+import { abis, TwoStepWhitelistInvestment } from '@contracts/abis'
 // NEXT_PUBLIC_COMMITTEE = '0x2fc3186176B80EA829A7952b874F36f7cb8bd184'
 // NEXT_PUBLIC_DIVIDEND = '0x13EE4A506974a54E9eAA905C892Aa91664AaCcbA'
 // NEXT_PUBLIC_INVESTMENT = '0xf2C90A9dB663759668A52a94f616725D84744b67'
@@ -91,7 +91,7 @@ const getMainContract = generateContract(abis, 'MAIN', MAIN)
 const getProjectContract = generateContract(abis, 'PROJECT', PROJECT)
 const getTokenContract = generateContract(abis, 'TOKEN', TOKEN)
 const getTwoStepInvestmentContract = generateContract(
-  abis,
+  TwoStepWhitelistInvestment,
   'TWOSTEP_INVESTMENT',
   TWOSTEP_INVESTMENT,
 )
