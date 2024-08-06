@@ -76,6 +76,7 @@ const WhitelistInvestmentModal: React.FC<{
     >
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
+          form={form}
           onFinish={onCreateInvestment}
           className='mt-6'
           name='create-proposal'
@@ -157,18 +158,19 @@ const WhitelistInvestmentModal: React.FC<{
             ]}
           >
             <Input className='' placeholder="investor's token address" />
+            <div className='mb-2'>
+              <Tag
+                className='cursor-pointer'
+                onClick={() => {
+                  form.setFieldsValue({
+                    tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+                  })
+                }}
+              >
+                Fill USDT
+              </Tag>
+            </div>
           </Form.Item>
-          <div className='mb-2'>
-            <Tag
-              onClick={() => {
-                form.setFieldsValue({
-                  tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-                })
-              }}
-            >
-              Fill USDT
-            </Tag>
-          </div>
 
           <Form.Item
             name='tokenAmount'
