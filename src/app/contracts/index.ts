@@ -106,7 +106,7 @@ async function getDecimals(tokenAddress: string): Promise<number> {
   const decimals = await tokenContract.decimals()
 
   // 更新缓存对象
-  decimalsCache[tokenAddress] = decimals
+  decimalsCache[tokenAddress] = Number(decimals)
 
   // 将更新后的缓存对象存储到localStorage中
   localStorage.setItem(cacheKey, JSON.stringify(decimalsCache))
