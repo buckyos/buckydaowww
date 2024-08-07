@@ -100,13 +100,17 @@ async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
     .then((network) => network.chainId.toString())
 
   // polygan
-  const networkId = process.env.NEXT_PUBLIC_NETWORK_ID || '0x89'
+  const networkId = process.env.NEXT_PUBLIC_NETWORK_ID || '137'
+  let hexString = Number(networkId).toString(16)
+  let hexStringWithPrefix = '0x' + hexString
+  console.log('networkId: ', hexStringWithPrefix) // 输出 "0x89"
+
   console.log('current network chainId', chainId, networkId)
   if (chainId !== networkId) {
     message.info('current network is not correct, switch to correct network...')
     const result = await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: networkId }],
+      params: [{ chainId: hexStringWithPrefix }],
     })
     console.log('wallet_switchEthereumChain result', result)
   }
