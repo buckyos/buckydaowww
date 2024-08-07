@@ -115,8 +115,8 @@ const InvestmentSubscriptionModal: React.FC<{
       footer={null}
     >
       <div>
-        The max remaining token you can subscribe to is
-        {maxTokenAmount} {contract.symbol}
+        The max remaining token you can subscribe to is {maxTokenAmount}{' '}
+        {contract.symbol}
       </div>
       <div>
         1 {contract.symbol} = {data.tokenRatio.daoAmount} {symbol}
