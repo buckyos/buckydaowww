@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
 import { getTwoStepInvestment } from '@services/index'
 import { useCommittee, useUserStore } from '@hooks/index'
+import InvestDetailTokenDescription from '@components/funding/TokenDescription'
 // import { getSymbol } from '@contracts/index'
 
 // 投资列表(grid)
@@ -34,7 +35,12 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
             children: dayjs(item.step2EndTime * 1000).format('YYYY-MM-DD'),
           },
           { key: '5', label: 'Token Address', children: item.tokenAddress },
-          { key: '6', label: 'Token Amount', children: item.totalAmount },
+          {
+            key: '6',
+            label: 'Token Amount',
+
+            children: <InvestDetailTokenDescription data={item} />,
+          },
           {
             key: '7',
             label: 'DAO Token Amount',

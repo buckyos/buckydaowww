@@ -12,26 +12,7 @@ import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 import { useUserStore, useContractStore } from '@hooks/index'
 import { endInvestment, getSymbol } from '@contracts/index'
-
-const InvestDetailTokenDescription: React.FC<{
-  data: TwoStepInvestmentData
-}> = ({ data }) => {
-  const [symbol, setSymbol] = useState('')
-  const [loading, setLoading] = useState(false)
-  useAsyncEffect(async () => {
-    setLoading(true)
-    const symbol = await getSymbol(data.tokenAddress)
-    setSymbol(symbol)
-    setLoading(false)
-  }, [data])
-  return (
-    <div className='flex-center gap-1'>
-      <div>{data.daoTokenAmount}</div>
-      {loading && <Spin></Spin>}
-      {!loading && <div>{symbol}</div>}
-    </div>
-  )
-}
+import InvestDetailTokenDescription from '@components/funding/TokenDescription'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
@@ -67,11 +48,15 @@ const InvestDetailPageContent: React.FC<{
       children: dayjs(data.step2EndTime * 1000).format('YYYY-MM-DD'),
     },
     { key: '5', label: 'Token Address', children: data.tokenAddress },
-    { key: '6', label: 'Token Amount', children: data.totalAmount },
+    {
+      key: '6',
+      label: 'Token Amount',
+      children: <InvestDetailTokenDescription data={data} />,
+    },
     {
       key: '7',
       label: 'DAO Token Amount',
-      children: <InvestDetailTokenDescription data={data} />,
+      children: data.daoTokenAmount,
     },
     {
       key: '8',
