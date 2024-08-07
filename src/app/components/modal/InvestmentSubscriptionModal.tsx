@@ -25,6 +25,7 @@ function countMaxTokenAmount(
   const now = Date.now()
   const totalAmount = parseFloat(token)
 
+  //计算占百分比
   if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
     const currentUser = data.whitelist[address]
     const percent = currentUser[0]
@@ -36,6 +37,7 @@ function countMaxTokenAmount(
     maxTokenAmount = totalAmount - parseInt(data.investedAmount)
   }
 
+  // 计算兑换比例
   let maxDaoTokenAmount =
     (maxTokenAmount * data.tokenRatio.daoAmount) / data.tokenRatio.tokenAmount
 
@@ -53,7 +55,6 @@ const InvestmentSubscriptionModal: React.FC<{
   const contract = useContractStore()
   const [maxTokenAmount, setMaxTokenAmount] = useState(0)
   const { user } = useUserStore()
-  const [symbol, setSymbol] = useState('')
 
   const DAO_TOKEN_ADDRESS = getAddressOfToken()
 
@@ -62,11 +63,7 @@ const InvestmentSubscriptionModal: React.FC<{
       return
     }
     console.log('🍻 cout max token amount data :', data)
-
-    const [tokenDecimals, symbol] = await Promise.all([
-      getDecimals(data.tokenAddress),
-      getSymbol(data.tokenAddress),
-    ])
+    const tokenDecimals = await getDecimals(data.tokenAddress)
 
     const maxDaoTokenAmount = countMaxTokenAmount(
       formatUnits(data.totalAmount, tokenDecimals),
@@ -76,8 +73,6 @@ const InvestmentSubscriptionModal: React.FC<{
     setMaxTokenAmount(maxDaoTokenAmount)
 
     // 获取投资token的symbol
-
-    setSymbol(symbol)
   }, [data, user])
 
   // 认购投资份额
