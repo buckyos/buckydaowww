@@ -3,16 +3,25 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
-import { subscribeInvestmentShare, getSymbol } from '@contracts/index'
+import {
+  subscribeInvestmentShare,
+  getSymbol,
+  getDecimals,
+} from '@contracts/index'
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
+import { formatUnits } from 'ethers'
 
 // 计算最大可认购的token数量
-function countMaxTokenAmount(data: TwoStepInvestmentData, address: string) {
+function countMaxTokenAmount(
+  token: string,
+  data: TwoStepInvestmentData,
+  address: string,
+) {
   let maxTokenAmount = 0
   const now = Date.now()
-  const totalAmount = parseInt(data.totalAmount)
+  const totalAmount = parseFloat(token)
 
   if (now < data.step1EndTime) {
     const currentUser = data.whitelist[address]
@@ -49,11 +58,20 @@ const InvestmentSubscriptionModal: React.FC<{
     }
     console.log('🍻 cout max token amount data :', data)
 
-    const maxDaoTokenAmount = countMaxTokenAmount(data, user.address)
+    const [tokenDecimals, symbol] = await Promise.all([
+      getDecimals(data.tokenAddress),
+      getSymbol(data.tokenAddress),
+    ])
+
+    const maxDaoTokenAmount = countMaxTokenAmount(
+      formatUnits(data.totalAmount, tokenDecimals),
+      data,
+      user.address,
+    )
     setMaxTokenAmount(maxDaoTokenAmount)
 
     // 获取投资token的symbol
-    const symbol = await getSymbol(contract.tokenAddress)
+
     setSymbol(symbol)
   }, [data, user])
 
