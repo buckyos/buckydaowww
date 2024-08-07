@@ -66,6 +66,7 @@ async function chnageCommitteeProposal(
 
 // 获取token 的symbol
 async function getSymbol(tokenAddress: string): Promise<string> {
+  // add cache
   let provider = await getProvider()
   const tokenContract = new ethers.Contract(tokenAddress, erc20, provider)
   const symbol = await tokenContract.symbol()
