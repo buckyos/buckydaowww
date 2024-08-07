@@ -30,6 +30,7 @@ function countMaxTokenAmount(
     const percent = currentUser[0]
     const hadSubscribe = parseInt(currentUser[1])
     // still in step 1, check limit first.
+    console.log('🍻 countMaxTokenAmount :', totalAmount, percent, hadSubscribe)
     maxTokenAmount = (totalAmount * percent) / 100 - hadSubscribe
   } else {
     maxTokenAmount = totalAmount - parseInt(data.investedAmount)

@@ -73,7 +73,7 @@ async function getSymbol(tokenAddress: string): Promise<string> {
 
   // 检查缓存中是否已经有这个tokenAddress的symbol
   if (symbolCache[tokenAddress]) {
-    console.log('Fetching symbol from cache.', tokenAddress)
+    // console.log('Fetching symbol from cache.', tokenAddress)
     return symbolCache[tokenAddress]
   }
 
@@ -98,7 +98,7 @@ async function getDecimals(tokenAddress: string): Promise<number> {
 
   // 检查缓存中是否已经有这个tokenAddress的decimals
   if (decimalsCache[tokenAddress]) {
-    console.log('Fetching decimals from cache.', tokenAddress)
+    // console.log('Fetching decimals from cache.', tokenAddress)
     return decimalsCache[tokenAddress]
   }
 
