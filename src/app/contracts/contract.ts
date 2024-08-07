@@ -113,6 +113,10 @@ async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
       params: [{ chainId: hexStringWithPrefix }],
     })
     console.log('wallet_switchEthereumChain result', result)
+    message.info('network switched, window reloading...')
+    setTimeout(() => {
+      window.location.reload()
+    }, 1500)
   }
 }
 
