@@ -7,11 +7,13 @@ import {
   subscribeInvestmentShare,
   getSymbol,
   getDecimals,
+  getAddressOfToken,
 } from '@contracts/index'
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
 import { formatUnits } from 'ethers'
+import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 
 // 计算最大可认购的token数量
 function countMaxTokenAmount(
@@ -51,6 +53,8 @@ const InvestmentSubscriptionModal: React.FC<{
   const [maxTokenAmount, setMaxTokenAmount] = useState(0)
   const { user } = useUserStore()
   const [symbol, setSymbol] = useState('')
+
+  const DAO_TOKEN_ADDRESS = getAddressOfToken()
 
   useAsyncEffect(async () => {
     if (!data || !user.address) {
@@ -118,9 +122,19 @@ const InvestmentSubscriptionModal: React.FC<{
         The max remaining token you can subscribe to is {maxTokenAmount}{' '}
         {contract.symbol}
       </div>
-      <div>
-        1 {contract.symbol} = {data.tokenRatio.daoAmount} {symbol}
+
+      <div className='flex mt-2'>
+        <TokenWithSymbol
+          totalAmount={data.tokenRatio.daoAmount.toString()}
+          tokenAddress={DAO_TOKEN_ADDRESS}
+        />
+        <div>=</div>
+        <TokenWithSymbol
+          totalAmount={data.tokenRatio.tokenAmount.toString()}
+          tokenAddress={data.tokenAddress}
+        />
       </div>
+
       <Spin tip='Waiting for confirmation...' spinning={loadingTx}>
         <Form
           onFinish={onSubscribe}
