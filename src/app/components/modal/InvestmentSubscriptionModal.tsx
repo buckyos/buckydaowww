@@ -25,7 +25,7 @@ function countMaxTokenAmount(
   const now = Date.now()
   const totalAmount = parseFloat(token)
 
-  if (now < data.step1EndTime) {
+  if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
     const currentUser = data.whitelist[address]
     const percent = currentUser[0]
     const hadSubscribe = parseInt(currentUser[1])
