@@ -90,6 +90,31 @@ async function getSymbol(tokenAddress: string): Promise<string> {
   return symbol
 }
 
+async function getDecimals(tokenAddress: string): Promise<number> {
+  // 检查localStorage中是否有缓存
+  const cacheKey = 'tokenDecimals'
+  let decimalsCache = JSON.parse(localStorage.getItem(cacheKey) || '{}')
+
+  // 检查缓存中是否已经有这个tokenAddress的decimals
+  if (decimalsCache[tokenAddress]) {
+    console.log('Fetching decimals from cache.', tokenAddress)
+    return decimalsCache[tokenAddress]
+  }
+
+  let provider = await getProvider()
+  const tokenContract = new ethers.Contract(tokenAddress, erc20, provider)
+  const decimals = await tokenContract.decimals()
+
+  // 更新缓存对象
+  decimalsCache[tokenAddress] = decimals
+
+  // 将更新后的缓存对象存储到localStorage中
+  localStorage.setItem(cacheKey, JSON.stringify(decimalsCache))
+  console.log('Caching decimals to local storage.')
+
+  return decimals
+}
+
 // 结束两步投资
 async function endInvestment(id: string, contract: ContractStoreDefine) {
   const twoStepInvestmentContract =
@@ -172,6 +197,8 @@ async function createWhitelistInvestment(
     return false
   }
 
+  const tokenDecimals = await getDecimals(values.tokenAddress)
+
   {
     // 查看授权额度
     // approve token, (eg usdt)
@@ -191,7 +218,7 @@ async function createWhitelistInvestment(
       // 额度不足， 让用户授权额度
       const tx = await tokenContract.approve(
         twoStepInvestmentAddress,
-        toBigInt(values.tokenAmount),
+        parseUnits(values.tokenAmount, tokenDecimals),
       )
       const receipt = await transactionWait(tx)
       if (receipt?.status !== 1) {
@@ -213,7 +240,7 @@ async function createWhitelistInvestment(
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
     firstPercent: values.whitelist.map((item: any) => parseFloat(item.percent)),
     tokenAddress: getAddress(values.tokenAddress),
-    tokenAmount: parseFloat(values.tokenAmount),
+    tokenAmount: parseUnits(values.tokenAmount, tokenDecimals),
     tokenRatio: {
       tokenAmount: parseInt(values.assetTokenAmount),
       daoTokenAmount: parseInt(values.daoTokenAmount),
@@ -239,6 +266,7 @@ async function createWhitelistInvestment(
 
 export {
   getSymbol,
+  getDecimals,
   createWhitelistInvestment,
   subscribeInvestmentShare,
   endInvestment,

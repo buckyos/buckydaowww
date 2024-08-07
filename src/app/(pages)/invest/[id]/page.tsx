@@ -57,6 +57,7 @@ const InvestDetailPageContent: React.FC<{
         <TokenWithSymbol
           totalAmount={data.totalAmount}
           tokenAddress={data.tokenAddress}
+          format={true}
         />
       ),
     },
