@@ -191,7 +191,7 @@ async function createWhitelistInvestment(
       // 额度不足， 让用户授权额度
       const tx = await tokenContract.approve(
         twoStepInvestmentAddress,
-        parseUnits(values.tokenAmount.toString(), 18),
+        toBigInt(values.tokenAmount),
       )
       const receipt = await transactionWait(tx)
       if (receipt?.status !== 1) {
