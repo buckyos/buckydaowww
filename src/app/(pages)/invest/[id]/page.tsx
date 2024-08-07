@@ -11,8 +11,8 @@ import dayjs from 'dayjs'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 import { useUserStore, useContractStore } from '@hooks/index'
-import { endInvestment, getSymbol } from '@contracts/index'
-import InvestDetailTokenDescription from '@components/funding/TokenDescription'
+import { endInvestment, getAddressOfToken } from '@contracts/index'
+import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
@@ -24,6 +24,8 @@ const InvestDetailPageContent: React.FC<{
       </div>
     )
   }
+
+  const DAO_TOKEN_ADDRESS = getAddressOfToken()
 
   const items: DescriptionsProps['items'] = [
     {
@@ -51,17 +53,39 @@ const InvestDetailPageContent: React.FC<{
     {
       key: '6',
       label: 'Token Amount',
-      children: <InvestDetailTokenDescription data={data} />,
+      children: (
+        <TokenWithSymbol
+          totalAmount={data.totalAmount}
+          tokenAddress={data.tokenAddress}
+        />
+      ),
     },
     {
       key: '7',
       label: 'DAO Token Amount',
-      children: data.daoTokenAmount,
+      children: (
+        <TokenWithSymbol
+          totalAmount={data.daoTokenAmount}
+          tokenAddress={DAO_TOKEN_ADDRESS}
+        />
+      ),
     },
     {
       key: '8',
       label: 'Token Ratio',
-      children: `${data.tokenRatio.daoAmount} = ${data.tokenRatio.tokenAmount}`,
+      children: (
+        <div className='flex'>
+          <TokenWithSymbol
+            totalAmount={data.tokenRatio.daoAmount.toString()}
+            tokenAddress={DAO_TOKEN_ADDRESS}
+          />
+          <div>=</div>
+          <TokenWithSymbol
+            totalAmount={data.tokenRatio.tokenAmount.toString()}
+            tokenAddress={data.tokenAddress}
+          />
+        </div>
+      ),
     },
     { key: '9', label: 'Investment', children: data.investedAmount },
     { label: 'Investor', children: data.investor },

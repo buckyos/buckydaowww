@@ -9,13 +9,14 @@ import dayjs from 'dayjs'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
 import { getTwoStepInvestment } from '@services/index'
 import { useCommittee, useUserStore } from '@hooks/index'
-import InvestDetailTokenDescription from '@components/funding/TokenDescription'
-// import { getSymbol } from '@contracts/index'
+import TokenWithSymbol from '@components/funding/TokenWithSymbol'
+import { getAddressOfToken } from '@contracts/index'
 
 // 投资列表(grid)
 const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
   data,
 }) => {
+  const DAO_TOKEN_ADDRESS = getAddressOfToken()
   return (
     <div className='grid grid-cols-1 gap-[18px] md:grid-cols-2'>
       {data.map((item, key) => {
@@ -38,18 +39,39 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
           {
             key: '6',
             label: 'Token Amount',
-
-            children: <InvestDetailTokenDescription data={item} />,
+            children: (
+              <TokenWithSymbol
+                totalAmount={item.totalAmount}
+                tokenAddress={item.tokenAddress}
+              />
+            ),
           },
           {
             key: '7',
             label: 'DAO Token Amount',
-            children: item.daoTokenAmount,
+            children: (
+              <TokenWithSymbol
+                totalAmount={item.daoTokenAmount}
+                tokenAddress={DAO_TOKEN_ADDRESS}
+              />
+            ),
           },
           {
             key: '8',
             label: 'Token Ratio',
-            children: `${item.tokenRatio.daoAmount} = ${item.tokenRatio.tokenAmount}`,
+            children: (
+              <div className='flex'>
+                <TokenWithSymbol
+                  totalAmount={item.tokenRatio.daoAmount.toString()}
+                  tokenAddress={DAO_TOKEN_ADDRESS}
+                />
+                <div>=</div>
+                <TokenWithSymbol
+                  totalAmount={item.tokenRatio.tokenAmount.toString()}
+                  tokenAddress={item.tokenAddress}
+                />
+              </div>
+            ),
           },
           { key: '9', label: 'Investment', children: item.investedAmount },
           { key: '10', label: 'Investor', children: item.investor },

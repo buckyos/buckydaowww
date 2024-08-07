@@ -4,24 +4,26 @@ import { useAsyncEffect } from 'ahooks'
 import { Spin } from 'antd'
 import { getSymbol } from '@contracts/index'
 
-const InvestDetailTokenDescription: React.FC<{
-  data: TwoStepInvestmentData
-}> = ({ data }) => {
+const TokenWithSymbol: React.FC<{
+  tokenAddress: string
+  totalAmount: string
+}> = ({ tokenAddress, totalAmount }) => {
   const [symbol, setSymbol] = useState('')
   const [loading, setLoading] = useState(false)
   useAsyncEffect(async () => {
     setLoading(true)
-    const symbol = await getSymbol(data.tokenAddress)
+    const symbol = await getSymbol(tokenAddress)
     setSymbol(symbol)
     setLoading(false)
-  }, [data])
+  }, [tokenAddress, totalAmount])
+
   return (
     <div className='flex items-center gap-1'>
-      <div>{data.totalAmount}</div>
+      <div>{totalAmount}</div>
       {loading && <Spin></Spin>}
       {!loading && <div className='font-bold text-cyfs-green'>{symbol}</div>}
     </div>
   )
 }
 
-export default InvestDetailTokenDescription
+export default TokenWithSymbol

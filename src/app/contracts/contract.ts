@@ -32,6 +32,11 @@ function getAddressOfTwoStepInvestment() {
   return TWOSTEP_INVESTMENT
 }
 
+function getAddressOfToken() {
+  if (!TOKEN) throw new Error('TOKEN is undefined')
+  return TOKEN
+}
+
 // cache contract instance
 const Contracts: {
   [key: string]: ethers.Contract | undefined
@@ -107,5 +112,6 @@ export {
   getTwoStepInvestmentContract,
 
   // address
+  getAddressOfToken,
   getAddressOfTwoStepInvestment,
 }
