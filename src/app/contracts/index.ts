@@ -66,10 +66,27 @@ async function chnageCommitteeProposal(
 
 // 获取token 的symbol
 async function getSymbol(tokenAddress: string): Promise<string> {
-  // add cache
+  // 检查localStorage中是否有缓存
+  const cacheKey = 'tokenSymbol'
+  let symbolCache = JSON.parse(localStorage.getItem(cacheKey) || '{}')
+
+  // 检查缓存中是否已经有这个tokenAddress的symbol
+  if (symbolCache[tokenAddress]) {
+    console.log('Fetching symbol from cache.', tokenAddress)
+    return symbolCache[tokenAddress]
+  }
+
   let provider = await getProvider()
   const tokenContract = new ethers.Contract(tokenAddress, erc20, provider)
   const symbol = await tokenContract.symbol()
+
+  // 更新缓存对象
+  symbolCache[tokenAddress] = symbol
+
+  // 将更新后的缓存对象存储到localStorage中
+  localStorage.setItem(cacheKey, JSON.stringify(symbolCache))
+  console.log('Caching symbol to local storage.')
+
   return symbol
 }
 

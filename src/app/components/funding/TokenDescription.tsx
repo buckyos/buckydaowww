@@ -16,10 +16,10 @@ const InvestDetailTokenDescription: React.FC<{
     setLoading(false)
   }, [data])
   return (
-    <div className='flex-center gap-1'>
+    <div className='flex items-center gap-1'>
       <div>{data.totalAmount}</div>
       {loading && <Spin></Spin>}
-      {!loading && <div>{symbol}</div>}
+      {!loading && <div className='font-bold text-cyfs-green'>{symbol}</div>}
     </div>
   )
 }
