@@ -61,7 +61,7 @@ function generateContract(abi: any, key?: string, address?: string) {
       return Contracts[key] as ethers.Contract
     }
 
-    let provider = getProvider()
+    let provider = await getProvider()
     // const network = await provider.getNetwork()
     // console.log(network)
 
@@ -74,7 +74,7 @@ function generateContract(abi: any, key?: string, address?: string) {
   }
 }
 
-function getProvider() {
+async function getProvider() {
   if (!window.ethereum) {
     message.error('Please install MetaMask first')
     console.log('MetaMask not installed; using read-only defaults')
@@ -85,7 +85,31 @@ function getProvider() {
 
   const provider = new ethers.BrowserProvider(window.ethereum)
   console.log('provider', provider)
+
+  // check
+  await checkEthNetworkId(provider)
+
   return provider
+}
+
+async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
+  if (!ethProvider) return
+
+  const chainId = await ethProvider
+    .getNetwork()
+    .then((network) => network.chainId.toString())
+
+  // polygan
+  const networkId = process.env.NEXT_PUBLIC_NETWORK_ID || '0x89'
+  console.log('current network chainId', chainId, networkId)
+  if (chainId !== networkId) {
+    message.info('current network is not correct, switch to correct network...')
+    const result = await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: networkId }],
+    })
+    console.log('wallet_switchEthereumChain result', result)
+  }
 }
 
 const getCommitteeContract = generateContract(abis, 'COMMITTEE', COMMITTEE)
@@ -114,4 +138,7 @@ export {
   // address
   getAddressOfToken,
   getAddressOfTwoStepInvestment,
+
+  // provider
+  getProvider,
 }

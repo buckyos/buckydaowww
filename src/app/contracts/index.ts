@@ -1,15 +1,16 @@
 import { StoreValue } from 'antd/es/form/interface'
 import { message } from 'antd'
-import { ethers, toBigInt, getAddress, parseUnits } from 'ethers'
+import { ethers, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
-import { getProvider, getTokenContract } from '@hooks/index'
+import { getTokenContract } from '@hooks/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
 import {
   getTwoStepInvestmentContract,
   getAddressOfTwoStepInvestment,
+  getProvider,
 } from '@contracts/index'
 
 export * from './vote' // proposal 投票

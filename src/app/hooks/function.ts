@@ -2,23 +2,7 @@
 import { ethers } from 'ethers'
 import { message } from 'antd'
 import { abis } from '@contracts/abis'
-
-//
-async function getProvider() {
-  if (window.ethereum) {
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      return provider
-    } catch (e) {
-      message.error((e as any).toString())
-      throw new Error('user reject connect wallet')
-    }
-  } else {
-    message.error('Please install MetaMask first')
-    console.log('MetaMask not installed; using read-only defaults')
-    throw new Error('MetaMask not installed; using read-only defaults')
-  }
-}
+import { getProvider } from '@contracts/contract'
 
 async function getTokenContract(address: string) {
   let provider = await getProvider()
