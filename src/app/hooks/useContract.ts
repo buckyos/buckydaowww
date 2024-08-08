@@ -1,7 +1,7 @@
 'use client'
 import { create } from 'zustand'
 import { ethers } from 'ethers'
-import { abis, TwoStepWhitelistInvestment } from '@contracts/abis'
+import { abis, ITwoStepWhitelistInvestment } from '@contracts/abis'
 import { persist } from 'zustand/middleware'
 import { getContractInfo } from '@services/index'
 
@@ -94,7 +94,7 @@ const useContractStore = create<ContractStoreDefine>()(
         const signer = await provider.getSigner()
         const contract = new ethers.Contract(
           address,
-          TwoStepWhitelistInvestment,
+          ITwoStepWhitelistInvestment,
           signer,
         )
         return contract
