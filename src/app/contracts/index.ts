@@ -13,6 +13,7 @@ import {
   getProvider,
   getTokenContract,
 } from '@contracts/index'
+import { getAddressOfToken } from './contract'
 
 export * from './vote' // proposal 投票
 export * from './execute'
@@ -92,6 +93,7 @@ async function getSymbol(tokenAddress: string): Promise<string> {
   return symbol
 }
 
+// 获取精度
 async function getDecimals(tokenAddress: string): Promise<number> {
   // 检查localStorage中是否有缓存
   const cacheKey = 'tokenDecimals'
@@ -133,9 +135,15 @@ async function endInvestment(id: string, contract: ContractStoreDefine) {
 }
 
 // 认购份额 (白名单地址才能认购)
-async function subscribeInvestmentShare(values: StoreValue, id: string) {
+async function subscribeInvestmentShare(
+  values: StoreValue,
+  id: string,
+  ownerAddress: string,
+) {
   // const amount = values.tokenAmount.toString()
-  const amount = parseUnits(values.tokenAmount.toString(), 18)
+  const daoTokenAddress = getAddressOfToken()
+  const decimals = await getDecimals(daoTokenAddress)
+  const amount = parseUnits(values.tokenAmount.toString(), decimals)
   const twostepInvestmentAddress = getAddressOfTwoStepInvestment()
   console.log(
     '🍻 subscribeInvestmentShare values :',
@@ -147,18 +155,28 @@ async function subscribeInvestmentShare(values: StoreValue, id: string) {
   // 授权token
   {
     const daoTokenContract = await getTokenContract()
-    const tx = await daoTokenContract.approve(twostepInvestmentAddress, amount)
-    const receipt = await transactionWait(tx)
-    if (receipt?.status !== 1) {
-      message.error('token approve failed')
-      console.warn('transaction status:', receipt?.status, tx)
-      return false
+    const allow = await daoTokenContract.allowance(
+      ownerAddress,
+      twostepInvestmentAddress,
+    )
+    console.log('🍻 contract allow :', allow, values.tokenAmount)
+
+    if (allow < values.tokenAmount) {
+      const tx = await daoTokenContract.approve(
+        twostepInvestmentAddress,
+        amount,
+      )
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        message.error('token approve failed')
+        console.warn('transaction status:', receipt?.status, tx)
+        return false
+      }
     }
   }
 
   // 认购份额
   const twoStepInvestmentContract = await getTwoStepInvestmentContract()
-  // const amount = parseUnits(values.tokenAmount.toString(), 18)
   const tx = await twoStepInvestmentContract.invest(id, amount)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
@@ -170,6 +188,7 @@ async function subscribeInvestmentShare(values: StoreValue, id: string) {
   return true
 }
 
+// 创建
 // 创建白名单投资
 async function createWhitelistInvestment(
   values: StoreValue,

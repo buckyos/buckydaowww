@@ -82,7 +82,11 @@ const InvestmentSubscriptionModal: React.FC<{
     setloadingTx(true)
 
     try {
-      const result = await subscribeInvestmentShare(values, data!.id.toString())
+      const result = await subscribeInvestmentShare(
+        values,
+        data!.id.toString(),
+        user.address,
+      )
       if (result) {
         message.success('Create Investment success')
         setShowModal(false)
