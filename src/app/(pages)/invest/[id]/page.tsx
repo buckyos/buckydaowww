@@ -120,7 +120,7 @@ const InvestDetailPageContent: React.FC<{
                   <Tag>percent</Tag>
                   {value[0] / 100} %
                 </div>
-                <div>
+                <div className='flex items-center'>
                   <Tag>subscribed</Tag>
                   <TokenWithSymbol
                     totalAmount={value[1]}
