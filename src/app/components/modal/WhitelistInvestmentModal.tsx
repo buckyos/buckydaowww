@@ -91,7 +91,10 @@ const WhitelistInvestmentModal: React.FC<{
                 <div>
                   {fields.map(({ key, name }, index) => {
                     return (
-                      <div key={key} className='grid grid-cols-6'>
+                      <div
+                        key={key}
+                        className='grid grid-cols-5 gap-4 items-center'
+                      >
                         <Form.Item
                           className='col-span-3'
                           name={[name, 'address']}
@@ -113,16 +116,18 @@ const WhitelistInvestmentModal: React.FC<{
                             },
                           ]}
                         >
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            placeholder='The percent of target address can take '
-                          />
+                          <div className='flex-center gap-1'>
+                            <InputNumber
+                              style={{ width: '100%' }}
+                              placeholder='The percent of target address can take '
+                            />
+                            <div>%</div>
+                          </div>
                         </Form.Item>
-                        <div>%</div>
 
                         <MinusCircleOutlined
                           style={{ fontSize: '20px' }}
-                          className='dynamic-delete-button mb-6 mr-6'
+                          className='dynamic-delete-button mb-6 mr-6 justify-end'
                           onClick={() => {
                             if (fields.length <= 1) {
                               message.error(
