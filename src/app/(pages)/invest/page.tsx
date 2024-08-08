@@ -38,28 +38,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
           },
           { key: '5', label: 'Token Address', children: item.tokenAddress },
           {
-            key: '6',
-            label: 'Token Amount',
-            children: (
-              <TokenWithSymbol
-                totalAmount={item.totalAmount}
-                tokenAddress={item.tokenAddress}
-                format={true}
-              />
-            ),
-          },
-          {
             key: '7',
-            label: 'DAO Token Amount',
-            children: (
-              <TokenWithSymbol
-                totalAmount={item.daoTokenAmount}
-                tokenAddress={DAO_TOKEN_ADDRESS}
-              />
-            ),
-          },
-          {
-            key: '8',
             label: 'Token Ratio',
             children: (
               <div className='flex'>
@@ -73,6 +52,28 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
                   tokenAddress={item.tokenAddress}
                 />
               </div>
+            ),
+          },
+          {
+            key: '8',
+            label: 'Total subscribed DAO Amount',
+            children: (
+              <TokenWithSymbol
+                totalAmount={item.daoTokenAmount}
+                tokenAddress={DAO_TOKEN_ADDRESS}
+                format={true}
+              />
+            ),
+          },
+          {
+            key: '9',
+            label: 'Total subscribed  Amount',
+            children: (
+              <TokenWithSymbol
+                totalAmount={item.investedAmount}
+                tokenAddress={item.tokenAddress}
+                format={true}
+              />
             ),
           },
           { key: '9', label: 'Investment', children: item.investedAmount },
