@@ -219,9 +219,9 @@
             "type": "address[]"
           },
           {
-            "internalType": "uint8[]",
+            "internalType": "uint16[]",
             "name": "firstPercent",
-            "type": "uint8[]"
+            "type": "uint16[]"
           },
           {
             "internalType": "address",
