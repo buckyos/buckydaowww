@@ -119,6 +119,7 @@ const WhitelistInvestmentModal: React.FC<{
                         >
                           <div className='flex-center gap-1'>
                             <InputNumber
+                              precision={2}
                               style={{ width: '100%' }}
                               placeholder='The percent of target address can take '
                             />
