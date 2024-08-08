@@ -1,6 +1,5 @@
 'use client'
 import { ethers } from 'ethers'
-import { message } from 'antd'
 import { abis } from '@contracts/abis'
 import { getProvider } from '@contracts/contract'
 

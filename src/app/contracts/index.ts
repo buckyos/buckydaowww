@@ -160,8 +160,7 @@ async function subscribeInvestmentShare(
       twostepInvestmentAddress,
     )
     console.log('🍻 contract allow :', allow, values.tokenAmount)
-
-    if (allow < values.tokenAmount) {
+    if (allow < amount) {
       const tx = await daoTokenContract.approve(
         twostepInvestmentAddress,
         amount,
