@@ -20,7 +20,7 @@ async function countMaxTokenAmount(
   totalAmount: bigint,
   data: TwoStepInvestmentData,
   address: string,
-) {
+): Promise<bigint> {
   let maxTokenAmount = 0n
   const now = Date.now()
   const tokenDecimals = await getDecimals(data.tokenAddress)
@@ -30,7 +30,8 @@ async function countMaxTokenAmount(
   if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
     const currentUser = data.whitelist[address]
     const percent = toBigInt(currentUser[0]) // 百分比的精度是10000
-    const hadSubscribe = parseUnits(currentUser[1], tokenDecimals)
+    // 这里的已认购是wei
+    const hadSubscribe = toBigInt(currentUser[1])
     // still in step 1, check limit first.
     console.log('🍻 countMaxTokenAmount :', totalAmount, percent, hadSubscribe)
     maxTokenAmount = (totalAmount * percent) / 10000n - hadSubscribe
@@ -39,14 +40,14 @@ async function countMaxTokenAmount(
   }
 
   // to number
-  const maxTokenAmountNumber = Number(
-    formatUnits(maxTokenAmount, tokenDecimals),
-  )
+  // const maxTokenAmountNumber = Number(
+  //   formatUnits(maxTokenAmount, tokenDecimals),
+  // )
 
   // 计算兑换比例
   let maxDaoTokenAmount =
-    (maxTokenAmountNumber * data.tokenRatio.daoAmount) /
-    data.tokenRatio.tokenAmount
+    (maxTokenAmount * toBigInt(data.tokenRatio.daoAmount)) /
+    toBigInt(data.tokenRatio.tokenAmount)
 
   return maxDaoTokenAmount
 }
@@ -60,7 +61,7 @@ const InvestmentSubscriptionModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
-  const [maxTokenAmount, setMaxTokenAmount] = useState(0)
+  const [maxTokenAmount, setMaxTokenAmount] = useState(0n)
   const { user } = useUserStore()
 
   const DAO_TOKEN_ADDRESS = getAddressOfToken()
@@ -122,8 +123,8 @@ const InvestmentSubscriptionModal: React.FC<{
       footer={null}
     >
       <div>
-        The max remaining token you can subscribe to is {maxTokenAmount}{' '}
-        {contract.symbol}
+        The max remaining token you can subscribe to is{' '}
+        {formatUnits(maxTokenAmount, contract.decimals)} {contract.symbol}
       </div>
 
       <div className='flex mt-2'>
@@ -146,6 +147,9 @@ const InvestmentSubscriptionModal: React.FC<{
           style={{ width: '100%' }}
           autoComplete='off'
         >
+          <div className='text-cyfs-gray'>
+            Input DAO token to subscribe the investment shares
+          </div>
           <Form.Item
             name='tokenAmount'
             label='Subscribe Shares'
@@ -159,8 +163,8 @@ const InvestmentSubscriptionModal: React.FC<{
             <InputNumber
               className='w-72'
               min={0}
-              max={maxTokenAmount}
-              placeholder='Input number of token to subscribe the investment shares'
+              max={parseFloat(formatUnits(maxTokenAmount, contract.decimals))}
+              placeholder='Input DAO token'
               suffix={contract.symbol}
             />
           </Form.Item>
