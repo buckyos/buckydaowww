@@ -3,7 +3,7 @@ import { message } from 'antd'
 import { ethers, getAddress, parseUnits } from 'ethers'
 import dayjs from 'dayjs'
 import { transactionWait } from '@utils/index'
-import { getTokenContract } from '@hooks/index'
+// import { getTokenContract } from '@hooks/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { parseInt } from 'lodash'
 import { erc20 } from './abis'
@@ -11,6 +11,7 @@ import {
   getTwoStepInvestmentContract,
   getAddressOfTwoStepInvestment,
   getProvider,
+  getTokenContract,
 } from '@contracts/index'
 
 export * from './vote' // proposal 投票
@@ -131,22 +132,22 @@ async function endInvestment(id: string, contract: ContractStoreDefine) {
   return true
 }
 
-// 认购份额(白名单)
-async function subscribeInvestmentShare(
-  values: StoreValue,
-  contract: ContractStoreDefine,
-  id: string,
-) {
-  console.log('🍻 subscribeInvestmentShare values :', values)
-  const amount = values.tokenAmount.toString()
+// 认购份额 (白名单地址才能认购)
+async function subscribeInvestmentShare(values: StoreValue, id: string) {
+  // const amount = values.tokenAmount.toString()
+  const amount = parseUnits(values.tokenAmount.toString(), 18)
+  const twostepInvestmentAddress = getAddressOfTwoStepInvestment()
+  console.log(
+    '🍻 subscribeInvestmentShare values :',
+    values,
+    '. amount:',
+    amount,
+  )
 
   // 授权token
   {
-    const daoTokenContract = await getTokenContract(contract.tokenAddress)
-    const tx = await daoTokenContract.approve(
-      contract.twostepInvestmentAddress,
-      parseUnits(amount, 18),
-    )
+    const daoTokenContract = await getTokenContract()
+    const tx = await daoTokenContract.approve(twostepInvestmentAddress, amount)
     const receipt = await transactionWait(tx)
     if (receipt?.status !== 1) {
       message.error('token approve failed')
@@ -156,8 +157,7 @@ async function subscribeInvestmentShare(
   }
 
   // 认购份额
-  const twoStepInvestmentContract =
-    await contract.getTwoStepInvestMentContract()
+  const twoStepInvestmentContract = await getTwoStepInvestmentContract()
   // const amount = parseUnits(values.tokenAmount.toString(), 18)
   const tx = await twoStepInvestmentContract.invest(id, amount)
   const receipt = await transactionWait(tx)
