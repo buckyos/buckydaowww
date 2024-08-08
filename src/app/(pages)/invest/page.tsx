@@ -38,6 +38,17 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
           },
           { key: '5', label: 'Token Address', children: item.tokenAddress },
           {
+            key: '6',
+            label: 'Token Amount',
+            children: (
+              <TokenWithSymbol
+                totalAmount={item.totalAmount}
+                tokenAddress={item.tokenAddress}
+                format={true}
+              />
+            ),
+          },
+          {
             key: '7',
             label: 'Token Ratio',
             children: (
