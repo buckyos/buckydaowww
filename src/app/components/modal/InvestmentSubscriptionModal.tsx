@@ -72,7 +72,7 @@ const InvestmentSubscriptionModal: React.FC<{
     console.log('🍻 cout max token amount data :', data)
     const tokenDecimals = await getDecimals(data.tokenAddress)
 
-    const maxDaoTokenAmount = countMaxTokenAmount(
+    const maxDaoTokenAmount = await countMaxTokenAmount(
       formatUnits(data.totalAmount, tokenDecimals),
       data,
       user.address,
@@ -147,6 +147,7 @@ const InvestmentSubscriptionModal: React.FC<{
           autoComplete='off'
         >
           <Form.Item
+            className='flex items-center gap-2'
             name='tokenAmount'
             label='Subscribe Shares'
             rules={[
@@ -162,6 +163,7 @@ const InvestmentSubscriptionModal: React.FC<{
               max={maxTokenAmount}
               placeholder='Input number of token to subscribe the investment shares'
             />
+            <div>BDT</div>
           </Form.Item>
 
           <div className='flex justify-center'>
