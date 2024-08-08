@@ -13,10 +13,15 @@ import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptio
 import { useUserStore, useContractStore } from '@hooks/index'
 import { endInvestment, getAddressOfToken } from '@contracts/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
+import { formatUnits } from 'ethers'
 
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
 }> = ({ data }) => {
+  const contract = useContractStore()
+  // const [decimals, setDecimals] = useState(0)
+  // const [sy, setDecimals] = useState(0)
+
   if (!data) {
     return (
       <div className='flex-center pt-10'>
@@ -88,7 +93,17 @@ const InvestDetailPageContent: React.FC<{
         </div>
       ),
     },
-    { key: '9', label: 'Investment', children: data.investedAmount },
+    {
+      key: '9',
+      label: 'Total subscribed  Amount',
+      children: (
+        <TokenWithSymbol
+          totalAmount={data.investedAmount}
+          tokenAddress={contract.tokenAddress}
+          format={true}
+        />
+      ),
+    },
     { label: 'Investor', children: data.investor },
     {
       label: 'whitelist',
