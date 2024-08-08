@@ -147,7 +147,6 @@ const InvestmentSubscriptionModal: React.FC<{
           autoComplete='off'
         >
           <Form.Item
-            className='flex items-center gap-2'
             name='tokenAmount'
             label='Subscribe Shares'
             rules={[
@@ -162,8 +161,8 @@ const InvestmentSubscriptionModal: React.FC<{
               min={0}
               max={maxTokenAmount}
               placeholder='Input number of token to subscribe the investment shares'
+              suffix={contract.symbol}
             />
-            <div>BDT</div>
           </Form.Item>
 
           <div className='flex justify-center'>
