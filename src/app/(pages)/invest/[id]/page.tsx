@@ -99,7 +99,7 @@ const InvestDetailPageContent: React.FC<{
       children: (
         <TokenWithSymbol
           totalAmount={data.investedAmount}
-          tokenAddress={contract.tokenAddress}
+          tokenAddress={data.tokenAddress}
           format={true}
         />
       ),
@@ -122,7 +122,11 @@ const InvestDetailPageContent: React.FC<{
                 </div>
                 <div>
                   <Tag>subscribed</Tag>
-                  {value[1]}
+                  <TokenWithSymbol
+                    totalAmount={value[1]}
+                    tokenAddress={data.tokenAddress}
+                    format={true}
+                  />
                 </div>
               </div>
             )
