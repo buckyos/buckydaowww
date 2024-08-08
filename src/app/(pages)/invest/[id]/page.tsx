@@ -67,16 +67,6 @@ const InvestDetailPageContent: React.FC<{
       ),
     },
     {
-      key: '7',
-      label: 'DAO Token Amount',
-      children: (
-        <TokenWithSymbol
-          totalAmount={data.daoTokenAmount}
-          tokenAddress={DAO_TOKEN_ADDRESS}
-        />
-      ),
-    },
-    {
       key: '8',
       label: 'Token Ratio',
       children: (
@@ -93,6 +83,18 @@ const InvestDetailPageContent: React.FC<{
         </div>
       ),
     },
+    {
+      key: '7',
+      label: 'Total subscribed DAO Amount',
+      children: (
+        <TokenWithSymbol
+          totalAmount={data.daoTokenAmount}
+          tokenAddress={DAO_TOKEN_ADDRESS}
+          format={true}
+        />
+      ),
+    },
+
     {
       key: '9',
       label: 'Total subscribed  Amount',

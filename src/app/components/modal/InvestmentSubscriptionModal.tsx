@@ -12,34 +12,41 @@ import {
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
-import { formatUnits } from 'ethers'
+import { formatUnits, parseUnits, toBigInt } from 'ethers'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 
 // 计算最大可认购的token数量
-function countMaxTokenAmount(
+async function countMaxTokenAmount(
   token: string,
   data: TwoStepInvestmentData,
   address: string,
 ) {
-  let maxTokenAmount = 0
+  let maxTokenAmount = 0n
   const now = Date.now()
-  const totalAmount = parseFloat(token)
+  const tokenDecimals = await getDecimals(data.tokenAddress)
+  const totalAmount = parseUnits(token, tokenDecimals)
 
   //计算占百分比
   if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
     const currentUser = data.whitelist[address]
-    const percent = currentUser[0] / 100 // 百分比的精度是10000
-    const hadSubscribe = parseInt(currentUser[1])
+    const percent = toBigInt(currentUser[0] / 100) // 百分比的精度是10000
+    const hadSubscribe = parseUnits(currentUser[1], tokenDecimals)
     // still in step 1, check limit first.
     console.log('🍻 countMaxTokenAmount :', totalAmount, percent, hadSubscribe)
-    maxTokenAmount = (totalAmount * percent) / 100 - hadSubscribe
+    maxTokenAmount = (totalAmount * percent) / 100n - hadSubscribe
   } else {
-    maxTokenAmount = totalAmount - parseInt(data.investedAmount)
+    maxTokenAmount = totalAmount - toBigInt(data.investedAmount)
   }
+
+  // to number
+  const maxTokenAmountNumber = Number(
+    formatUnits(maxTokenAmount, tokenDecimals),
+  )
 
   // 计算兑换比例
   let maxDaoTokenAmount =
-    (maxTokenAmount * data.tokenRatio.daoAmount) / data.tokenRatio.tokenAmount
+    (maxTokenAmountNumber * data.tokenRatio.daoAmount) /
+    data.tokenRatio.tokenAmount
 
   return maxDaoTokenAmount
 }
