@@ -91,12 +91,9 @@ const WhitelistInvestmentModal: React.FC<{
                 <div>
                   {fields.map(({ key, name }, index) => {
                     return (
-                      <div
-                        key={key}
-                        className='flex items-center justify-between gap-10'
-                      >
+                      <div key={key} className='grid grid-cols-6'>
                         <Form.Item
-                          className='w-full'
+                          className='col-span-3'
                           name={[name, 'address']}
                           rules={[
                             {
@@ -109,7 +106,6 @@ const WhitelistInvestmentModal: React.FC<{
                         </Form.Item>
                         <Form.Item
                           name={[name, 'percent']}
-                          className='w-full'
                           rules={[
                             {
                               required: true,
@@ -122,6 +118,7 @@ const WhitelistInvestmentModal: React.FC<{
                             placeholder='The percent of target address can take '
                           />
                         </Form.Item>
+                        <div>%</div>
 
                         <MinusCircleOutlined
                           style={{ fontSize: '20px' }}

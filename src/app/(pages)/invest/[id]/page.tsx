@@ -103,7 +103,7 @@ const InvestDetailPageContent: React.FC<{
                 </div>
                 <div>
                   <Tag>percent</Tag>
-                  {value[0]}
+                  {value[0] / 100} %
                 </div>
                 <div>
                   <Tag>subscribed</Tag>

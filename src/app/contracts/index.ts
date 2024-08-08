@@ -183,8 +183,8 @@ async function createWhitelistInvestment(
     return acc + cur.percent
   }, 0)
   // console.log('🍻 totlePercent :', totlePercent)
-  if (totlePercent !== 100) {
-    message.error('error: total percent must be 100')
+  if (totlePercent > 100) {
+    message.error('error: total percent must be 100 or less 100')
     return false
   }
 
@@ -239,7 +239,9 @@ async function createWhitelistInvestment(
 
   const startParams = {
     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
-    firstPercent: values.whitelist.map((item: any) => parseFloat(item.percent)),
+    firstPercent: values.whitelist.map((item: any) =>
+      parseInt((item.percent * 100).toString()),
+    ),
     tokenAddress: getAddress(values.tokenAddress),
     tokenAmount: parseUnits(values.tokenAmount, tokenDecimals),
     tokenRatio: {

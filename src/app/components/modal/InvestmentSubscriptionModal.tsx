@@ -5,7 +5,7 @@ import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
 import {
   subscribeInvestmentShare,
-  getSymbol,
+  // getSymbol,
   getDecimals,
   getAddressOfToken,
 } from '@contracts/index'
@@ -28,7 +28,7 @@ function countMaxTokenAmount(
   //计算占百分比
   if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
     const currentUser = data.whitelist[address]
-    const percent = currentUser[0]
+    const percent = currentUser[0] / 100 // 百分比的精度是10000
     const hadSubscribe = parseInt(currentUser[1])
     // still in step 1, check limit first.
     console.log('🍻 countMaxTokenAmount :', totalAmount, percent, hadSubscribe)
