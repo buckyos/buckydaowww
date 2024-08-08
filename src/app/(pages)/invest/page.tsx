@@ -76,7 +76,6 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
               />
             ),
           },
-          { key: '9', label: 'Investment', children: item.investedAmount },
           { key: '10', label: 'Investor', children: item.investor },
         ]
 
