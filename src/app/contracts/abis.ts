@@ -8,7 +8,7 @@ import ISourceDAOTokenDividend from './Interface.sol/ISourceDAOTokenDividend.jso
 import ISourceDevGroup from './Interface.sol/ISourceDevGroup.json'
 import ISourceTokenLockup from './Interface.sol/ISourceTokenLockup.json'
 import SourceDaoContractUpgradeable from './Interface.sol/SourceDaoContractUpgradeable.json'
-import TwoStepWhitelistInvestment from './Interface.sol/TwoStepWhitelistInvestment.json'
+import ITwoStepWhitelistInvestment from './Interface.sol/ITwoStepWhitelistInvestment.json'
 import erc20 from './ERC20.json'
 
 const abis = [
@@ -25,4 +25,4 @@ const abis = [
   ...SourceDaoContractUpgradeable,
 ]
 
-export { TwoStepWhitelistInvestment, abis, erc20 }
+export { ITwoStepWhitelistInvestment, abis, erc20 }
