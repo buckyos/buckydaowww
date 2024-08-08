@@ -17,23 +17,23 @@ import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 
 // 计算最大可认购的token数量
 async function countMaxTokenAmount(
-  token: string,
+  totalAmount: bigint,
   data: TwoStepInvestmentData,
   address: string,
 ) {
   let maxTokenAmount = 0n
   const now = Date.now()
   const tokenDecimals = await getDecimals(data.tokenAddress)
-  const totalAmount = parseUnits(token, tokenDecimals)
+  // const totalAmount = parseUnits(token, tokenDecimals)
 
   //计算占百分比
   if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
     const currentUser = data.whitelist[address]
-    const percent = toBigInt(currentUser[0] / 100) // 百分比的精度是10000
+    const percent = toBigInt(currentUser[0]) // 百分比的精度是10000
     const hadSubscribe = parseUnits(currentUser[1], tokenDecimals)
     // still in step 1, check limit first.
     console.log('🍻 countMaxTokenAmount :', totalAmount, percent, hadSubscribe)
-    maxTokenAmount = (totalAmount * percent) / 100n - hadSubscribe
+    maxTokenAmount = (totalAmount * percent) / 10000n - hadSubscribe
   } else {
     maxTokenAmount = totalAmount - toBigInt(data.investedAmount)
   }
@@ -70,10 +70,10 @@ const InvestmentSubscriptionModal: React.FC<{
       return
     }
     console.log('🍻 cout max token amount data :', data)
-    const tokenDecimals = await getDecimals(data.tokenAddress)
-
+    // const tokenDecimals = await getDecimals(data.tokenAddress)
     const maxDaoTokenAmount = await countMaxTokenAmount(
-      formatUnits(data.totalAmount, tokenDecimals),
+      toBigInt(data.totalAmount),
+      // formatUnits(data.totalAmount, tokenDecimals),
       data,
       user.address,
     )
