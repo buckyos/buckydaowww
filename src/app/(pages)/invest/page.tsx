@@ -19,7 +19,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
   const DAO_TOKEN_ADDRESS = getAddressOfToken()
 
   return (
-    <div className='grid grid-cols-1 gap-[18px] md:grid-cols-2'>
+    <div className='grid grid-cols-1 gap-10 md:grid-cols-2'>
       {data.map((item, key) => {
         const items: DescriptionsProps['items'] = [
           {
