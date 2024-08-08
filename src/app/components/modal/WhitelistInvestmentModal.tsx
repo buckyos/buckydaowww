@@ -93,10 +93,10 @@ const WhitelistInvestmentModal: React.FC<{
                     return (
                       <div
                         key={key}
-                        className='grid grid-cols-5 gap-4 items-center'
+                        className='grid grid-cols-7 gap-4 items-center'
                       >
                         <Form.Item
-                          className='col-span-3'
+                          className='col-span-4'
                           name={[name, 'address']}
                           rules={[
                             {
@@ -108,6 +108,7 @@ const WhitelistInvestmentModal: React.FC<{
                           <Input placeholder='Whitelist address' />
                         </Form.Item>
                         <Form.Item
+                          className='col-span-2'
                           name={[name, 'percent']}
                           rules={[
                             {
