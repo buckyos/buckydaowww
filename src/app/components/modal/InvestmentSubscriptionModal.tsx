@@ -20,7 +20,7 @@ async function countMaxTokenAmount(
   totalAmount: bigint,
   data: TwoStepInvestmentData,
   address: string,
-): Promise<bigint> {
+): Promise<number> {
   let maxTokenAmount = 0n
   const now = Date.now()
   const tokenDecimals = await getDecimals(data.tokenAddress)
@@ -40,14 +40,16 @@ async function countMaxTokenAmount(
   }
 
   // to number
-  // const maxTokenAmountNumber = Number(
-  //   formatUnits(maxTokenAmount, tokenDecimals),
-  // )
+  const maxTokenAmountNumber = parseFloat(
+    formatUnits(maxTokenAmount, tokenDecimals),
+  )
 
   // 计算兑换比例
   let maxDaoTokenAmount =
-    (maxTokenAmount * toBigInt(data.tokenRatio.daoAmount)) /
-    toBigInt(data.tokenRatio.tokenAmount)
+    (maxTokenAmountNumber * data.tokenRatio.daoAmount) /
+    data.tokenRatio.tokenAmount
+
+  console.log('🍻 maxDaoTokenAmount :', maxDaoTokenAmount)
 
   return maxDaoTokenAmount
 }
@@ -61,7 +63,7 @@ const InvestmentSubscriptionModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
-  const [maxTokenAmount, setMaxTokenAmount] = useState(0n)
+  const [maxTokenAmount, setMaxTokenAmount] = useState(0)
   const { user } = useUserStore()
 
   const DAO_TOKEN_ADDRESS = getAddressOfToken()
@@ -123,8 +125,8 @@ const InvestmentSubscriptionModal: React.FC<{
       footer={null}
     >
       <div>
-        The max remaining token you can subscribe to is{' '}
-        {formatUnits(maxTokenAmount, contract.decimals)} {contract.symbol}
+        The max remaining token you can subscribe to is {maxTokenAmount}{' '}
+        {contract.symbol}
       </div>
 
       <div className='flex mt-2'>
@@ -163,7 +165,7 @@ const InvestmentSubscriptionModal: React.FC<{
             <InputNumber
               className='w-72'
               min={0}
-              max={parseFloat(formatUnits(maxTokenAmount, contract.decimals))}
+              max={maxTokenAmount}
               placeholder='Input DAO token'
               suffix={contract.symbol}
             />
