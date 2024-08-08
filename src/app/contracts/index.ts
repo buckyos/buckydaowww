@@ -143,13 +143,13 @@ async function subscribeInvestmentShare(
   // const amount = values.tokenAmount.toString()
   const daoTokenAddress = getAddressOfToken()
   const decimals = await getDecimals(daoTokenAddress)
-  const amount = parseUnits(values.tokenAmount.toString(), decimals)
+  const daoAmount = parseUnits(values.tokenAmount.toString(), decimals)
   const twostepInvestmentAddress = getAddressOfTwoStepInvestment()
   console.log(
     '🍻 subscribeInvestmentShare values :',
     values,
-    '. amount:',
-    amount,
+    '. DAO token amount:',
+    daoAmount,
   )
 
   // 授权token
@@ -159,11 +159,11 @@ async function subscribeInvestmentShare(
       ownerAddress,
       twostepInvestmentAddress,
     )
-    console.log('🍻 contract allow :', allow, values.tokenAmount)
-    if (allow < amount) {
+    console.log('🍻 contract allow :', allow, daoAmount)
+    if (allow < daoAmount) {
       const tx = await daoTokenContract.approve(
         twostepInvestmentAddress,
-        amount,
+        daoAmount,
       )
       const receipt = await transactionWait(tx)
       if (receipt?.status !== 1) {
@@ -176,7 +176,7 @@ async function subscribeInvestmentShare(
 
   // 认购份额
   const twoStepInvestmentContract = await getTwoStepInvestmentContract()
-  const tx = await twoStepInvestmentContract.invest(id, amount)
+  const tx = await twoStepInvestmentContract.invest(id, daoAmount)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
     console.warn('transaction status:', receipt?.status, tx)
