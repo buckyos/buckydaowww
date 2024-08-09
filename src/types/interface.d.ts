@@ -152,7 +152,7 @@ interface ProjectItem {
   current_version: string
   stage: string
   github_url: string
-  descption: string
+  description: string
   project_logs?: ProjectLogsDefine[]
 }
 

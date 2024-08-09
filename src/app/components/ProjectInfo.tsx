@@ -109,7 +109,7 @@ const ProjectInfo: React.FC<{
           <div className='mt-10'>
             <h3 className='font-normal'>project description:</h3>
             <div className='text-sm mt-2 leading-8 text-gray-500'>
-              {project?.descption}
+              {project?.description}
             </div>
           </div>
         </>
