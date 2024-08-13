@@ -22,7 +22,9 @@ const SubscribeProgress: React.FC<SubscribeProgressProps> = ({
         tokenAddress={tokenAddress}
         format={true}
       />
-      <Progress percent={progress} size='small' />
+      <div className='w-14'>
+        <Progress percent={progress} size='small' />
+      </div>
     </div>
   )
 }
