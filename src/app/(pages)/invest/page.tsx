@@ -10,6 +10,7 @@ import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal
 import { getTwoStepInvestment } from '@services/index'
 import { useCommittee, useUserStore } from '@hooks/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
+import SubscribeProgress from '@components/invest/SubscribeProgress'
 import { getAddressOfToken } from '@contracts/index'
 
 // 投资列表(grid)
@@ -80,10 +81,10 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
             key: '9',
             label: 'Total subscribed  Amount',
             children: (
-              <TokenWithSymbol
-                totalAmount={item.investedAmount}
+              <SubscribeProgress
+                totalAmount={item.totalAmount}
+                investedAmount={item.investedAmount}
                 tokenAddress={item.tokenAddress}
-                format={true}
               />
             ),
           },
