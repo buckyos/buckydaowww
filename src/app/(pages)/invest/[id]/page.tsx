@@ -52,7 +52,15 @@ const InvestDetailPageContent: React.FC<{
       label: 'Step 2 duration',
       children: dayjs(data.step2EndTime * 1000).format('YYYY-MM-DD'),
     },
-    { key: '5', label: 'Token Address', children: data.tokenAddress },
+    {
+      key: '5',
+      label: 'Token Address',
+      children: (
+        <Link href={`https://polygonscan.com/token/${data.tokenAddress}`}>
+          data.tokenAddress
+        </Link>
+      ),
+    },
     {
       key: '6',
       label: 'Token Amount',

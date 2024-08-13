@@ -43,7 +43,19 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
             label: 'Step 2 duration',
             children: dayjs(item.step2EndTime * 1000).format('YYYY-MM-DD'),
           },
-          { key: '5', label: 'Token Address', children: item.tokenAddress },
+          {
+            key: '5',
+            label: 'Token Address',
+            children: (
+              <Link
+                href={`https://polygonscan.com/token/${item.tokenAddress}`}
+                target='_blank'
+              >
+                data.tokenAddress
+              </Link>
+            ),
+          },
+
           {
             key: '6',
             label: 'Token Amount',
