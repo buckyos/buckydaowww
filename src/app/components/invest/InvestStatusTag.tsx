@@ -23,11 +23,22 @@ const InvestStatusTag: React.FC<{ data: TwoStepInvestmentData }> = ({
       ? InvestStatus.SubscribeLeftAmount
       : InvestStatus.InvestmentEnd
 
-  const content = `Phase 1: Whitelisted users can subscribe to their allotted share of tokens.
-
-Phase 2: Whitelisted users can subscribe to all remaining unsold tokens, as long as their DAO holdings are sufficient for the exchange.
-
-Phase 3: The contract ends, and subscriptions are no longer possible. Investors can reclaim any remaining tokens.`
+  const content = (
+    <div>
+      <p>
+        Phase 1: Whitelisted users can subscribe to their allotted share of
+        tokens.
+      </p>
+      <p>
+        Phase 2: Whitelisted users can subscribe to all remaining unsold tokens,
+        as long as their DAO holdings are sufficient for the exchange.
+      </p>
+      <p>
+        Phase 3: The contract ends, and subscriptions are no longer possible.
+        Investors can reclaim any remaining tokens.
+      </p>
+    </div>
+  )
 
   return (
     <div>
@@ -41,7 +52,7 @@ Phase 3: The contract ends, and subscriptions are no longer possible. Investors 
         <Tag color='cyan'>Processing: subcribe</Tag>
       )}
       <div>
-        <Tooltip title={content}>
+        <Tooltip title={content} color='blue'>
           <InfoCircleOutlined />
         </Tooltip>
       </div>
