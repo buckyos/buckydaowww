@@ -15,6 +15,8 @@ import { endInvestment, getAddressOfToken } from '@contracts/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
 
+import InvestStatusTag from '@components/invest/InvestStatusTag'
+
 const InvestDetailPageContent: React.FC<{
   data?: TwoStepInvestmentData
 }> = ({ data }) => {
@@ -39,7 +41,7 @@ const InvestDetailPageContent: React.FC<{
     },
     {
       label: 'Status',
-      children: data.end ? <Tag>End</Tag> : <Tag>Processing</Tag>,
+      children: <InvestStatusTag data={data} />,
     },
 
     {
