@@ -1,7 +1,7 @@
 'use client'
 import useUserStore from '@hooks/useUserStore'
 import { Dropdown, MenuProps, Tag } from 'antd'
-import ConnectWalletButton from './ConnectWalletButton'
+import ConnectWalletButton from '@components/header/ConnectWalletButton'
 import { LogoutOutlined, ContactsOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import Image from 'next/image'
