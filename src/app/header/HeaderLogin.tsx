@@ -6,7 +6,6 @@ import { useAsyncEffect } from 'ahooks'
 import { getTokenContract } from '@contracts/index'
 import { formatUnits } from 'ethers'
 import { Tag, Spin } from 'antd'
-import ConnectWalletButton from '@components/header/ConnectWalletButton'
 
 const HeaderRight = () => {
   const user = useUserStore()
@@ -37,7 +36,6 @@ const HeaderRight = () => {
           <Tag>BDT</Tag>
         </div>
         <HeaderUserAvatar />
-        <ConnectWalletButton tooltip={true} />
       </div>
     </>
   )

@@ -46,20 +46,26 @@ const HeaderUserAvatar = () => {
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
       <div className='flex-center'>
         <Image
-          width={32}
-          height={32}
+          width={48}
+          height={48}
           className='w-8 h-8 rounded-full overflow-hidden'
           src={user.user.avatar!}
           alt='avatar'
         />
-        <span className='ml-2 text-sm cursor-default'>
-          {user.user.nickname}
-        </span>
-        {isCommittee && (
-          <div className='ml-2'>
-            <Tag color='green'>committee</Tag>
+        <div className='flex flex-col gap-1'>
+          <div className='flex-center'>
+            <span className='ml-2 text-sm cursor-default'>
+              {user.user.nickname}
+            </span>
+            {isCommittee && (
+              <div className='ml-2'>
+                <Tag color='green'>committee</Tag>
+              </div>
+            )}
           </div>
-        )}
+
+          <ConnectWalletButton tooltip={true} />
+        </div>
       </div>
     </Dropdown>
   )
