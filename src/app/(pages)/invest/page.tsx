@@ -12,6 +12,7 @@ import { useCommittee, useUserStore } from '@hooks/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
 import { getAddressOfToken } from '@contracts/index'
+import InvestStatusTag from '@components/invest/InvestStatusTag'
 
 // 投资列表(grid)
 const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
@@ -29,6 +30,11 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
             children: <Link href={`invest/${item.id}`}>{item.txHash}</Link>,
           },
           { key: '2', label: 'ID', children: item.id },
+          {
+            label: 'Status',
+            children: <InvestStatusTag data={item} />,
+          },
+
           {
             label: 'Step 1 duration',
             children: dayjs(item.step1EndTime * 1000).format('YYYY-MM-DD'),
