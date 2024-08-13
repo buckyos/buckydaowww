@@ -51,7 +51,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
                 href={`https://polygonscan.com/token/${item.tokenAddress}`}
                 target='_blank'
               >
-                data.tokenAddress
+                {item.tokenAddress}
               </Link>
             ),
           },

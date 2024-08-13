@@ -56,8 +56,11 @@ const InvestDetailPageContent: React.FC<{
       key: '5',
       label: 'Token Address',
       children: (
-        <Link href={`https://polygonscan.com/token/${data.tokenAddress}`}>
-          data.tokenAddress
+        <Link
+          href={`https://polygonscan.com/token/${data.tokenAddress}`}
+          target='_blank'
+        >
+          {data.tokenAddress}
         </Link>
       ),
     },
