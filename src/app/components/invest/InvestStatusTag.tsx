@@ -1,5 +1,6 @@
 'use client'
-import { Tag } from 'antd'
+import { ClockCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { Tag, Tooltip } from 'antd'
 
 enum InvestStatus {
   // 只能认购自己的份额
@@ -8,15 +9,8 @@ enum InvestStatus {
   SubscribeLeftAmount = 1,
   // 投资结束
   InvestmentEnd = 2,
-
-  // InvestmentPhase1 = 1,
-  // InvestmentPhase2 = 2,
-  // InvestmentEnd = 3,
 }
 
-// Investment Phase 1，绿色
-// Investment Phase 2，绿色
-// Investment End，红色
 const InvestStatusTag: React.FC<{ data: TwoStepInvestmentData }> = ({
   data,
 }) => {
@@ -29,16 +23,28 @@ const InvestStatusTag: React.FC<{ data: TwoStepInvestmentData }> = ({
       ? InvestStatus.SubscribeLeftAmount
       : InvestStatus.InvestmentEnd
 
+  const content = `Phase 1: Whitelisted users can subscribe to their allotted share of tokens.
+
+Phase 2: Whitelisted users can subscribe to all remaining unsold tokens, as long as their DAO holdings are sufficient for the exchange.
+
+Phase 3: The contract ends, and subscriptions are no longer possible. Investors can reclaim any remaining tokens.`
+
   return (
     <div>
       {data.end || stage === InvestStatus.InvestmentEnd ? (
-        <Tag color='magenta'>End</Tag>
+        <Tag color='magenta' icon={<ClockCircleOutlined />}>
+          End
+        </Tag>
       ) : stage === InvestStatus.OnlySubscribeSelfShare ? (
         <Tag color='green'>Processing: open</Tag>
       ) : (
         <Tag color='cyan'>Processing: subcribe</Tag>
       )}
-      <div></div>
+      <div>
+        <Tooltip title={content}>
+          <InfoCircleOutlined />
+        </Tooltip>
+      </div>
     </div>
   )
 }
