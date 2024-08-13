@@ -13,7 +13,9 @@ const SubscribeProgress: React.FC<SubscribeProgressProps> = ({
   tokenAddress,
   totalAmount,
 }) => {
-  const progress = (Number(investedAmount) / Number(totalAmount)) * 100
+  const progress = parseFloat(
+    ((Number(investedAmount) / Number(totalAmount)) * 100).toFixed(4),
+  )
 
   return (
     <div className='flex items-center gap-2'>
