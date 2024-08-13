@@ -24,7 +24,7 @@ const InvestStatusTag: React.FC<{ data: TwoStepInvestmentData }> = ({
       : InvestStatus.InvestmentEnd
 
   const content = (
-    <div>
+    <div className='flex flex-row gap-2'>
       <p>
         Phase 1: Whitelisted users can subscribe to their allotted share of
         tokens.
@@ -41,7 +41,7 @@ const InvestStatusTag: React.FC<{ data: TwoStepInvestmentData }> = ({
   )
 
   return (
-    <div>
+    <div className='flex items-center'>
       {data.end || stage === InvestStatus.InvestmentEnd ? (
         <Tag color='magenta' icon={<ClockCircleOutlined />}>
           End
