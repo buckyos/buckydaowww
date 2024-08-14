@@ -18,7 +18,7 @@ const ConnectWalletButton: React.FC<{}> = ({}) => {
   return (
     <>
       <div className='flex items-center w-42'>
-        <WalletOutlined className='mr-1' />
+        <WalletOutlined className='mr-2' />
         <span className='mr-4'>wallet</span>
         {isConnect() ? (
           address
