@@ -1,14 +1,16 @@
 'use client'
-import useUserStore from '@hooks/useUserStore'
-import { Dropdown, MenuProps, Tag } from 'antd'
-import ConnectWalletButton from '@components/header/ConnectWalletButton'
-import { LogoutOutlined, ContactsOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useCommittee } from '@hooks/index'
+import { Dropdown, MenuProps, Tag, Tooltip } from 'antd'
+import { LogoutOutlined, ContactsOutlined } from '@ant-design/icons'
+import ConnectWalletButton from '@components/header/ConnectWalletButton'
+import useUserStore from '@hooks/useUserStore'
+import { useCommittee, useBindWalletAddress } from '@hooks/index'
 
 const HeaderUserAvatar = () => {
   const user = useUserStore()
+  const userBind = useBindWalletAddress()
+
   const { isCommittee } = useCommittee(user.user)
 
   const items: MenuProps['items'] = [
@@ -68,7 +70,11 @@ const HeaderUserAvatar = () => {
             )}
           </div>
 
-          <ConnectWalletButton tooltip={true} />
+          <Tooltip title={userBind.user.address}>
+            <div className='text-cyfs-green text-sm'>
+              {userBind.addressEllipsis()}
+            </div>
+          </Tooltip>
         </div>
       </div>
     </Dropdown>

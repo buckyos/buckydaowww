@@ -38,10 +38,20 @@ function useBindWalletAddress() {
     }
   }
 
+  // ellipsis
+  const addressEllipsis = () => {
+    const displayed = user.address
+    if (displayed.length < 15) {
+      return displayed
+    }
+    return `${displayed.slice(0, 6)}...${displayed.slice(displayed.length - 5)}`
+  }
+
   return {
     isConnect,
     user,
     handleConnect,
+    addressEllipsis,
   }
 }
 
