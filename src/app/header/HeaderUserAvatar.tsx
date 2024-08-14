@@ -44,16 +44,16 @@ const HeaderUserAvatar = () => {
 
   return (
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
-      <div className='flex-center'>
+      <div className='flex-center gap-2'>
         <Image
-          width={48}
-          height={48}
-          className='w-8 h-8 rounded-full overflow-hidden'
+          width={64}
+          height={64}
+          className='w-16 h-16 rounded-full overflow-hidden'
           src={user.user.avatar!}
           alt='avatar'
         />
-        <div className='flex flex-col gap-1'>
-          <div className='flex-center'>
+        <div className='flex flex-col'>
+          <div className='flex items-center'>
             <span className='ml-2 text-sm cursor-default'>
               {user.user.nickname}
             </span>

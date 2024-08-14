@@ -16,7 +16,7 @@ const ConnectWalletButton: React.FC<{ tips?: string; tooltip?: boolean }> = ({
   }
 
   const addressWithTips = (
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-2 text-sm'>
       <Tooltip title={user.address}>
         <div className='text-cyfs-green'>{encryptedUserDisplayed()}</div>
       </Tooltip>
