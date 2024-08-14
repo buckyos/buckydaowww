@@ -23,7 +23,11 @@ const HeaderUserAvatar = () => {
     },
 
     {
-      label: <ConnectWalletButton />,
+      label: (
+        <div className='py-2'>
+          <ConnectWalletButton />
+        </div>
+      ),
       key: 'wallet',
     },
     {
