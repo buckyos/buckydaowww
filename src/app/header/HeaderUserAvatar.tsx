@@ -46,9 +46,9 @@ const HeaderUserAvatar = () => {
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
       <div className='flex-center gap-2'>
         <Image
-          width={64}
-          height={64}
-          className='w-16 h-16 rounded-full overflow-hidden'
+          width={56}
+          height={56}
+          className='w-14 h-14 rounded-full overflow-hidden'
           src={user.user.avatar!}
           alt='avatar'
         />
