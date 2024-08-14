@@ -70,11 +70,13 @@ const HeaderUserAvatar = () => {
             )}
           </div>
 
-          <Tooltip title={userBind.user.address}>
-            <div className='text-cyfs-green text-sm'>
-              {userBind.addressEllipsis()}
-            </div>
-          </Tooltip>
+          {userBind.user.address && (
+            <Tooltip title={userBind.user.address}>
+              <div className='text-cyfs-green text-sm'>
+                {userBind.addressEllipsis()}
+              </div>
+            </Tooltip>
+          )}
         </div>
       </div>
     </Dropdown>
