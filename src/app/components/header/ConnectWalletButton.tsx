@@ -33,7 +33,7 @@ const ConnectWalletButton: React.FC<{ tips?: string; tooltip?: boolean }> = ({
   return (
     <>
       <div className='flex items-center py-2 w-42'>
-        <WalletOutlined className='mr-2' />
+        <WalletOutlined className='mr-1' />
         <span className='mr-4'>wallet</span>
         {isConnect() ? (
           tooltip ? (
