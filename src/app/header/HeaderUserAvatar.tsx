@@ -54,7 +54,9 @@ const HeaderUserAvatar = () => {
         />
         <div className='flex flex-col'>
           <div className='flex items-center'>
-            <span className='text-sm cursor-default'>{user.user.nickname}</span>
+            <span className='text-base cursor-default'>
+              {user.user.nickname}
+            </span>
             {isCommittee && (
               <div className='ml-2'>
                 <Tag color='green'>committee</Tag>
