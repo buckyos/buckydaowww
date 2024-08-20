@@ -18,6 +18,8 @@ const PROJECT = process.env.NEXT_PUBLIC_PROJECT
 const TOKEN = process.env.NEXT_PUBLIC_TOKEN
 const TWOSTEP_INVESTMENT = process.env.NEXT_PUBLIC_TWOSTEP_INVESTMENT
 
+const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
+
 console.log('🔡 COMMITTEE contract address', COMMITTEE)
 console.log('🔡 DIVIDEND contract address', DIVIDEND)
 console.log('🔡 INVESTMENT contract address', INVESTMENT)
@@ -35,6 +37,21 @@ function getAddressOfTwoStepInvestment() {
 function getAddressOfToken() {
   if (!TOKEN) throw new Error('TOKEN is undefined')
   return TOKEN
+}
+
+function getAddressOfMain() {
+  if (!MAIN) throw new Error('MAIN is undefined')
+  return MAIN
+}
+
+function getAddressOfLockup() {
+  if (!LOCKUP) throw new Error('LOCKUP is undefined')
+  return LOCKUP
+}
+
+function getNetworkId() {
+  if (!NETWORK_ID) throw new Error('NETWORK_ID is undefined')
+  return NETWORK_ID
 }
 
 // cache contract instance
@@ -146,6 +163,9 @@ export {
   // address
   getAddressOfToken,
   getAddressOfTwoStepInvestment,
+  getAddressOfMain,
+  getAddressOfLockup,
+  getNetworkId,
 
   // provider
   getProvider,

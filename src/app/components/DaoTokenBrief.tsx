@@ -8,6 +8,11 @@ import {
   bigTransformPercentNumber,
 } from '@utils/numberConverter'
 import { GithubOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import {
+  getNetworkId,
+  getAddressOfMain,
+  getAddressOfToken,
+} from '@contracts/index'
 import DaoTokenCard from './DaoTokenCard'
 
 import localFont from 'next/font/local'
@@ -18,6 +23,10 @@ const font = localFont({
 })
 
 export default function DaoTokenBrief() {
+  const mainAddress = getAddressOfMain()
+  const networkId = getNetworkId()
+  const tokenAddress = getAddressOfToken()
+
   const [symbol, setSymbol] = useState('')
   const [daoTokenCardItems, setDaoTokenCardItems] = useState<
     DaoTokenAmountCardItem[]
@@ -46,8 +55,6 @@ export default function DaoTokenBrief() {
   }
 
   useAsyncEffect(async () => {
-    await contract.fetchContractAddress()
-
     const token = await contract.fetchToken()
     const totalSupply = transformNumber(token.totalSupply, token.decimals)
     const totalReleased = transformNumber(token.totalReleased, token.decimals)
@@ -118,17 +125,15 @@ export default function DaoTokenBrief() {
         <div className='col-span-2'>Chain Network:</div>
         <div className='col-span-2 font-bold'>
           {process.env.NEXT_PUBLIC_CHAIN}
-          <span className='text-cyfs-gray ml-1'>
-            {contract.chainId > 0 ? `(#${contract.chainId})` : ''}
-          </span>
+          <span className='text-cyfs-gray ml-1'>{networkId}</span>
         </div>
         <div className='col-span-2'>Contract Address:</div>
         <a
           className='col-span-2 font-bold text-black'
-          href={`https://polygonscan.com/address/${contract.mainAddress}`}
+          href={`https://polygonscan.com/address/${mainAddress}`}
           target='_blank'
         >
-          {contract.mainAddress}
+          {mainAddress}
         </a>
 
         <div className='col-span-2'>
@@ -139,10 +144,10 @@ export default function DaoTokenBrief() {
         </div>
         <a
           className='col-span-2 font-bold text-black'
-          href={`https://polygonscan.com/token/${contract.tokenAddress}`}
+          href={`https://polygonscan.com/token/${tokenAddress}`}
           target='_blank'
         >
-          {contract.tokenAddress}
+          {tokenAddress}
         </a>
         <a
           className='col-span-2 text-black no-underline flex items-center'

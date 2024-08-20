@@ -9,10 +9,14 @@ import { abis } from '@contracts/abis'
 import { useCommitteeStore, CommitteeType } from './useCommittee'
 import {
   getProvider,
-  getTokenContract,
   getProjectContract,
   contractProxyContract,
 } from './function'
+import {
+  getCommitteeContract,
+  getAddressOfLockup,
+  getAddressOfToken,
+} from '@contracts/index'
 
 function useBindWalletAddress() {
   const { isConnect, user, updateUser, jwt } = useUserStore((state) => ({
@@ -56,12 +60,9 @@ function useBindWalletAddress() {
 }
 
 function useLockToken(ownerAddress: string) {
-  const { lockupAddress, tokenAddress } = useContractStore((state) => {
-    return {
-      lockupAddress: state.lockupAddress,
-      tokenAddress: state.tokenAddress,
-    }
-  })
+  const tokenAddress = getAddressOfToken()
+  const lockupAddress = getAddressOfLockup()
+
   const [token, setToken] = useState<{
     token: number
     assigned: number
@@ -103,8 +104,8 @@ function useLockToken(ownerAddress: string) {
 
 // 是否是委员会成员
 function useCommittee(user: User) {
-  const { getComitteeContract, decimals } = useContractStore((state) => ({
-    getComitteeContract: state.getComitteeContract,
+  const { decimals } = useContractStore((state) => ({
+    // getComitteeContract: state.getComitteeContract,
     decimals: state.decimals,
   }))
 
@@ -121,7 +122,7 @@ function useCommittee(user: User) {
       return
     }
 
-    const contract = await getComitteeContract()
+    const contract = await getCommitteeContract()
     // 需要注意,这里是user表的, 可能和钱包地址不一致
     const isMember = await contract.isMember(user.address)
     console.log('isCommitteeMember: ', isMember, user.address)
@@ -171,7 +172,6 @@ export {
   useCommitteeStore,
   useContractStore,
   getProvider,
-  getTokenContract,
   getProjectContract,
   contractProxyContract,
 }

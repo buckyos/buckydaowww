@@ -260,26 +260,15 @@ interface SettlementVersionProposalParams {
 }
 
 interface ContractStoreDefine {
-  chainId: number
-  mainAddress: string
-  tokenAddress: string
-  committeeAddress: string
-  projectAddress: string
-  investmentAddress: string
-  lockupAddress: string
-  twostepInvestmentAddress: string
   totalSupply: number
   totalReleased: number
   totalUnreleased: number
   symbol: string
   decimals: number
   expiration: number
-  fetchContractAddress: () => Promise<void>
   fetchToken: () => Promise<any>
-  getComitteeContract: () => Promise<ethers.Contract>
   getSignerComitteeContract: () => Promise<ethers.Contract>
   getInvestMentContract: () => Promise<ethers.Contract>
-  getTwoStepInvestMentContract: () => Promise<ethers.Contract>
 }
 
 interface TwoStepTokenRatio {

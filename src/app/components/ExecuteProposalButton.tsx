@@ -2,11 +2,7 @@ import { useState } from 'react'
 import { Button, message, Tooltip } from 'antd'
 import { useCommittee } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
-import useContractStore, {
-  getTokenContract,
-  getProjectContract,
-  contractProxyContract,
-} from '@hooks/useContract'
+import useContractStore, { getProjectContract } from '@hooks/useContract'
 import _ from 'lodash'
 import {
   extractMessage,
@@ -20,6 +16,7 @@ import { ProposalState } from '@vars/index'
 import {
   executeChangeCommittee,
   executeUpgradeContract,
+  getTokenContract,
 } from '@contracts/index'
 
 interface ExecuteProposalButtonProps {
@@ -112,7 +109,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   }
 
   const executeReleaseToken = async () => {
-    const tokenContract = await getTokenContract(contract.tokenAddress)
+    const tokenContract = await getTokenContract()
 
     const address = proposal?.params[0]
     const amounts = proposal?.params[1]

@@ -4,13 +4,14 @@ import TextArea from 'antd/es/input/TextArea'
 import { StoreValue } from 'antd/es/form/interface'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { Modal, Form, Input, Button, message, Spin, InputNumber } from 'antd'
-import useContractStore, { getTokenContract } from '@hooks/useContract'
+import useContractStore from '@hooks/useContract'
 import useUserStore from '@hooks/useUserStore'
 import { createReleaseToken, proposalSetparams } from '@services/index'
 import dayjs from 'dayjs'
 import { getAddress } from 'ethers'
 import { unwrapUnits } from '@utils/numberConverter'
 import { extractMessage } from '@utils/index'
+import { getTokenContract } from '@contracts/index'
 
 interface TokenDefined {
   address: string
@@ -49,7 +50,7 @@ const CreateTransferModal: React.FC<{
       },
       { address: [] as string[], amounts: [] as bigint[] },
     )
-    const tokenContract = await getTokenContract(contract.tokenAddress)
+    const tokenContract = await getTokenContract()
     // 7days
     const duration = 60 * 60 * 24 * 7
 

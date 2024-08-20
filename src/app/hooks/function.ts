@@ -2,20 +2,10 @@
 import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
 import { getProvider } from '@contracts/contract'
-
-async function getTokenContract(address: string) {
-  let provider = await getProvider()
-  const signer = await provider.getSigner()
-  const contract = new ethers.Contract(address, abis, signer)
-  return contract
-}
+import { getProjectContract as getProjectContractBase } from '@contracts/index'
 
 async function getProjectContract(contractStrore: ContractStoreDefine) {
-  const address = contractStrore.projectAddress
-  // console.log('🐼 getProjectContract', address)
-  let provider = await getProvider()
-  const signer = await provider.getSigner()
-  const contract = new ethers.Contract(address, abis, signer)
+  const contract = await getProjectContractBase()
   return contract
 }
 
@@ -27,9 +17,4 @@ async function contractProxyContract(contractProxyAddress: string) {
   return contract
 }
 
-export {
-  getProvider,
-  getTokenContract,
-  getProjectContract,
-  contractProxyContract,
-}
+export { getProvider, getProjectContract, contractProxyContract }

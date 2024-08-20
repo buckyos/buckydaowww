@@ -9,7 +9,10 @@ import useContractStore from '@hooks/useContract'
 import { useAsyncEffect } from 'ahooks'
 import { RightOutlined } from '@ant-design/icons'
 
+import { getAddressOfMain } from '@contracts/index'
+
 const ContractAbout = () => {
+  const mainAddress = getAddressOfMain()
   const contract = useContractStore()
   const router = useRouter()
   const toDaoContract = () => {
@@ -67,7 +70,7 @@ const ContractAbout = () => {
 
         <div className={cx('mt-[18px]', 'break-words')}>
           <span className={cx('font-medium')}>Contract address:&nbsp;</span>
-          <span>{contract.mainAddress}</span>
+          <span>{mainAddress}</span>
         </div>
 
         <div
