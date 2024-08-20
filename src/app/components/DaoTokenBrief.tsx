@@ -124,13 +124,13 @@ export default function DaoTokenBrief() {
         ))}
         <div className='col-span-2'>Chain Network:</div>
         <div className='col-span-2 font-bold'>
-          {process.env.NEXT_PUBLIC_CHAIN}
+          X Layer
           <span className='text-cyfs-gray ml-1'>{networkId}</span>
         </div>
         <div className='col-span-2'>Contract Address:</div>
         <a
           className='col-span-2 font-bold text-black'
-          href={`https://polygonscan.com/address/${mainAddress}`}
+          href={`https://www.okx.com/zh-hans/web3/explorer/xlayer/address/${mainAddress}`}
           target='_blank'
         >
           {mainAddress}
@@ -144,7 +144,7 @@ export default function DaoTokenBrief() {
         </div>
         <a
           className='col-span-2 font-bold text-black'
-          href={`https://polygonscan.com/token/${tokenAddress}`}
+          href={`https://www.okx.com/zh-hans/web3/explorer/xlayer/token/${tokenAddress}`}
           target='_blank'
         >
           {tokenAddress}
