@@ -77,6 +77,19 @@ const HeaderUserAvatar = () => {
               </div>
             </Tooltip>
           )}
+
+          {!userBind.user.address && (
+            <div
+              className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-6 px-4 rounded-lg cursor-pointer text-sm'
+              onClick={() => {
+                // setShowModal(true)
+                // 先不用弹窗
+                userBind.handleConnect()
+              }}
+            >
+              <span className='ml-1'>Connect</span>
+            </div>
+          )}
         </div>
       </div>
     </Dropdown>

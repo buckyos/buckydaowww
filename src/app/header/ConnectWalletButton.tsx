@@ -3,14 +3,7 @@ import { WalletOutlined } from '@ant-design/icons'
 import { useBindWalletAddress } from '@hooks/index'
 
 const ConnectWalletButton: React.FC<{ tips?: string }> = () => {
-  const { isConnect, user, handleConnect } = useBindWalletAddress()
-  const encryptedUserDisplayed = () => {
-    const displayed = user.address
-    if (displayed.length < 15) {
-      return displayed
-    }
-    return `${displayed.slice(0, 6)}...${displayed.slice(displayed.length - 5)}`
-  }
+  const { isConnect, handleConnect, addressEllipsis } = useBindWalletAddress()
 
   return (
     <>
@@ -19,7 +12,7 @@ const ConnectWalletButton: React.FC<{ tips?: string }> = () => {
         <span className='mr-4'>wallet</span>
         {isConnect() ? (
           <div className='flex items-center gap-2'>
-            <div className='text-cyfs-green'>{encryptedUserDisplayed()}</div>
+            <div className='text-cyfs-green'>{addressEllipsis()}</div>
           </div>
         ) : (
           <div
