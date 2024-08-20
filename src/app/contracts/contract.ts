@@ -117,7 +117,7 @@ async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
     .then((network) => network.chainId.toString())
 
   // polygan
-  const networkId = process.env.NEXT_PUBLIC_NETWORK_ID || '137'
+  const networkId = NETWORK_ID || '196'
   let hexString = Number(networkId).toString(16)
   let hexStringWithPrefix = '0x' + hexString
   console.log('networkId: ', hexStringWithPrefix) // 输出 "0x89"
