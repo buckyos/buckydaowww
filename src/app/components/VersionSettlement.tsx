@@ -133,14 +133,16 @@ const VersionSettlement: React.FC<{
       render: (value: number) => {
         return (
           <Tooltip title='except for unexplained situations, there may be deviations'>
-            <div className='flex-center'>
-              <div className='flex-center'>
-                {wrapUnits(
-                  calculateProportion(value / totle, budget),
-                  decimals,
-                )}
+            <div className='flex-center gap-2'>
+              <div className='flex-center gap-1'>
+                <span>
+                  {wrapUnits(
+                    calculateProportion(value / totle, budget),
+                    decimals,
+                  )}
+                </span>
 
-                {symbol}
+                <span>{symbol}</span>
               </div>
               <ExclamationCircleOutlined />
             </div>
@@ -164,7 +166,12 @@ const VersionSettlement: React.FC<{
       </div>
 
       <div className='mt-6 px-10'>
-        <Table dataSource={contributions} columns={columns} bordered={false} />
+        <Table
+          dataSource={contributions}
+          columns={columns}
+          bordered={false}
+          pagination={false}
+        />
       </div>
 
       <WithdrawButton proposal={proposal} />
