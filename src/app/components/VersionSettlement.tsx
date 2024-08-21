@@ -159,19 +159,13 @@ const VersionSettlement: React.FC<{
     },
     {
       title: 'Estimated gain',
-      dataIndex: 'value',
-      render: (value: number) => {
+      dataIndex: 'amount',
+      render: (amount: string) => {
         return (
           <Tooltip title='except for unexplained situations, there may be deviations'>
             <div className='flex-center gap-2'>
               <div className='flex-center gap-1'>
-                <span>
-                  {wrapUnits(
-                    calculateProportion(value / totle, budget),
-                    decimals,
-                  )}
-                </span>
-
+                <span>{wrapUnits(amount, decimals)}</span>
                 <span>{symbol}</span>
               </div>
               <ExclamationCircleOutlined />
