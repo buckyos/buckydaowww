@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useAsyncEffect } from 'ahooks'
 import {
-  getProjectDetail,
   getProjectVersionDetail,
   fetchProposalId,
+  fetchRepositoryList,
 } from '@services/index'
 import { ProjectInfo } from '@components/ProjectInfo'
 import VersionSettlementModal from '@components/modal/VersionSettlementModal'
@@ -21,14 +21,21 @@ const ProjectVersionPage = () => {
 
   useAsyncEffect(async () => {
     setIsLoading(true)
-    const resp = await Promise.all([
-      getProjectDetail(projectId as string),
+    const [projectResult, versionResult] = await Promise.all([
+      fetchRepositoryList(),
       getProjectVersionDetail(versionId as string),
     ])
-    console.log(resp)
-    const version = resp[1].data as ProjectVersionProps
+    console.log(projectResult, versionResult)
+    const version = versionResult.data as ProjectVersionProps
     setVersion(version)
-    setProject(resp[0].data)
+    const project = projectResult.data
+      .map((item) => {
+        return JSON.parse(item.detail) as ProjectItem
+      })
+      .find((item) => item.id == projectId)
+    if (project) {
+      setProject(project)
+    }
 
     // fetch 验收提案
     if (version.accept_proposal_id) {
