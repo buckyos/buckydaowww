@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Tag, message, Button, Tooltip, Spin } from 'antd'
+import { Tag, message, Button, Tooltip, Spin, Table } from 'antd'
 import ProposalStateTag from '@components/ProposalStateTag'
 import { ProposalState } from '@vars/index'
 import useContractStore, { getProjectContract } from '@hooks/useContract'
@@ -115,6 +115,41 @@ const VersionSettlement: React.FC<{
     return acc + cur.value
   }, 0)
 
+  const columns = [
+    {
+      title: 'Contributor',
+      dataIndex: 'contributor',
+    },
+    {
+      title: 'Value',
+      dataIndex: 'value',
+      render: (value: number) => {
+        return <div>{value} Point</div>
+      },
+    },
+    {
+      title: 'Estimated gain',
+      dataIndex: 'value',
+      render: (value: number) => {
+        return (
+          <div className='flex-center'>
+            <Tooltip title='except for unexplained situations, there may be deviations'>
+              <div className='flex-center'>
+                {wrapUnits(
+                  calculateProportion(value / totle, budget),
+                  decimals,
+                )}
+
+                {symbol}
+              </div>
+              <ExclamationCircleOutlined />
+            </Tooltip>
+          </div>
+        )
+      },
+    },
+  ]
+
   return (
     <>
       <div className='flex mt-20 items-center gap-4'>
@@ -128,33 +163,8 @@ const VersionSettlement: React.FC<{
         Total contribution value: <Tag>{totle}</Tag>
       </div>
 
-      {contributions.map((item: ContributionInfo, index: number) => {
-        return (
-          <div key={index} className='flex items-center mt-4 gap-2'>
-            <div className='w-[400px]'>
-              Contributor <Tag>{item.contributor}</Tag>
-            </div>
-            <div className='w-[100px]'>
-              value:
-              <Tag>{item.value}</Tag>
-            </div>
-            <div className=''>
-              <Tooltip title='except for unexplained situations, there may be deviations'>
-                Estimated gain
-                <Tag>
-                  {wrapUnits(
-                    calculateProportion(item.value / totle, budget),
-                    decimals,
-                  )}
-
-                  {symbol}
-                </Tag>
-                <ExclamationCircleOutlined />
-              </Tooltip>
-            </div>
-          </div>
-        )
-      })}
+      <div className='mt-6'></div>
+      <Table dataSource={contributions} columns={columns} bordered={false} />
 
       <WithdrawButton proposal={proposal} />
     </>
