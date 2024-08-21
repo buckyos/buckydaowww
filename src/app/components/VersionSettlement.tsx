@@ -163,6 +163,7 @@ const VersionSettlement: React.FC<{
       </h3>
       <div className='flex items-center mt-4'>
         Total contribution value: <Tag>{totle}</Tag>
+        Point
       </div>
 
       <div className='mt-6 px-10'>
