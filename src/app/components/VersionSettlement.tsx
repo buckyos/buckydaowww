@@ -180,6 +180,13 @@ const VersionSettlement: React.FC<{
         )
       },
     },
+    {
+      title: 'Claim',
+      dataIndex: 'hasClaim',
+      render: (hasClaim: boolean) => {
+        return hasClaim ? 'YES' : 'NO'
+      },
+    },
   ]
 
   return (
