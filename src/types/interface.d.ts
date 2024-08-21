@@ -249,6 +249,14 @@ interface ContributionInfo {
   contributor: string
   value: number
   hasClaim: boolean
+  amount?: string
+}
+
+interface ContributionItem {
+  address: string
+  amount: string
+  isClaim: boolean
+  projectId: number
 }
 
 interface SettlementVersionProposalParams {

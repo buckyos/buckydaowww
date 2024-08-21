@@ -212,26 +212,6 @@ export async function getContractInfo(): Promise<ContractInfomationResponse> {
   return data
 }
 
-// 版本详情
-export async function getProjectDetail(
-  projectId: string,
-): Promise<CommonResponse<ProjectItem>> {
-  // if (projectId == '1') {
-  //   return {
-  //     code: 0,
-  //     msg: '',
-  //     data: {
-  //       project_id: '1',
-  //       ...project_data,
-  //     },
-  //   }
-  // }
-
-  const resp = await fetch(`/api/project/${projectId}`)
-  const data = await resp.json()
-  return data
-}
-
 // 获取提案列表
 export async function getProposals(
   page: number,
@@ -304,6 +284,14 @@ export async function createProjectVersionExtra(
       'DAO-TOKEN': jwt,
     },
   })
+  const data = await resp.json()
+  return data
+}
+
+export async function getVersionContributionInfo(
+  versionId: string,
+): Promise<CommonResponse<ContributionItem[]>> {
+  const resp = await fetch('/api/contribution/' + versionId)
   const data = await resp.json()
   return data
 }

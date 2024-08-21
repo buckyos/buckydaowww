@@ -4,10 +4,15 @@ import ProposalStateTag from '@components/ProposalStateTag'
 import { ProposalState } from '@vars/index'
 import useContractStore, { getProjectContract } from '@hooks/useContract'
 import { extractMessage, transactionWait } from '@utils/index'
-import { postContributionWithdraw } from '@services/index'
+import {
+  postContributionWithdraw,
+  getVersionContributionInfo,
+} from '@services/index'
 import useUserStore from '@hooks/useUserStore'
 import { wrapUnits, calculateProportion } from '@utils/numberConverter'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { useAsyncEffect } from 'ahooks'
+import _ from 'lodash'
 
 const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
   proposal,
@@ -91,11 +96,37 @@ const VersionSettlement: React.FC<{
   version?: ProjectVersionProps
   proposal?: ProposalResponseData
   loading: boolean
-}> = ({ proposal, loading }) => {
+}> = ({ version, proposal, loading }) => {
   const { decimals, symbol } = useContractStore((state) => ({
     decimals: state.decimals,
     symbol: state.symbol,
   }))
+
+  const [contributions, setContributions] = useState<ContributionInfo[]>([])
+
+  useAsyncEffect(async () => {
+    if (version && proposal) {
+      const contributions = proposal.params[0]
+        .contributions as ContributionInfo[]
+      const result = await getVersionContributionInfo(version.id.toString())
+      const data = contributions.map((contribution) => {
+        const item = _.find(
+          result.data,
+          (item) => item.address == contribution.contributor,
+        )
+        if (item) {
+          return {
+            ...contribution,
+            hasClaim: item.isClaim,
+            amount: item.amount,
+          }
+        } else {
+          return contribution
+        }
+      })
+      setContributions(data)
+    }
+  }, [version, proposal])
 
   if (loading) {
     return <Spin></Spin>
@@ -109,7 +140,6 @@ const VersionSettlement: React.FC<{
     return null
   }
 
-  const contributions = proposal.params[0].contributions as ContributionInfo[]
   const budget = BigInt(proposal.params[0].budget)
   const totle = contributions.reduce((acc, cur) => {
     return acc + cur.value
