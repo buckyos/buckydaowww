@@ -132,8 +132,8 @@ const VersionSettlement: React.FC<{
       dataIndex: 'value',
       render: (value: number) => {
         return (
-          <div className='flex-center'>
-            <Tooltip title='except for unexplained situations, there may be deviations'>
+          <Tooltip title='except for unexplained situations, there may be deviations'>
+            <div className='flex-center'>
               <div className='flex-center'>
                 {wrapUnits(
                   calculateProportion(value / totle, budget),
@@ -143,8 +143,8 @@ const VersionSettlement: React.FC<{
                 {symbol}
               </div>
               <ExclamationCircleOutlined />
-            </Tooltip>
-          </div>
+            </div>
+          </Tooltip>
         )
       },
     },
@@ -163,8 +163,9 @@ const VersionSettlement: React.FC<{
         Total contribution value: <Tag>{totle}</Tag>
       </div>
 
-      <div className='mt-6'></div>
-      <Table dataSource={contributions} columns={columns} bordered={false} />
+      <div className='mt-6 px-10'>
+        <Table dataSource={contributions} columns={columns} bordered={false} />
+      </div>
 
       <WithdrawButton proposal={proposal} />
     </>
