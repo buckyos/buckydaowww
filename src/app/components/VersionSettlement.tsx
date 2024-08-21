@@ -165,7 +165,9 @@ const VersionSettlement: React.FC<{
           <Tooltip title='except for unexplained situations, there may be deviations'>
             <div className='flex-center gap-2'>
               <div className='flex-center gap-1'>
-                <span>{wrapUnits(amount, decimals)}</span>
+                <span>
+                  {parseFloat(wrapUnits(amount, decimals)).toFixed(4)}
+                </span>
                 <span>{symbol}</span>
               </div>
               <ExclamationCircleOutlined />
