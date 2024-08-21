@@ -18,7 +18,7 @@ const HeaderRight = () => {
       const instance = await getTokenContract()
       const token = await instance.balanceOf(user.user.address)
       console.log('token', token)
-      setTokenAmount(formatUnits(token, 18))
+      setTokenAmount(parseFloat(formatUnits(token, 18)).toFixed(2))
       setLoading(false)
     }
   }
