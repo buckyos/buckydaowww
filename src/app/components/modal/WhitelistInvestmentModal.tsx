@@ -82,7 +82,8 @@ const WhitelistInvestmentModal: React.FC<{
           autoComplete='off'
           initialValues={{
             canEndEarly: true,
-            tokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+            // xlayer usdt token 地址
+            tokenAddress: '0x1E4a5963aBFD975d8c9021ce480b42188849D41d',
           }}
         >
           <Form.List name='whitelist' initialValue={formListInitValues}>
