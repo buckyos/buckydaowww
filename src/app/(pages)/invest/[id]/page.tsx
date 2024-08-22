@@ -46,11 +46,11 @@ const InvestDetailPageContent: React.FC<{
 
     {
       label: 'Step 1 duration',
-      children: dayjs(data.step1EndTime * 1000).format('YYYY-MM-DD'),
+      children: dayjs(data.step1EndTime * 1000).format('YYYY-MM-DD HH:mm'),
     },
     {
       label: 'Step 2 duration',
-      children: dayjs(data.step2EndTime * 1000).format('YYYY-MM-DD'),
+      children: dayjs(data.step2EndTime * 1000).format('YYYY-MM-DD HH:mm'),
     },
     {
       key: '5',

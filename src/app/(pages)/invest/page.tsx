@@ -44,11 +44,15 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
 
           {
             label: 'Step 1 duration',
-            children: dayjs(item.step1EndTime * 1000).format('YYYY-MM-DD'),
+            children: dayjs(item.step1EndTime * 1000).format(
+              'YYYY-MM-DD HH:mm',
+            ),
           },
           {
             label: 'Step 2 duration',
-            children: dayjs(item.step2EndTime * 1000).format('YYYY-MM-DD'),
+            children: dayjs(item.step2EndTime * 1000).format(
+              'YYYY-MM-DD HH:mm',
+            ),
           },
           {
             key: '5',
