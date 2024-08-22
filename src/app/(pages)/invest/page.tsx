@@ -48,7 +48,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
             label: 'Token Address',
             children: (
               <Link
-                href={`https://polygonscan.com/token/${item.tokenAddress}`}
+                href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${item.tokenAddress}`}
                 target='_blank'
               >
                 {item.tokenAddress}

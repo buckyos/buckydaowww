@@ -144,7 +144,7 @@ export default function DaoTokenBrief() {
         </div>
         <a
           className='col-span-2 font-bold text-black'
-          href={`https://www.okx.com/zh-hans/web3/explorer/xlayer/token/${tokenAddress}`}
+          href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${tokenAddress}`}
           target='_blank'
         >
           {tokenAddress}
