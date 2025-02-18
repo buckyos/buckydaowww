@@ -130,7 +130,7 @@ export default function DaoTokenBrief() {
         <div className='col-span-2'>Contract Address:</div>
         <a
           className='col-span-2 font-bold text-black'
-          href={`https://www.okx.com/zh-hans/web3/explorer/xlayer/address/${mainAddress}`}
+          href={`${process.env.NEXT_PUBLIC_ADDRESS_LINK}${mainAddress}`}
           target='_blank'
         >
           {mainAddress}
