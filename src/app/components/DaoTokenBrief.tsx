@@ -124,7 +124,7 @@ export default function DaoTokenBrief() {
         ))}
         <div className='col-span-2'>Chain Network:</div>
         <div className='col-span-2 font-bold'>
-          X Layer
+          {process.env.NEXT_PUBLIC_CHAIN}
           <span className='text-cyfs-gray ml-1'>{networkId}</span>
         </div>
         <div className='col-span-2'>Contract Address:</div>
