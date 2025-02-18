@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import dayjs from 'dayjs'
 
 // 过期时间 12小时
 const EXPIRATION_DURATION = 12 * 60 * 60 * 1000
