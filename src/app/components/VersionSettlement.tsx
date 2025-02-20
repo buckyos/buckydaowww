@@ -162,6 +162,10 @@ const VersionSettlement: React.FC<{
       title: 'Estimated gain',
       dataIndex: 'amount',
       render: (amount: string) => {
+        if (!amount) {
+          return <div>Unkonw</div>
+        }
+
         return (
           <Tooltip title='except for unexplained situations, there may be deviations'>
             <div className='flex-center gap-2'>
