@@ -303,14 +303,14 @@ export default function ProposalDetailPage() {
           {voteInfo.length &&
             <div className='flex flex-col'>
               {voteInfo.map(item => {
-                return (<div className='flex'>
+                return (<div className='flex' key={item.address}>
                   <div>vote address: {item.address}</div>
                   <div>address is commiitee: {item.isCommiittee}</div>
                 </div>)
               })}
             </div>
           }
-          
+
           <div className='flex'>
             <div className='w-20'>Disgree</div>
             <Progress
