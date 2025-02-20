@@ -47,6 +47,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       } else if (proposalType === proposalTypeMap.CreateVersion) {
         await executeCreateVersion('Execute create version proposal success')
       } else if (proposalType === proposalTypeMap.SettlementVersion) {
+        // 前端显示 acceptProject
         await executeCreateVersion(
           'Execute settlement version proposal success',
         )
@@ -98,6 +99,11 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       message.error('error: missing project name')
       return
     }
+    console.log(
+      'projectContract.promoteProject id',
+      proposal.project.id,
+      proposal,
+    )
     const tx = await projectContract.promoteProject(proposal.project.id)
     const receipt = await transactionWait(tx)
     if (receipt?.status !== 1) {
