@@ -115,6 +115,7 @@ const VersionSettlement: React.FC<{
           (item) => item.address == contribution.contributor,
         )
         if (item) {
+          console.log('version contributions item', item)
           return {
             ...contribution,
             hasClaim: item.isClaim,

@@ -186,26 +186,25 @@ export default function ProposalDetailPage() {
   const handleSupport = errorWrap(async () => {
     setSupportLoading(true)
     const proposalType = getProposalType(proposal!)
-    let tx
-    if (proposalType === proposalTypeMap.releaseTokens) {
-      tx = await voteSupportReleaseToken()
-    } else if (proposalType === proposalTypeMap.createInvestment) {
-      tx = await voteSupportInvestment()
-    } else if (proposalType === proposalTypeMap.CreateVersion) {
-      tx = await voteSupportCreateVersion()
-    } else if (proposalType === proposalTypeMap.SettlementVersion) {
-      tx = await voteSupportSettlementVersion()
-    } else if (proposalType === proposalTypeMap.UpgradeContract) {
-      tx = await voteUpgradeContract(contract, proposalId, proposal?.params!)
-    } else if (proposalType === proposalTypeMap.ChangeCommittee) {
-      tx = await voteChangeCommittee(contract, proposalId, proposal?.params!)
-    } else {
-      setSupportLoading(false)
-      message.error('not support proposal type: ' + proposalType)
-      return
-    }
-
     try {
+      let tx
+      if (proposalType === proposalTypeMap.releaseTokens) {
+        tx = await voteSupportReleaseToken()
+      } else if (proposalType === proposalTypeMap.createInvestment) {
+        tx = await voteSupportInvestment()
+      } else if (proposalType === proposalTypeMap.CreateVersion) {
+        tx = await voteSupportCreateVersion()
+      } else if (proposalType === proposalTypeMap.SettlementVersion) {
+        tx = await voteSupportSettlementVersion()
+      } else if (proposalType === proposalTypeMap.UpgradeContract) {
+        tx = await voteUpgradeContract(contract, proposalId, proposal?.params!)
+      } else if (proposalType === proposalTypeMap.ChangeCommittee) {
+        tx = await voteChangeCommittee(contract, proposalId, proposal?.params!)
+      } else {
+        setSupportLoading(false)
+        message.error('not support proposal type: ' + proposalType)
+        return
+      }
       const receipt = await transactionWait(tx)
       setSupportLoading(false)
       if (receipt?.status !== 1) {
@@ -214,7 +213,7 @@ export default function ProposalDetailPage() {
       }
     } catch (e) {
       setSupportLoading(false)
-      message.error('Failed to vote')
+      //message.error('Failed to vote')
     }
 
     message.success('Vote successfully. windwo refreshing...')
