@@ -109,8 +109,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       message.success(msg)
     }
 
-    return
-
+    /*
     const projectContract = await getProjectContract(contract)
     if (!proposal.project) {
       message.error('error: missing project name')
@@ -129,6 +128,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       return
     }
     message.success(msg)
+    */
   }
 
   const executeReleaseToken = async () => {
