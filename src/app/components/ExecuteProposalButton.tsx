@@ -17,6 +17,7 @@ import {
   executeChangeCommittee,
   executeUpgradeContract,
   getTokenContract,
+  getCommitteeContract,
 } from '@contracts/index'
 
 interface ExecuteProposalButtonProps {
@@ -94,6 +95,22 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   // }
 
   const executeCreateVersion = async (msg: string) => {
+    {
+      const committeeContract = await getCommitteeContract()
+      console.log('committeeContract settleProposal')
+      const tx = await committeeContract.settleProposal(proposal.id)
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        console.warn('transaction status:', receipt?.status, tx)
+        message.error(`execute failed[3][${receipt?.status}]`)
+        return
+      }
+      console.log('committeeContract settleProposal success')
+      message.success(msg)
+    }
+
+    return
+
     const projectContract = await getProjectContract(contract)
     if (!proposal.project) {
       message.error('error: missing project name')
