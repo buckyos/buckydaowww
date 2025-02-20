@@ -301,9 +301,9 @@ export default function ProposalDetailPage() {
             />
           </div>
           {voteInfo.length &&
-            <div className='flex flex-col'>
+            <div className='flex flex-col px-8 py-2 text-sm'>
               {voteInfo.map(item => {
-                return (<div className='flex' key={item.address}>
+                return (<div className='flex justify-around gap-2' key={item.address}>
                   <div>vote address: {item.address}</div>
                   <div>address is commiitee: {item.isCommiittee}</div>
                 </div>)
