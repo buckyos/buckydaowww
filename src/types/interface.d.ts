@@ -305,3 +305,10 @@ interface TwoStepInvestmentData {
   canEndEarly: boolean
   end: boolean
 }
+
+
+// 提案投票信息
+interface ProposalVoteInfomation {
+  isCommiittee: boolean,
+  address: string,
+}

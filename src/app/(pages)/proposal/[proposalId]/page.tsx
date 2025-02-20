@@ -68,6 +68,8 @@ export default function ProposalDetailPage() {
   const [supportPercent, setSupportPercent] = useState<number>(0)
   const [rejectPercent, setRejectPercent] = useState<number>(0)
 
+  const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
+
   const [edit, setEdit] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
@@ -87,8 +89,18 @@ export default function ProposalDetailPage() {
     const data = await fetchMembers()
     const memberCount = data.data.length
 
+    const votesInfo: ProposalVoteInfomation[] = proposal.support.map(item=> {
+      return {
+        address:item,
+        isCommiittee: !!_.find(data.data, (member) => member.address == item )
+      }
+    })
+
+    console.log('vote result', votesInfo)
+    setVoteinfo(votesInfo)
+
     setSupportPercent(
-      transformPercentNumber(proposal.supportCount, memberCount),
+      transformPercentNumber(votesInfo.filter(o=>o.isCommiittee).length, memberCount),
     )
     setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
 
