@@ -89,10 +89,10 @@ export default function ProposalDetailPage() {
     const data = await fetchMembers()
     const memberCount = data.data.length
 
-    const votesInfo: ProposalVoteInfomation[] = proposal.support.map(item=> {
+    const votesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
       return {
-        address:item,
-        isCommiittee: !!_.find(data.data, (member) => member.address == item )
+        address: item,
+        isCommiittee: !!_.find(data.data, (member) => member.address == item)
       }
     })
 
@@ -100,7 +100,7 @@ export default function ProposalDetailPage() {
     setVoteinfo(votesInfo)
 
     setSupportPercent(
-      transformPercentNumber(votesInfo.filter(o=>o.isCommiittee).length, memberCount),
+      transformPercentNumber(votesInfo.filter(o => o.isCommiittee).length, memberCount),
     )
     setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
 
@@ -300,6 +300,17 @@ export default function ProposalDetailPage() {
               percent={supportPercent}
             />
           </div>
+          {voteInfo.length &&
+            <div className='flex flex-col'>
+              {voteInfo.map(item => {
+                return (<div className='flex'>
+                  <div>vote address: {item.address}</div>
+                  <div>address is commiitee: {item.isCommiittee}</div>
+                </div>)
+              })}
+            </div>
+          }
+          
           <div className='flex'>
             <div className='w-20'>Disgree</div>
             <Progress
