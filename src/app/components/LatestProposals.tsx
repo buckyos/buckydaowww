@@ -8,6 +8,7 @@ import images from '@images'
 import { useAsyncEffect } from 'ahooks'
 import ProposalCard from './ProposalCard'
 import { fetchMembers, getProposals } from '@services/index'
+import _ from 'lodash'
 
 type LastestProposalsProps = {
   showButton: boolean
@@ -30,21 +31,28 @@ const LatestProposals: React.FC<LastestProposalsProps> = ({
   }
 
   useAsyncEffect(async () => {
-    const result = await getProposals(page, 10)
-    if (result.code !== 0) {
-      message.error('Get proposal failed')
-    } else {
-      // const proposals = (result.data.items as ProposalResponseData[]).filter(
-      //   (items) => items.title != '',
-      // )
-      const proposals = result.data.items as ProposalResponseData[]
-      setProposals(proposals)
-      setTotal(result.data.totalSize)
+    const [result, memberResult] = await Promise.all([
+      getProposals(page, 10),
+      fetchMembers(),
+    ])
+    if (result.code !== 0 || memberResult.code !== 0) {
+      message.error('server error')
+      return
     }
+    // const result = await getProposals(page, 10)
+    const proposals = result.data.items as ProposalResponseData[]
 
-    const data = await fetchMembers()
-    const memberCount = data.data.length
-    setMemberCount(memberCount)
+    // 处理投票数量（普通地址投票无效，要委员会的成员地址）
+    setProposals(proposals.map(proposal => {
+      return {
+        ...proposal,
+        supportCount: proposal.support.filter(address => {
+          return _.find(memberResult.data, (member) => member.address == address)
+        }).length
+      }
+    }))
+    setTotal(result.data.totalSize)
+    setMemberCount(memberResult.data.length)
     // console.log('🍻 proposal :', data)
   }, [page])
 

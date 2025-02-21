@@ -32,6 +32,7 @@ import { voteChangeCommittee, voteUpgradeContract } from '@contracts/index'
 
 dayjs.extend(relativeTime)
 
+// 提取参数
 // 同意和拒绝都用到
 function extractReleaseTokenParams(proposal: ProposalResponseData) {
   console.log('proposal.params', proposal?.params)
@@ -85,8 +86,10 @@ export default function ProposalDetailPage() {
 
   useAsyncEffect(async () => {
     // 获取提案信息
-    const proposal = await fetchData()
-    const data = await fetchMembers()
+    const [proposal, data] = await Promise.all([
+      fetchData(),
+      fetchMembers(),
+    ])
     const memberCount = data.data.length
 
     const votesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
@@ -104,6 +107,7 @@ export default function ProposalDetailPage() {
     )
     setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
 
+    // 设置模式
     const isCreator = proposal.creator!.address === user.address
     setEdit(isCreator && proposal.title == '')
   }, [])
