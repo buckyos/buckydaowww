@@ -108,7 +108,7 @@ const VersionSettlementModal = () => {
         style={{ width: '100%' }}
         autoComplete='off'
         initialValues={{
-          result: '4',
+          result: '4', // 默认是GOOD
         }}
       >
         <label>Acceptance Rating</label>
@@ -117,9 +117,9 @@ const VersionSettlementModal = () => {
           rules={[{ required: true, message: 'Acceptance rating is required' }]}
         >
           <Radio.Group>
-            <Radio.Button value='3'>Normal</Radio.Button>
-            <Radio.Button value='4'>Good</Radio.Button>
-            <Radio.Button value='5'>Excellent</Radio.Button>
+            <Radio.Button value='3'>Normal (80%)</Radio.Button>
+            <Radio.Button value='4'>Good (100%)</Radio.Button>
+            <Radio.Button value='5'>Excellent (120%)</Radio.Button>
           </Radio.Group>
         </Form.Item>
 
