@@ -1,28 +1,27 @@
 import ISourceDaoCommittee from './Interface.sol/ISourceDaoCommittee.json'
-import IInvestment from './Interface.sol/IInvestment.json'
-import IMarketingGroup from './Interface.sol/IMarketingGroup.json'
-import IMultiSigWallet from './Interface.sol/IMultiSigWallet.json'
+import IAcquired from './Interface.sol/IAcquired.json'
 import ISourceDao from './Interface.sol/ISourceDao.json'
-import ISourceDAOToken from './Interface.sol/ISourceDAOToken.json'
-import ISourceDAOTokenDividend from './Interface.sol/ISourceDAOTokenDividend.json'
+import ISourceDAODevToken from './Interface.sol/ISourceDAODevToken.json'
+import ISourceDAONormalToken from './Interface.sol/ISourceDAONormalToken.json'
+import ISourceDAODividend from './Interface.sol/ISourceDAODividend.json'
 import ISourceDevGroup from './Interface.sol/ISourceDevGroup.json'
 import ISourceTokenLockup from './Interface.sol/ISourceTokenLockup.json'
 import SourceDaoContractUpgradeable from './Interface.sol/SourceDaoContractUpgradeable.json'
-import ITwoStepWhitelistInvestment from './Interface.sol/ITwoStepWhitelistInvestment.json'
 import erc20 from './ERC20.json'
 
 const abis = [
   ...erc20,
+  ...IAcquired,
   ...ISourceDaoCommittee,
-  ...IInvestment,
-  ...IMarketingGroup,
-  ...IMultiSigWallet,
+  // ...IMarketingGroup,
+  // ...IMultiSigWallet,
   ...ISourceDao,
-  ...ISourceDAOToken,
-  ...ISourceDAOTokenDividend,
+  ...ISourceDAODevToken,
+  ...ISourceDAONormalToken,
+  ...ISourceDAODividend,
   ...ISourceDevGroup,
   ...ISourceTokenLockup,
   ...SourceDaoContractUpgradeable,
 ]
 
-export { ITwoStepWhitelistInvestment, abis, erc20 }
+export { abis, erc20 }

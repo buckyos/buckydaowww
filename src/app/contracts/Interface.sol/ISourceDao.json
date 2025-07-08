@@ -1,10 +1,10 @@
 [
   {
     "inputs": [],
-    "name": "assetWallet",
+    "name": "acquired",
     "outputs": [
       {
-        "internalType": "contract IMultiSigWallet",
+        "internalType": "contract IAcquired",
         "name": "",
         "type": "address"
       }
@@ -27,23 +27,10 @@
   },
   {
     "inputs": [],
-    "name": "committeeWallet",
+    "name": "devToken",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "devGroup",
-    "outputs": [
-      {
-        "internalType": "contract ISourceDevGroup",
+        "internalType": "contract ISourceDAODevToken",
         "name": "",
         "type": "address"
       }
@@ -56,33 +43,7 @@
     "name": "dividend",
     "outputs": [
       {
-        "internalType": "contract ISourceDAOTokenDividend",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "incomeWallet",
-    "outputs": [
-      {
-        "internalType": "contract IMultiSigWallet",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "investment",
-    "outputs": [
-      {
-        "internalType": "contract IInvestment",
+        "internalType": "contract ISourceDAODividend",
         "name": "",
         "type": "address"
       }
@@ -98,7 +59,7 @@
         "type": "address"
       }
     ],
-    "name": "isAuthorizedAddress",
+    "name": "isDAOContract",
     "outputs": [
       {
         "internalType": "bool",
@@ -123,104 +84,24 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "normalToken",
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "walletAddress",
+        "internalType": "contract ISourceDAONormalToken",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "perpareSetAssetWallet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      }
-    ],
-    "name": "perpareSetCommitteeWallet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      }
-    ],
-    "name": "perpareSetIncomeWallet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "setAssetWallet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "setCommitteeWallet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      }
-    ],
-    "name": "setIncomeWallet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "token",
+    "name": "project",
     "outputs": [
       {
-        "internalType": "contract ISourceDAOToken",
+        "internalType": "contract ISourceProject",
         "name": "",
         "type": "address"
       }

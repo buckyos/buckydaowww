@@ -30,82 +30,8 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "total",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "owners",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "TokensDeposited",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "owners",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "TokensPrepareDeposit",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "duration",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "owners",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
       }
     ],
     "name": "TokensPrepareUnlock",
@@ -125,18 +51,6 @@
         "internalType": "uint256",
         "name": "total",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "owners",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
       }
     ],
     "name": "TokensUnlocked",
@@ -158,45 +72,24 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address[]",
-        "name": "owners",
+        "name": "to",
         "type": "address[]"
       },
       {
         "internalType": "uint256[]",
-        "name": "amounts",
+        "name": "amount",
         "type": "uint256[]"
       }
     ],
-    "name": "depositTokens",
+    "name": "convertAndLock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "duration",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "owners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "prepareDepositTokens",
+    "inputs": [],
+    "name": "getCanClaimTokens",
     "outputs": [
       {
         "internalType": "uint256",
@@ -204,36 +97,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "duration",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "owners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "prepareUnlockTokens",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -263,7 +127,7 @@
         "type": "address"
       }
     ],
-    "name": "totalLocked",
+    "name": "totalClaimed",
     "outputs": [
       {
         "internalType": "uint256",
@@ -276,42 +140,18 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "totalUnlocked",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "proposalId",
-        "type": "uint256"
-      },
       {
         "internalType": "address[]",
-        "name": "owners",
+        "name": "to",
         "type": "address[]"
       },
       {
         "internalType": "uint256[]",
-        "name": "amounts",
+        "name": "amount",
         "type": "uint256[]"
       }
     ],
-    "name": "unlockTokens",
+    "name": "transferAndLock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
