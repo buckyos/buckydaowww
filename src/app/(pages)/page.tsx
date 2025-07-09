@@ -1,4 +1,4 @@
-import DaoTokenBrief from '@components/DaoTokenBrief'
+import DaoTokenBrief from '@components/home/DaoTokenBrief'
 import FundingEntrance from '@components/FundingEntrance'
 import LatestProposals from '@components/LatestProposals'
 import DaoMembers from '@components/DaoMembers'

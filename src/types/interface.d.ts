@@ -274,9 +274,9 @@ interface ContractStoreDefine {
   symbol: string
   decimals: number
   expiration: number
-  fetchToken: () => Promise<any>
-  getSignerComitteeContract: () => Promise<ethers.Contract>
-  getInvestMentContract: () => Promise<ethers.Contract>
+  // fetchToken: () => Promise<any>
+  // getSignerComitteeContract: () => Promise<ethers.Contract>
+  // getInvestMentContract: () => Promise<ethers.Contract>
 }
 
 interface TwoStepTokenRatio {
@@ -311,4 +311,22 @@ interface TwoStepInvestmentData {
 interface ProposalVoteInfomation {
   isCommiittee: boolean,
   address: string,
+}
+
+
+interface ContractTokenInfo {
+  normal: {
+    totalSupply: number
+    symbol: any
+    decimals: number
+  }
+  dev: {
+    totalSupply: number
+    symbol: any
+    decimals: number
+    totalReleased: number
+    totalReleasedPercent: number
+    unrelease: number
+    unreleasePercent: number
+  }
 }

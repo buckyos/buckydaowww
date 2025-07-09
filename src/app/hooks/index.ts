@@ -8,14 +8,16 @@ import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
 import { useCommitteeStore, CommitteeType } from './useCommittee'
 import {
-  getProvider,
-  getProjectContract,
+  // getProvider,
+  // getProjectContract,
   contractProxyContract,
 } from './function'
 import {
-  getCommitteeContract,
-  getAddressOfLockup,
-  getAddressOfToken,
+  // getCommitteeContract,
+  // getAddressOfLockup,
+  // getAddressOfToken,
+  getProvider,
+  contractService
 } from '@contracts/index'
 
 function useBindWalletAddress() {
@@ -60,8 +62,8 @@ function useBindWalletAddress() {
 }
 
 function useLockToken(ownerAddress: string) {
-  const tokenAddress = getAddressOfToken()
-  const lockupAddress = getAddressOfLockup()
+  // const tokenAddress = contractService.getAddressOfToken()
+  const lockupAddress = contractService.getAddressOfLockup()
 
   const [token, setToken] = useState<{
     token: number
@@ -87,7 +89,7 @@ function useLockToken(ownerAddress: string) {
       contract.totalLocked(ownerAddress),
     ])
 
-    const tokenContract = new ethers.Contract(tokenAddress, abis, provider)
+    const tokenContract = new ethers.Contract(contractService.getAddressOfDevToken(), abis, provider)
     const result2 = await tokenContract.balanceOf(ownerAddress)
     console.log('🍻 tokenContract token balanceOf :', result2)
 
@@ -122,7 +124,7 @@ function useCommittee(user: User) {
       return
     }
 
-    const contract = await getCommitteeContract()
+    const contract = await contractService.getCommitteeContract()
     // 需要注意,这里是user表的, 可能和钱包地址不一致
     const isMember = await contract.isMember(user.address)
     console.log('isCommitteeMember: ', isMember, user.address)
@@ -172,6 +174,5 @@ export {
   useCommitteeStore,
   useContractStore,
   getProvider,
-  getProjectContract,
   contractProxyContract,
 }

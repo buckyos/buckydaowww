@@ -3,15 +3,13 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 // import { getContractInfo } from '@services/index'
 import {
-  getCommitteeContract,
-  getInvestmentContract,
-  getTokenContract,
+  contractService,
 } from '@contracts/index'
 
 import {
   contractProxyContract,
-  getProjectContract,
-  getProvider,
+  // getProjectContract,
+  // getProvider,
 } from './function'
 
 // 过期时间 5分钟
@@ -26,44 +24,8 @@ const useContractStore = create<ContractStoreDefine>()(
       symbol: '',
       decimals: 0,
       expiration: 0,
-      async getSignerComitteeContract() {
-        const contract = await getCommitteeContract()
-        return contract
-      },
-
-      // 获取投资合约实例
-      async getInvestMentContract() {
-        const contract = await getInvestmentContract()
-        return contract
-      },
-
       // fetch token's value in contract
-      async fetchToken() {
-        const daoTokenContract = await getTokenContract()
-        const token = await Promise.all([
-          daoTokenContract.totalSupply(),
-          daoTokenContract.totalReleased(),
-          daoTokenContract.totalUnreleased(),
-          daoTokenContract.symbol(),
-          daoTokenContract.decimals(),
-        ])
-
-        // console.log( '🐼 useContractStore fetchToken info symbol decimals', token, parseInt(token[4]),)
-        set({
-          totalSupply: token[0],
-          totalReleased: token[1],
-          totalUnreleased: token[2],
-          symbol: token[3],
-          decimals: parseInt(token[4]),
-        })
-        return {
-          totalSupply: token[0],
-          totalReleased: token[1],
-          totalUnreleased: token[2],
-          symbol: token[3],
-          decimals: parseInt(token[4]),
-        }
-      },
+      // TODO remove
     }),
     {
       name: 'contract_address',
@@ -82,4 +44,4 @@ const useContractStore = create<ContractStoreDefine>()(
 )
 
 export default useContractStore
-export { contractProxyContract, getProjectContract, getProvider }
+export { contractProxyContract }
