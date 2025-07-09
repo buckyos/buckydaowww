@@ -17,12 +17,10 @@ export async function fetchTokenInfo(): Promise<ContractTokenInfo> {
     const normal = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
     const token = await Promise.all([
         normal.totalSupply(),
-        // normal.totalReleased(),
-        // normal.totalUnreleased(),
         normal.symbol(),
         normal.decimals(),
     ])
-    
+
     // BDDT
     const dev = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
     const devToken = await Promise.all([
@@ -49,16 +47,13 @@ export async function fetchTokenInfo(): Promise<ContractTokenInfo> {
     )
 
     return {
-        normal: {
+        normal: {  // BDT
             totalSupply: normalTotalSupply,
-            // totalReleased: token[1],
-            // totalUnreleased: token[2],
             symbol: token[1],
             decimals: parseInt(token[2]),
         },
-        dev: {
+        dev: {  // BDDT
             totalSupply: devTotalSupply,
-            // totalUnreleased: devTokenInfo[2],
             symbol: devToken[1],
             decimals: parseInt(devToken[2]),
             totalReleased: devTotalReleased,
