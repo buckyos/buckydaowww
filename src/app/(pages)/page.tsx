@@ -14,7 +14,7 @@ export default function Home() {
       <MainIntroduce />
       <div className='text-2xl font-medium mt-16 mb-6'>Recent Proposal Votes</div>
       <LatestProposals showButton={true} showPage={false} />
-      <div className='mt-4'>
+      <div className='mt-4 min-h-[200px]'>
         <DaoMembers />
       </div>
     </div>
