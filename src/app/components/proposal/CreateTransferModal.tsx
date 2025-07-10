@@ -18,6 +18,7 @@ interface TokenDefined {
   amounts: number
 }
 
+// deprecated
 const CreateTransferModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
