@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Tag, message, Button, Tooltip, Spin, Table } from 'antd'
 import ProposalStateTag from '@components/ProposalStateTag'
 import { ProposalState } from '@vars/index'
-import useContractStore, { getProjectContract } from '@hooks/useContract'
+import useContractStore from '@hooks/useContract'
 import { extractMessage, transactionWait } from '@utils/index'
 import {
   postContributionWithdraw,
@@ -10,6 +10,7 @@ import {
 } from '@services/index'
 import useUserStore from '@hooks/useUserStore'
 import { wrapUnits, calculateProportion } from '@utils/numberConverter'
+import { contractService } from '@contracts/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useAsyncEffect } from 'ahooks'
 import _ from 'lodash'
@@ -17,7 +18,6 @@ import _ from 'lodash'
 const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
   proposal,
 }) => {
-  const contract = useContractStore()
   const { jwt, isLogin } = useUserStore((state) => ({
     jwt: state.jwt,
     isLogin: state.isLogin,
@@ -42,7 +42,7 @@ const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
         return
       }
 
-      const projectContractCaller = await getProjectContract(contract)
+      const projectContractCaller = await contractService.getProjectContract()
       const tx = await projectContractCaller.withdrawContributions([
         proposal.project.id,
       ])

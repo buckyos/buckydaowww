@@ -28,7 +28,11 @@ import {
   proposalTypeMap,
 } from '@utils/index'
 import { useUserStore, useContractStore } from '@hooks/index'
-import { voteChangeCommittee, voteUpgradeContract } from '@contracts/index'
+import { 
+  contractService,
+  voteChangeCommittee, 
+  voteUpgradeContract 
+} from '@contracts/index'
 
 dayjs.extend(relativeTime)
 
@@ -131,7 +135,7 @@ export default function ProposalDetailPage() {
   }
 
   const voteSupportReleaseToken = async () => {
-    const committeeContract = await contract.getSignerComitteeContract()
+    const committeeContract = await contractService.getCommitteeContract()
     const proposalParams = extractReleaseTokenParams(proposal!)
     const tx = await committeeContract.support(proposalId, proposalParams)
     return tx
@@ -140,7 +144,7 @@ export default function ProposalDetailPage() {
     if (!proposal?.project) {
       throw new Error('missing project data')
     }
-    const committeeContract = await contract.getSignerComitteeContract()
+    const committeeContract = await contractService.getCommitteeContract()
     const tx = await committeeContract.support(proposalId, [
       zeroPadLeft(proposal?.project?.id),
       zeroPadLeft(proposal?.project?.budget),
@@ -151,7 +155,7 @@ export default function ProposalDetailPage() {
     return tx
   }
   const voteSupportSettlementVersion = async () => {
-    const committeeContract = await contract.getSignerComitteeContract()
+    const committeeContract = await contractService.getCommitteeContract()
     const params = proposal?.params[0] as SettlementVersionProposalParams
     const tx = await committeeContract.support(proposalId, [
       zeroPadLeft(params.projectId),
@@ -178,7 +182,7 @@ export default function ProposalDetailPage() {
 
   const voteSupportInvestment = async () => {
     console.log('handleSupport', proposal?.investment)
-    const committeeContract = await contract.getSignerComitteeContract()
+    const committeeContract = await contractService.getCommitteeContract()
     // 投资的参数, 投票后面需要根据类型来区分参数
     const tx = await committeeContract.support(proposalId, [
       zeroPadLeft(proposal?.investment?.id),
@@ -213,9 +217,9 @@ export default function ProposalDetailPage() {
       } else if (proposalType === proposalTypeMap.SettlementVersion) {
         tx = await voteSupportSettlementVersion()
       } else if (proposalType === proposalTypeMap.UpgradeContract) {
-        tx = await voteUpgradeContract(contract, proposalId, proposal?.params!)
+        tx = await voteUpgradeContract(proposalId, proposal?.params!)
       } else if (proposalType === proposalTypeMap.ChangeCommittee) {
-        tx = await voteChangeCommittee(contract, proposalId, proposal?.params!)
+        tx = await voteChangeCommittee(proposalId, proposal?.params!)
       } else {
         setSupportLoading(false)
         message.error('not support proposal type: ' + proposalType)
@@ -241,7 +245,7 @@ export default function ProposalDetailPage() {
 
   const handleReject = errorWrap(async () => {
     setRejectLoading(true)
-    const committeeContract = await contract.getSignerComitteeContract()
+    const committeeContract = await contractService.getCommitteeContract()
     const proposalType = getProposalType(proposal!)
     let tx
     if (getProposalType(proposal!) === 'releaseTokens') {

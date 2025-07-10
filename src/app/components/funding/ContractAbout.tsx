@@ -9,10 +9,10 @@ import useContractStore from '@hooks/useContract'
 import { useAsyncEffect } from 'ahooks'
 import { RightOutlined } from '@ant-design/icons'
 
-import { getAddressOfMain } from '@contracts/index'
+import { contractService, fetchTokenInfo } from '@contracts/index'
 
 const ContractAbout = () => {
-  const mainAddress = getAddressOfMain()
+  const mainAddress = contractService.getAddressOfMain()
   const contract = useContractStore()
   const router = useRouter()
   const toDaoContract = () => {
@@ -33,11 +33,8 @@ const ContractAbout = () => {
   const [totalReleasedDisplayed, setTotalReleasedDisplayed] = useState('')
 
   useAsyncEffect(async () => {
-    const token = await contract.fetchToken()
-    const totalReleased = parseToFloat(
-      wrapUnits(token.totalReleased, token.decimals),
-    )
-    setTotalReleasedDisplayed(formatAmount(totalReleased, 3, true))
+    const token = await fetchTokenInfo()
+    setTotalReleasedDisplayed(formatAmount(token.dev.totalReleased, 3, true))
   }, [])
 
   const totalSupply = formatAmount(

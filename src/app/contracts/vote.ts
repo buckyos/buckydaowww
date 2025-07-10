@@ -1,22 +1,21 @@
 import { ethers } from 'ethers'
+import { contractService } from '@contracts/index'
 
 async function voteChangeCommittee(
-  contract: ContractStoreDefine,
   proposalId: string,
   params: any[],
 ) {
-  const committeeContract = await contract.getSignerComitteeContract()
+  const committeeContract = await contractService.getCommitteeContract()
   const tx = await committeeContract.support(proposalId, params)
 
   return tx
 }
 
 async function voteUpgradeContract(
-  contract: ContractStoreDefine,
   proposalId: string,
   params: any[],
 ) {
-  const committeeContract = await contract.getSignerComitteeContract()
+  const committeeContract = await contractService.getCommitteeContract()
   const contractProxyAddress = params[0]
   const implAddress = params[1]
   const upgradeContract = params[2]
