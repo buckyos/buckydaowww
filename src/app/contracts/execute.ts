@@ -1,16 +1,16 @@
 import { transactionWait } from '@utils/index'
 import { message } from 'antd'
 import { contractProxyContract } from '@hooks/index'
+import { contractService } from './contract'
 
 // 执行委员会变更
 async function executeChangeCommittee(
-  contract: ContractStoreDefine,
   id: string,
   committeeList: string[],
   msg: string,
 ) {
   console.log('🌍🌍🌍 executeChangeCommittee', id, committeeList, msg)
-  const committeeContract = await contract.getSignerComitteeContract()
+  const committeeContract = await contractService.getCommitteeContract()
   const tx = await committeeContract.setCommittees(committeeList, id)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {

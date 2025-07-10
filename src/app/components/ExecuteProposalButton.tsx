@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Button, message, Tooltip } from 'antd'
 import { useCommittee } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
-import useContractStore, { getProjectContract } from '@hooks/useContract'
 import _ from 'lodash'
 import {
   extractMessage,
@@ -16,8 +15,7 @@ import { ProposalState } from '@vars/index'
 import {
   executeChangeCommittee,
   executeUpgradeContract,
-  getTokenContract,
-  getCommitteeContract,
+  contractService,
 } from '@contracts/index'
 
 interface ExecuteProposalButtonProps {
@@ -30,7 +28,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   disabled,
 }) => {
   const user = useUserStore()
-  const contract = useContractStore()
+  // const contract = useContractStore()
   const { isCommittee } = useCommittee(user.user)
   const [loading, setLoading] = useState(false)
 
@@ -57,7 +55,6 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
         await executeUpgradeContract(proposal.params[0], proposal.params[1])
       } else if (proposalType === proposalTypeMap.ChangeCommittee) {
         await executeChangeCommittee(
-          contract,
           proposal.id.toString(),
           // remove the last element which is the type of the proposal
           proposal.params
@@ -95,7 +92,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   // }
 
   const executeCreateVersion = async (msg: string) => {
-    const projectContract = await getProjectContract(contract)
+    const projectContract = await contractService.getProjectContract()
     if (!proposal.project) {
       message.error('error: missing project name')
       return
@@ -116,20 +113,21 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   }
 
   const executeReleaseToken = async () => {
-    const tokenContract = await getTokenContract()
+    message.warning("current type no support")
+    // const tokenContract = await getTokenContract()
 
-    const address = proposal?.params[0]
-    const amounts = proposal?.params[1]
+    // const address = proposal?.params[0]
+    // const amounts = proposal?.params[1]
 
-    const tx = await tokenContract.releaseTokens(proposal.id, address, amounts)
-    console.log('🍻 contract releaseTokens result :', tx, address, amounts)
-    const receipt = await transactionWait(tx)
-    if (receipt?.status !== 1) {
-      console.warn('transaction status:', receipt?.status, tx)
-      message.error(`Create Investment failed[3][${receipt?.status}]`)
-      return
-    }
-    message.success('Execute proposal success')
+    // const tx = await tokenContract.releaseTokens(proposal.id, address, amounts)
+    // console.log('🍻 contract releaseTokens result :', tx, address, amounts)
+    // const receipt = await transactionWait(tx)
+    // if (receipt?.status !== 1) {
+    //   console.warn('transaction status:', receipt?.status, tx)
+    //   message.error(`Create Investment failed[3][${receipt?.status}]`)
+    //   return
+    // }
+    // message.success('Execute proposal success')
   }
 
   if (proposal.state > ProposalState.InProgress) {

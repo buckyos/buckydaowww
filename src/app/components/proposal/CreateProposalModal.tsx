@@ -26,6 +26,7 @@ enum InvestmentPriceType {
   Floating, // 浮动价格融资
 }
 
+// deprecated 2025/07/10
 const CreateProposalModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>

@@ -3,14 +3,12 @@ import { useState } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { message } from 'antd'
 import { useCommittee, useUserStore } from '@hooks/index'
-import CreateProposalModal from '@components/proposal/CreateProposalModal'
 import CreateTransferModal from '@components/proposal/CreateTransferModal'
 import UpgradeContractModal from '@components/modal/UpgradeContractModal'
 import ChangeCommitteeModal from '@components/modal/ChangeCommitteeModal'
 
 const CreateButtons = () => {
   const user = useUserStore()
-  const [showModal, setShowModal] = useState(false)
   const [showTranferModal, setShowTranferModal] = useState(false)
   const [showUpgradeContractModal, setShowUpgradeContractModal] =
     useState(false)
@@ -34,11 +32,6 @@ const CreateButtons = () => {
     }
   }
 
-  // 创建投资提案
-  const onShowCreateInvestmentModal = generateCheck(() => {
-    setShowModal(true)
-  })
-
   // 分配token提案
   const onShowTranferModal = generateCheck(() => {
     setShowTranferModal(true)
@@ -57,14 +50,6 @@ const CreateButtons = () => {
   return (
     <>
       <div className='flex items-center mt-10 gap-4'>
-        <div
-          onClick={onShowCreateInvestmentModal}
-          className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-8 px-4 rounded-lg cursor-pointer text-sm'
-        >
-          <PlusOutlined className='mr-1' />
-          Create Investment
-        </div>
-
         <div
           onClick={onShowTranferModal}
           className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-8 px-4 rounded-lg cursor-pointer text-sm'
@@ -90,7 +75,6 @@ const CreateButtons = () => {
         </div>
       </div>
 
-      <CreateProposalModal showModal={showModal} setShowModal={setShowModal} />
       <CreateTransferModal
         showModal={showTranferModal}
         setShowModal={setShowTranferModal}

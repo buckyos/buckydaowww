@@ -1,5 +1,5 @@
 import DaoTokenBrief from '@components/home/DaoTokenBrief'
-import FundingEntrance from '@components/FundingEntrance'
+import FundingEntrance from '@components/home/FundingEntrance'
 import LatestProposals from '@components/LatestProposals'
 import DaoMembers from '@components/DaoMembers'
 import { Participate } from '../components/home/Participate'

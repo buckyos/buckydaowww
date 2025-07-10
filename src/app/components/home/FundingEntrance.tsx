@@ -5,26 +5,10 @@ import { Button, message } from 'antd'
 import { nowTimestamp, timeago } from '@utils/time'
 import { useRouter } from 'next/navigation'
 import { useInvestment } from '@hooks/useInvestment'
+import Link from 'next/link'
 
 const FundingEntrance = () => {
-  const router = useRouter()
   const { latestInvestment } = useInvestment()
-
-  const handleFundingButtonClicked = () => {
-    // if (latestInvestment === null) {
-    //   message.info(
-    //     'There is currently no investment, please create a proposal first',
-    //     10,
-    //   )
-    //   router.push('/proposals')
-    //   setTimeout(() => {
-    //     window.scrollTo(0, 0)
-    //   }, 0)
-    //   return
-    // }
-    //
-    router.push('/invest')
-  }
 
   const latestInvestmentEndTimeDisplay = () => {
     if (latestInvestment === null) {
@@ -77,9 +61,12 @@ const FundingEntrance = () => {
             </div>
           </div>
         </div>
-        <Button type='primary' onClick={handleFundingButtonClicked}>
-          Funding Now
-        </Button>
+        <Link href='/invest'>
+          <Button type='primary' >
+            Funding Now
+          </Button>
+        </Link>
+
       </div>
 
       <div className='mt-10 text-sm leading-6  pl-12'>
