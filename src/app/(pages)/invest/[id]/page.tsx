@@ -11,7 +11,7 @@ import dayjs from 'dayjs'
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
 import { useUserStore, useContractStore } from '@hooks/index'
-import { endInvestment, getAddressOfToken } from '@contracts/index'
+import { contractService } from '@contracts/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
 
@@ -28,7 +28,7 @@ const InvestDetailPageContent: React.FC<{
     )
   }
 
-  const DAO_TOKEN_ADDRESS = getAddressOfToken()
+  const DAO_TOKEN_ADDRESS = contractService.getAddressOfDevToken()
 
   const items: DescriptionsProps['items'] = [
     {
@@ -180,10 +180,10 @@ const InvestDetailPage = () => {
         console.log('🍻 onEndInvestment data :', data)
         // end investment
         if (data && data.id) {
-          const result = await endInvestment(data.id.toString(), contract)
-          if (result) {
-            message.success('End investment success')
-          }
+          // const result = await endInvestment(data.id.toString(), contract)
+          // if (result) {
+          //   message.success('End investment success')
+          // }
         }
       },
     })
