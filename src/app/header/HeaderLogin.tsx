@@ -3,7 +3,7 @@ import { useState } from 'react'
 import useUserStore from '@hooks/useUserStore'
 import HeaderUserAvatar from './HeaderUserAvatar'
 import { useAsyncEffect } from 'ahooks'
-import { getTokenContract } from '@contracts/index'
+import { contractService } from '@contracts/index'
 import { formatUnits } from 'ethers'
 import { Tag, Spin } from 'antd'
 
@@ -15,10 +15,14 @@ const HeaderRight = () => {
   const reload = async () => {
     if (user.user.address) {
       setLoading(true)
-      const instance = await getTokenContract()
-      const token = await instance.balanceOf(user.user.address)
+      const devToken = await contractService.getDevTokenContract()
+      const normalToken = await contractService.getNormalTokenContract()
+      const token = await Promise.all([
+        devToken.balanceOf(user.user.address),
+        normalToken.balanceOf(user.user.address)
+      ]) 
       console.log('token', token)
-      setTokenAmount(parseFloat(formatUnits(token, 18)).toFixed(2))
+      setTokenAmount(parseFloat(formatUnits(token[0], 18)).toFixed(2))
       setLoading(false)
     }
   }

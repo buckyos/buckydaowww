@@ -9,13 +9,14 @@ import {
 } from 'antd'
 import { useState } from 'react'
 import useUserStore from '@hooks/useUserStore'
-import useContractStore, { getProjectContract } from '@hooks/useContract'
+import useContractStore from '@hooks/useContract'
 import dayjs from 'dayjs'
 import { create } from 'zustand'
 import { unwrapUnits } from '@utils/numberConverter'
 import { createProjectVersionExtra } from '@services/index'
 import TextArea from 'antd/es/input/TextArea'
 import { transactionWait } from '@utils/index'
+import { contractService } from '@contracts/index'
 
 interface CreateVersionModalProps {
   visible: boolean
@@ -60,12 +61,13 @@ const CreateVersionModal = () => {
       }
       const startDate = dayjs(values.startDate).unix()
       const endDate = dayjs(values.endDate).unix()
+      // TODO mark update decimals
       const budget = unwrapUnits(values.budget, contract.decimals)
       const issueId = values.issueId as number
       const issueLink = values.issueLink
 
       // 合约
-      const projectContractCaller = await getProjectContract(contract)
+      const projectContractCaller = await contractService.getProjectContract()
       console.log('values', values, startDate, endDate)
       const tx = await projectContractCaller.createProject(
         budget,

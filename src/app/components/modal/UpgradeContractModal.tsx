@@ -2,24 +2,23 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import useContractStore from '@hooks/useContract'
 import useUserStore from '@hooks/useUserStore'
 import { extractMessage, transactionWait } from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
+import { contractService } from '@contracts/index'
 
 const UpgradeContractModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const contract = useContractStore()
   const user = useUserStore()
 
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
     const fn = async () => {
-      const comitteeContract = await contract.getSignerComitteeContract()
+      const comitteeContract = await contractService.getCommitteeContract()
       const tx = await comitteeContract.perpareContractUpgrade(
         values.contractProxyAddress,
         values.implAddress,

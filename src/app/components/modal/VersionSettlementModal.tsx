@@ -1,16 +1,15 @@
 import { Button, Modal, message, Form, Input, InputNumber, Radio } from 'antd'
 import { useState } from 'react'
 import useUserStore from '@hooks/useUserStore'
-import useContractStore, { getProjectContract } from '@hooks/useContract'
 import { useVersionSettlementModalStore } from '@hooks/modal'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { getAddress } from 'ethers'
 import { proposalSetparams } from '@services/index'
 import { extractMessage, transactionWait } from '@utils/index'
+import { contractService } from '@contracts/index'
 
 const VersionSettlementModal = () => {
   const { visible, version, close } = useVersionSettlementModalStore()
-  const contract = useContractStore()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { jwt } = useUserStore((state) => {
@@ -36,7 +35,7 @@ const VersionSettlementModal = () => {
       )
       console.log('onFinish', values, contributions)
       // 合约
-      const projectContractCaller = await getProjectContract(contract)
+      const projectContractCaller = await contractService.getProjectContract()
       const tx = await projectContractCaller.acceptProject(
         version.id,
         values.result,

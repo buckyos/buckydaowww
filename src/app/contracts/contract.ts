@@ -107,6 +107,12 @@ class ContractService {
     return this.LOCKUP
   }
 
+  public getAddressOfAquired() {
+    if (!this.ACQUIRED) throw new Error('ACQUIRED is undefined')
+    return this.ACQUIRED
+  }
+
+
   public getNetworkId() {
     if (!this.NETWORK_ID) throw new Error('NETWORK_ID is undefined')
     return this.NETWORK_ID

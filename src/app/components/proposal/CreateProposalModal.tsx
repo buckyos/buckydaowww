@@ -19,7 +19,7 @@ import dayjs from 'dayjs'
 import useUserStore from '@hooks/useUserStore'
 import { createInvestmentExtra } from '@services/index'
 
-import { getAddressOfMain } from '@contracts/index'
+import { contractService } from '@contracts/index'
 
 enum InvestmentPriceType {
   Fixed, // 固定价格融资
@@ -39,7 +39,7 @@ const CreateProposalModal: React.FC<{
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
-    const mainAddress = getAddressOfMain()
+    const mainAddress = contractService.getAddressOfMain()
     const proposalDuration = values.proposalDuration * 24 * 60 * 60
     const daoTokenDecimals = contract.decimals
     const assetTokenDecimals = 18
@@ -92,7 +92,7 @@ const CreateProposalModal: React.FC<{
     }
     setloadingTx(true)
     console.log('🍻 investmentData :', investmentData)
-    const investmentContract = await contract.getInvestMentContract()
+    const investmentContract = await contractService.getAcquiredContract()
     const tx = await investmentContract.createInvestment(
       proposalDuration,
       investmentData,

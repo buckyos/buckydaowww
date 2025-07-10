@@ -11,7 +11,7 @@ import dayjs from 'dayjs'
 import { getAddress } from 'ethers'
 import { unwrapUnits } from '@utils/numberConverter'
 import { extractMessage } from '@utils/index'
-import { getTokenContract } from '@contracts/index'
+import { contractService } from '@contracts/index'
 
 interface TokenDefined {
   address: string
@@ -50,7 +50,7 @@ const CreateTransferModal: React.FC<{
       },
       { address: [] as string[], amounts: [] as bigint[] },
     )
-    const tokenContract = await getTokenContract()
+    const tokenContract = await contractService.getNormalTokenContract()
     // 7days
     const duration = 60 * 60 * 24 * 7
 

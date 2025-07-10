@@ -4,10 +4,11 @@ import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, InputNumber, Button, message, Spin } from 'antd'
 import {
-  subscribeInvestmentShare,
+  // subscribeInvestmentShare,
   // getSymbol,
   getDecimals,
-  getAddressOfToken,
+  // getAddressOfToken,
+  contractService
 } from '@contracts/index'
 import { useContractStore, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
@@ -66,7 +67,7 @@ const InvestmentSubscriptionModal: React.FC<{
   const [maxTokenAmount, setMaxTokenAmount] = useState(0)
   const { user } = useUserStore()
 
-  const DAO_TOKEN_ADDRESS = getAddressOfToken()
+  const DAO_TOKEN_ADDRESS = contractService.getAddressOfDevToken()
 
   useAsyncEffect(async () => {
     if (!data || !user.address) {
@@ -92,15 +93,15 @@ const InvestmentSubscriptionModal: React.FC<{
     setloadingTx(true)
 
     try {
-      const result = await subscribeInvestmentShare(
-        values,
-        data!.id.toString(),
-        user.address,
-      )
-      if (result) {
-        message.success('Create Investment success')
-        setShowModal(false)
-      }
+      // const result = await subscribeInvestmentShare(
+      //   values,
+      //   data!.id.toString(),
+      //   user.address,
+      // )
+      // if (result) {
+      //   message.success('Create Investment success')
+      //   setShowModal(false)
+      // }
     } catch (e) {
       console.error('onCreateInvestment', e)
       message.error(extractMessage(e))

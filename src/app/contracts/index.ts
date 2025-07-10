@@ -10,6 +10,7 @@ import { erc20 } from './abis'
 import {
   contractService,
   newProviderContract,
+  newSignerContract,
 } from '@contracts/contract'
 // import { getAddressOfToken } from './contract'
 
@@ -185,106 +186,103 @@ async function getDecimals(tokenAddress: string): Promise<number> {
 
 // 创建
 // 创建白名单投资
-// async function createWhitelistInvestment(
-//   values: StoreValue,
-//   ownerAddress: string,
-//   // contract: ContractStoreDefine,
-// ) {
-//   const twoStepInvestmentAddress = getAddressOfTwoStepInvestment()
-//   console.log('🍻 createWhitelistInvestment values :', values)
+async function createWhitelistInvestment(
+  values: StoreValue,
+  ownerAddress: string,
+  // contract: ContractStoreDefine,
+) {
+  const twoStepInvestmentAddress = contractService.getAddressOfAquired()
+  console.log('🍻 createWhitelistInvestment values :', values)
 
-//   const totlePercent = values.whitelist.reduce((acc: number, cur: any) => {
-//     return acc + cur.percent
-//   }, 0)
-//   // console.log('🍻 totlePercent :', totlePercent)
-//   if (totlePercent > 100) {
-//     message.error('error: total percent must be 100 or less 100')
-//     return false
-//   }
+  const totlePercent = values.whitelist.reduce((acc: number, cur: any) => {
+    return acc + cur.percent
+  }, 0)
+  // console.log('🍻 totlePercent :', totlePercent)
+  if (totlePercent > 100) {
+    message.error('error: total percent must be 100 or less 100')
+    return false
+  }
 
-//   if (!values.endTime) {
-//     message.error('error: missing end time')
-//     return false
-//   }
+  if (!values.endTime) {
+    message.error('error: missing end time')
+    return false
+  }
 
-//   if (values.endTime2 < values.endTime) {
-//     message.error('error: second end time must be greater than end time')
-//     return false
-//   }
+  if (values.endTime2 < values.endTime) {
+    message.error('error: second end time must be greater than end time')
+    return false
+  }
 
-//   const tokenDecimals = await getDecimals(values.tokenAddress)
+  const tokenDecimals = await getDecimals(values.tokenAddress)
 
-//   {
-//     // 查看授权额度
-//     // approve token, (eg usdt)
-//     let provider = await getProvider()
-//     const signer = await provider.getSigner()
-//     const tokenContract = new ethers.Contract(
-//       values.tokenAddress,
-//       erc20,
-//       signer,
-//     )
-//     const allow = await tokenContract.allowance(
-//       ownerAddress,
-//       twoStepInvestmentAddress,
-//     )
-//     console.log('🍻 contract allow :', allow, values.tokenAmount)
-//     if (allow < values.tokenAmount) {
-//       // 额度不足， 让用户授权额度
-//       const tx = await tokenContract.approve(
-//         twoStepInvestmentAddress,
-//         parseUnits(values.tokenAmount, tokenDecimals),
-//       )
-//       const receipt = await transactionWait(tx)
-//       if (receipt?.status !== 1) {
-//         message.error('token approve failed')
-//         console.warn('transaction status:', receipt?.status, tx)
-//         return false
-//       }
-//     }
-//   }
+  {
+    // 查看授权额度
+    // approve token, (eg usdt)
+    const tokenContract = await newSignerContract(
+      values.tokenAddress,
+      erc20,
+    )
+    const allow = await tokenContract.allowance(
+      ownerAddress,
+      twoStepInvestmentAddress,
+    )
+    console.log('🍻 contract allow :', allow, values.tokenAmount)
+    if (allow < values.tokenAmount) {
+      // 额度不足， 让用户授权额度
+      const tx = await tokenContract.approve(
+        twoStepInvestmentAddress,
+        parseUnits(values.tokenAmount, tokenDecimals),
+      )
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        message.error('token approve failed')
+        console.warn('transaction status:', receipt?.status, tx)
+        return false
+      }
+    }
+  }
 
-//   // 结束时间
-//   const now = dayjs().unix()
-//   const step1Duration = dayjs(values.endTime).unix() - now
-//   const step2Duration = dayjs(values.endTime2).unix() - now
+  // 结束时间
+  const now = dayjs().unix()
+  const step1Duration = dayjs(values.endTime).unix() - now
+  const step2Duration = dayjs(values.endTime2).unix() - now
 
-//   console.log('🍻 step1Duration :', step1Duration, step2Duration)
+  console.log('🍻 step1Duration :', step1Duration, step2Duration)
 
-//   const startParams = {
-//     whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
-//     firstPercent: values.whitelist.map((item: any) =>
-//       parseInt((item.percent * 100).toString()),
-//     ),
-//     tokenAddress: getAddress(values.tokenAddress),
-//     tokenAmount: parseUnits(values.tokenAmount, tokenDecimals),
-//     tokenRatio: {
-//       tokenAmount: parseInt(values.assetTokenAmount),
-//       daoTokenAmount: parseInt(values.daoTokenAmount),
-//     },
-//     step1Duration,
-//     step2Duration,
-//     canEndEarly: values.canEndEarly,
-//   }
-//   console.log('🍻 createWhitelistInvestment startParams :', startParams)
+  const startParams = {
+    whitelist: values.whitelist.map((item: any) => getAddress(item.address)),
+    firstPercent: values.whitelist.map((item: any) =>
+      parseInt((item.percent * 100).toString()),
+    ),
+    tokenAddress: getAddress(values.tokenAddress),
+    tokenAmount: parseUnits(values.tokenAmount, tokenDecimals),
+    tokenRatio: {
+      tokenAmount: parseInt(values.assetTokenAmount),
+      daoTokenAmount: parseInt(values.daoTokenAmount),
+    },
+    step1Duration,
+    step2Duration,
+    canEndEarly: values.canEndEarly,
+  }
+  console.log('🍻 createWhitelistInvestment startParams :', startParams)
 
-//   // 启动两步投资
-//   const twoStepInvestmentContract = await getTwoStepInvestmentContract() // await contract.getTwoStepInvestMentContract()
-//   const tx = await twoStepInvestmentContract.startInvestment(startParams)
-//   const receipt = await transactionWait(tx)
-//   if (receipt?.status !== 1) {
-//     console.warn('transaction status:', receipt?.status, tx)
-//     message.error(`Create whitelist investment failed [${receipt?.status}]`)
-//     return false
-//   }
+  // 启动两步投资
+  const twoStepInvestmentContract = await contractService.getAcquiredContract() // await contract.getTwoStepInvestMentContract()
+  const tx = await twoStepInvestmentContract.startInvestment(startParams)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`Create whitelist investment failed [${receipt?.status}]`)
+    return false
+  }
 
-//   return true
-// }
+  return true
+}
 
 export {
   getSymbol,
   getDecimals,
-  // createWhitelistInvestment,
+  createWhitelistInvestment,
   // subscribeInvestmentShare,
   // endInvestment,
   chnageCommitteeProposal,
