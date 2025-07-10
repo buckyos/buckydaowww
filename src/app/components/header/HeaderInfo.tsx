@@ -53,7 +53,7 @@ const HeaderInfo = () => {
         <>
             <div className='flex-center gap-2'>
                 <div className='flex-center' onClick={() => reload()}>
-                    {loading && <Spin size='small' />}
+                    {loading && <Spin className='mr-2' size='small' />}
                     {!loading && <TokenInfo />}
                 </div>
                 <HeaderUserAvatar />
