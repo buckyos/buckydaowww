@@ -37,11 +37,11 @@ const HeaderInfo = () => {
     function TokenInfo() {
         return (
             <div className='flex-center flex-col gap-2'>
-                <div className='flex-center gap-1 justify-end'>
+                <div className='flex gap-2'>
                     <div>{devTokenAmount ? devTokenAmount : 0}</div>
                     <Tag>BDDT</Tag>
                 </div>
-                <div className='flex-center gap-1 justify-end'>
+                <div className='flex gap-2'>
                     <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
                     <Tag>BDT</Tag>
                 </div>
@@ -53,7 +53,7 @@ const HeaderInfo = () => {
         <>
             <div className='flex-center gap-2'>
                 <div className='flex-center' onClick={() => reload()}>
-                    {loading && <Spin className='mr-2' size='small' />}
+                    {loading && <Spin className='mr-4' size='small' />}
                     {!loading && <TokenInfo />}
                 </div>
                 <HeaderUserAvatar />
