@@ -37,11 +37,11 @@ const HeaderInfo = () => {
     function TokenInfo() {
         return (
             <div className='flex-center flex-col gap-2'>
-                <div className='flex-center gap-1'>
+                <div className='flex-center gap-1 justify-end'>
                     <div>{devTokenAmount ? devTokenAmount : 0}</div>
                     <Tag>BDDT</Tag>
                 </div>
-                <div className='flex-center gap-1'>
+                <div className='flex-center gap-1 justify-end'>
                     <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
                     <Tag>BDT</Tag>
                 </div>
