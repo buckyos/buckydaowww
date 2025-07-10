@@ -11,14 +11,14 @@ import { getTwoStepInvestment } from '@services/index'
 import { useCommittee, useUserStore } from '@hooks/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
-import { getAddressOfToken } from '@contracts/index'
+import { contractService } from '@contracts/index'
 import InvestStatusTag from '@components/invest/InvestStatusTag'
 
 // 投资列表(grid)
 const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
   data,
 }) => {
-  const DAO_TOKEN_ADDRESS = getAddressOfToken()
+  const DAO_TOKEN_ADDRESS = contractService.getAddressOfDevToken()
 
   return (
     <div className='grid grid-cols-1 gap-10 md:grid-cols-2'>
@@ -175,7 +175,7 @@ export default function InvestmentPage() {
         showModal={showModal}
         setShowModal={setShowModal}
       />
-      <h1 className='text-2xl mt-10'>Two-round whitelist investment</h1>
+      <h1 className='text-2xl mt-10'>Acquired</h1>
 
       <div className='flex items-center mt-10 gap-4'>
         <div
@@ -183,7 +183,7 @@ export default function InvestmentPage() {
           className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-8 px-4 rounded-lg cursor-pointer text-sm'
         >
           <PlusOutlined className='mr-1' />
-          Create Investment
+          Create Acquired
         </div>
       </div>
 
