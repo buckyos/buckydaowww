@@ -138,7 +138,7 @@ async function subscribeInvestmentShare(
   ownerAddress: string,
 ) {
   // const amount = values.tokenAmount.toString()
-  const daoTokenAddress = contractService.getAddressOfDevToken()
+  const daoTokenAddress = contractService.getAddressOfNormalToken()
   const decimals = await getDecimals(daoTokenAddress)
   const daoAmount = parseUnits(values.tokenAmount.toString(), decimals)
   const twostepInvestmentAddress = contractService.getAddressOfAquired()
