@@ -372,7 +372,7 @@ export default function ProposalDetailPage() {
           <div className='flex flex-col gap-4'>
             <div>
               <label className='font-bold mr-4'>params:</label>
-              <span className='text-cyfs-gray'>{proposal.params}</span>
+              <span className='text-cyfs-gray'>{JSON.stringify(proposal.params, null, 2)}</span>
             </div>
             <div>
               <label className='font-bold mr-4'>paramroot:</label>
