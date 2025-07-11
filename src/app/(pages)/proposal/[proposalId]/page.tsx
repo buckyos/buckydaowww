@@ -368,11 +368,25 @@ export default function ProposalDetailPage() {
         <ProposalExtraContent proposal={proposal} />
 
         <div className='mt-20 pt-20'>{proposal.extra}</div>
-        <div className='mt-20 flex justify-end '>
+        <div className='mt-20 flex'>
           <div className='flex flex-col gap-4'>
             <div>
               <label className='font-bold mr-4'>params:</label>
-              <span className='text-cyfs-gray'>{JSON.stringify(proposal.params, null, 2)}</span>
+              <div className='text-cyfs-gray pl-4'>
+                {proposal.params?.map((param, index) => (
+                  <div key={index} className="py-1">
+                    {Array.isArray(param) ? (
+                      <div className="pl-4">
+                        {param.map((item, idx) => (
+                          <div key={idx}>{item}</div>
+                        ))}
+                      </div>
+                    ) : (
+                      param
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
             <div>
               <label className='font-bold mr-4'>paramroot:</label>
