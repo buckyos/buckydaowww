@@ -1,5 +1,4 @@
 'use client'
-import { useEffect, useState } from 'react'
 import { Button, Tag, Input, message } from 'antd'
 import {
   useCommittee,
@@ -8,107 +7,10 @@ import {
   useLockToken,
   useUserStore,
 } from '@hooks/index'
-import TextArea from 'antd/es/input/TextArea'
-import { create } from 'zustand'
-import { PostUserExtraInfo } from '@services/index'
 import { parseToFloat, wrapUnits } from '@utils/index'
+import UserInfoButton from './UserInfoButton'
+import UserInfoInput from './UserInfoInput'
 
-const useUserinfo = create<{
-  job: string
-  desc: string
-  isEdit: boolean
-  setIsEdit: (isEdit: boolean) => void
-  setJob: (job: string) => void
-  setDesc: (desc: string) => void
-}>((set) => ({
-  job: '',
-  desc: '',
-  isEdit: false,
-  setIsEdit: (isEdit: boolean) => set({ isEdit }),
-  setJob: (job: string) => set({ job }),
-  setDesc: (desc: string) => set({ desc }),
-}))
-
-const UserInfoInput = () => {
-  const { isEdit, setJob, setDesc, job, desc } = useUserinfo()
-  const user = useUserStore()
-  useEffect(() => {
-    setJob(user.user.job)
-    setDesc(user.user.desc)
-  }, [user.user.job, user.user.desc, setJob, setDesc])
-
-  return (
-    <>
-      <div className='mt-20 flex items-center'>
-        <label className='inline-block w-48 font-bold flex-shrink-0'>
-          position
-        </label>
-        {isEdit && (
-          <Input value={job} onChange={(e) => setJob(e.target.value)}></Input>
-        )}
-        {!isEdit && <div>{user.user.job}</div>}
-      </div>
-
-      <div className='flex  py-4'>
-        <label className='inline-block w-48 font-bold flex-shrink-0'>
-          description
-        </label>
-        {isEdit && (
-          <TextArea
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-            autoSize={{ minRows: 3, maxRows: 5 }}
-          ></TextArea>
-        )}
-        {!isEdit && <div>{user.user.desc}</div>}
-      </div>
-    </>
-  )
-}
-
-const UserInfoButton = () => {
-  const { isEdit, setIsEdit, job, desc } = useUserinfo()
-  const { jwt, updateUser } = useUserStore((state) => ({
-    jwt: state.jwt,
-    updateUser: state.updateUser,
-  }))
-  const [loading, setLoading] = useState(false)
-
-  const onSubmitChange = async () => {
-    setLoading(true)
-    const result = await PostUserExtraInfo(jwt, job, desc)
-    console.log('onSubmitChange', result)
-    if (result.code === 0) {
-      message.success('update user info success')
-    } else {
-      message.error('update user info failed ' + result.msg)
-    }
-    await updateUser()
-
-    setLoading(false)
-    setIsEdit(false)
-  }
-
-  return (
-    <div className='flex-center mt-10'>
-      {isEdit && (
-        <Button loading={loading} type='primary' onClick={onSubmitChange}>
-          Submit Change
-        </Button>
-      )}
-      {!isEdit && (
-        <Button
-          type='primary'
-          onClick={() => {
-            setIsEdit(true)
-          }}
-        >
-          Edit
-        </Button>
-      )}
-    </div>
-  )
-}
 
 export default function UserInfoPage() {
   const user = useUserStore()

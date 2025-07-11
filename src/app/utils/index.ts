@@ -98,6 +98,19 @@ const checkProposalVote = (proposal: ProposalResponseData) => {
   }
 }
 
+function convertVersion(version: string): number {
+    let versions = version.split('.');
+    if (versions.length < 3) {
+        throw new Error(`Invalid version format: ${version}. Expected format is 'major.minor.patch'.`);
+    }
+
+    let major = parseInt(versions[0], 10);
+    let minor = parseInt(versions[1], 10);
+    let patch = parseInt(versions[2], 10);
+
+    return major*10000000000+minor*100000+patch
+}
+
 export {
   // number
   parseToFloat,
@@ -111,4 +124,5 @@ export {
   proposalExpiredTimeDisplay,
   zeroPadLeft,
   extractMessage,
+  convertVersion,
 }

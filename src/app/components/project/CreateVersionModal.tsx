@@ -15,7 +15,7 @@ import { create } from 'zustand'
 import { unwrapUnits } from '@utils/numberConverter'
 import { createProjectVersionExtra } from '@services/index'
 import TextArea from 'antd/es/input/TextArea'
-import { transactionWait } from '@utils/index'
+import { transactionWait, convertVersion } from '@utils/index'
 import { contractService } from '@contracts/index'
 
 interface CreateVersionModalProps {
@@ -63,17 +63,21 @@ const CreateVersionModal = () => {
       const endDate = dayjs(values.endDate).unix()
       // TODO mark update decimals
       const budget = unwrapUnits(values.budget, contract.decimals)
-      const issueId = values.issueId as number
+      // const issueId = values.issueId as number
       const issueLink = values.issueLink
 
       // 合约
-      const projectContractCaller = await contractService.getProjectContract()
+      const projectContract = await contractService.getProjectContract()
       console.log('values', values, startDate, endDate)
-      const tx = await projectContractCaller.createProject(
+      // function createProject(uint budget, bytes32 name, uint64 version, uint64 startDate, uint64 endDate, address[] calldata extraTokens, uint256[] calldata extraTokenAmunts) external nonReentrant returns(uint ProjectId)
+      const tx = await projectContract.createProject(
         budget,
-        issueId,
+        project_name,
+        convertVersion(values.version),
         startDate,
         endDate,
+        [],
+        []
       )
       const receipt = await transactionWait(tx)
       if (receipt?.status !== 1) {
@@ -191,22 +195,6 @@ const CreateVersionModal = () => {
           ]}
         >
           <DatePicker className='w-full' placeholder='end time' />
-        </Form.Item>
-        <Form.Item
-          name='issueId'
-          className='w-full'
-          rules={[
-            {
-              required: true,
-              message: 'issue id is required',
-            },
-          ]}
-        >
-          <InputNumber
-            style={{ width: '100%' }}
-            min={1}
-            placeholder='issue id'
-          />
         </Form.Item>
         <Form.Item
           name='issueLink'
