@@ -4,53 +4,45 @@ import { CheckCircleOutlined } from '@ant-design/icons'
 import useUserStore from '@hooks/useUserStore'
 import ContractAbout from '@components/funding/ContractAbout'
 import { RightOutlined } from '@ant-design/icons'
-import { useInvestment } from '@hooks/useInvestment'
 import { wrapUnits } from '@utils/numberConverter'
 import { useCommittee } from '@hooks/index'
 
 const InvestmentInfo: React.FC<{ decimals: number }> = ({ decimals }) => {
-  const { latestInvestment } = useInvestment()
-  console.log('latestInvestment', latestInvestment)
-  if (!latestInvestment) {
-    return null
-  }
+  return null
 
-  const rate =
-    latestInvestment.tokenExchangeRate / latestInvestment.assetExchangeRate
-
-  return (
-    <div className='relative border border-solid rounded-lg border-[#F0F0F0] p-6 mt-3 leading-10'>
-      <dd>
-        A total of
-        <span className='mx-1 text-cyfs-green font-bold'>
-          {wrapUnits(latestInvestment.goalAssetAmount, decimals)}
-        </span>
-        tokens will be released in this round of investment
-      </dd>
-      <dd>
-        Current price:
-        <span className='mx-1 font-bold'> {rate} </span>
-        USDT per BST
-      </dd>
-      <dd>
-        Maximum limit per investor: {latestInvestment.maxAssetPerInvestor} USDT
-      </dd>
-      <dd>
-        Minimum limit per investor: {latestInvestment.minAssetPerInvestor} USDT
-      </dd>
-      <dd className='mt-10'>
-        Tron USDT address for this round of investment:
-        <span className='ml-1 font-bold'>{latestInvestment.assetAddress}</span>
-      </dd>
-      <dd>KYC-verified address: 0x0000000000000000000000000000000000000000</dd>
-      <dd className='text-cyfs-gray text-sm'>
-        (only accepts KYC-verified addresses to transfer Tron USDT out and
-        receive DAO tokens)
-      </dd>
-      <dd>KYC-verified addresses have invested in this round: 750,000</dd>
-      <dd>USDT, remaining investment quota: 250,000 USDT</dd>
-    </div>
-  )
+  // return (
+  //   <div className='relative border border-solid rounded-lg border-[#F0F0F0] p-6 mt-3 leading-10'>
+  //     <dd>
+  //       A total of
+  //       <span className='mx-1 text-cyfs-green font-bold'>
+  //         {wrapUnits(latestInvestment.goalAssetAmount, decimals)}
+  //       </span>
+  //       tokens will be released in this round of investment
+  //     </dd>
+  //     <dd>
+  //       Current price:
+  //       <span className='mx-1 font-bold'> {rate} </span>
+  //       USDT per BST
+  //     </dd>
+  //     <dd>
+  //       Maximum limit per investor: {latestInvestment.maxAssetPerInvestor} USDT
+  //     </dd>
+  //     <dd>
+  //       Minimum limit per investor: {latestInvestment.minAssetPerInvestor} USDT
+  //     </dd>
+  //     <dd className='mt-10'>
+  //       Tron USDT address for this round of investment:
+  //       <span className='ml-1 font-bold'>{latestInvestment.assetAddress}</span>
+  //     </dd>
+  //     <dd>KYC-verified address: 0x0000000000000000000000000000000000000000</dd>
+  //     <dd className='text-cyfs-gray text-sm'>
+  //       (only accepts KYC-verified addresses to transfer Tron USDT out and
+  //       receive DAO tokens)
+  //     </dd>
+  //     <dd>KYC-verified addresses have invested in this round: 750,000</dd>
+  //     <dd>USDT, remaining investment quota: 250,000 USDT</dd>
+  //   </div>
+  // )
 }
 
 export default function Funding() {
