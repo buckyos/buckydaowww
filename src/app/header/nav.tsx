@@ -1,67 +1,48 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { SwapRightOutlined } from '@ant-design/icons'
+import Link from 'next/link'
 
 const Nav = () => {
   const router = useRouter()
   return (
     <nav className='flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-[38px]'>
-      <div
+      <Link
+        href="/governance_introducing"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer flex items-center gap-2'
-        onClick={() => {
-          router.push('/governance_introducing')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
       >
         <div>Governance</div>
         <div className='-rotate-45'>
           <SwapRightOutlined />
         </div>
-      </div>
+      </Link>
 
-      <div
+      <Link
+        href="/#members"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
-        onClick={() => {
-          router.push('/#members')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
       >
         Member
-      </div>
-      <div
+      </Link>
+      <Link
+        href="/proposals"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
-        onClick={() => {
-          router.push('/proposals')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
       >
         Proposal
-      </div>
+      </Link>
 
-      <div
+      <Link
+        href="/invest"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
-        onClick={() => {
-          router.push('/invest')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
       >
         Investment
-      </div>
+      </Link>
 
-      <div
+      <Link
+        href="/projects"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer'
-        onClick={() => {
-          router.push('/projects')
-          // setIsMenuOpened(false)
-        }}
-        aria-hidden
       >
         Project
-      </div>
+      </Link>
 
       <div className='block md:hidden'>{/* <WalletConnector /> */}</div>
     </nav>
