@@ -28,10 +28,10 @@ import {
   proposalTypeMap,
 } from '@utils/index'
 import { useUserStore, useContractStore } from '@hooks/index'
-import { 
+import {
   contractService,
-  voteChangeCommittee, 
-  voteUpgradeContract 
+  voteChangeCommittee,
+  voteUpgradeContract
 } from '@contracts/index'
 
 dayjs.extend(relativeTime)
@@ -313,7 +313,7 @@ export default function ProposalDetailPage() {
               {voteInfo.map(item => {
                 return (<div className='flex gap-2' key={item.address}>
                   <div className='w-[460px]'>vote address: {item.address}</div>
-                  <Tag>{item.isCommiittee? 'committee':'normal'}</Tag>
+                  <Tag>{item.isCommiittee ? 'committee' : 'normal'}</Tag>
                 </div>)
               })}
             </div>
@@ -326,7 +326,7 @@ export default function ProposalDetailPage() {
               percent={rejectPercent}
             />
           </div>
-          {voteInProgress && (
+          {/*voteInProgress && (
             <>
               <div className='flex justify-center gap-10'>
                 <Button
@@ -357,7 +357,7 @@ export default function ProposalDetailPage() {
                 Proposals completed by voting need to be clicked to execute
               </div>
             </>
-          )}
+          ) */}
 
           <ExecuteProposalButton
             disabled={voteInProgress}
@@ -369,9 +369,13 @@ export default function ProposalDetailPage() {
 
         <div className='mt-20 pt-20'>{proposal.extra}</div>
         <div className='mt-20 flex justify-end '>
-          <div className='flex flex-col'>
+          <div className='flex flex-col gap-4'>
             <div>
               <label className='font-bold mr-4'>params:</label>
+              <span className='text-cyfs-gray'>{proposal.params}</span>
+            </div>
+            <div>
+              <label className='font-bold mr-4'>paramroot:</label>
               <span className='text-cyfs-gray'>{proposal.paramroot}</span>
             </div>
             <div>
