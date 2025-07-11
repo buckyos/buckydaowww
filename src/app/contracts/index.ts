@@ -118,71 +118,71 @@ async function getDecimals(tokenAddress: string): Promise<number> {
 }
 
 // 结束两步投资
-// async function endInvestment(id: string, contract: ContractStoreDefine) {
-//   const twoStepInvestmentContract = await getTwoStepInvestmentContract()
-//   const tx = await twoStepInvestmentContract.endInventment(id)
-//   const receipt = await transactionWait(tx)
-//   if (receipt?.status !== 1) {
-//     console.warn('transaction status:', receipt?.status, tx)
-//     message.error(`End investment failed [${receipt?.status}]`)
-//     return false
-//   }
+async function endInvestment(id: string) {
+  const twoStepInvestmentContract = await contractService.getAcquiredContract()
+  const tx = await twoStepInvestmentContract.endInventment(id)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`End investment failed [${receipt?.status}]`)
+    return false
+  }
 
-//   return true
-// }
+  return true
+}
 
 // 认购份额 (白名单地址才能认购)
-// async function subscribeInvestmentShare(
-//   values: StoreValue,
-//   id: string,
-//   ownerAddress: string,
-// ) {
-//   // const amount = values.tokenAmount.toString()
-//   const daoTokenAddress = getAddressOfToken()
-//   const decimals = await getDecimals(daoTokenAddress)
-//   const daoAmount = parseUnits(values.tokenAmount.toString(), decimals)
-//   const twostepInvestmentAddress = getAddressOfTwoStepInvestment()
-//   console.log(
-//     '🍻 subscribeInvestmentShare values :',
-//     values,
-//     '. DAO token amount:',
-//     daoAmount,
-//   )
+async function subscribeInvestmentShare(
+  values: StoreValue,
+  id: string,
+  ownerAddress: string,
+) {
+  // const amount = values.tokenAmount.toString()
+  const daoTokenAddress = contractService.getAddressOfDevToken()
+  const decimals = await getDecimals(daoTokenAddress)
+  const daoAmount = parseUnits(values.tokenAmount.toString(), decimals)
+  const twostepInvestmentAddress = contractService.getAddressOfAquired()
+  console.log(
+    '🍻 subscribeInvestmentShare values :',
+    values,
+    '. DAO token amount:',
+    daoAmount,
+  )
 
-//   // 授权token
-//   {
-//     const daoTokenContract = await getTokenContract()
-//     const allow = await daoTokenContract.allowance(
-//       ownerAddress,
-//       twostepInvestmentAddress,
-//     )
-//     console.log('🍻 contract allow :', allow, daoAmount)
-//     if (allow < daoAmount) {
-//       const tx = await daoTokenContract.approve(
-//         twostepInvestmentAddress,
-//         daoAmount,
-//       )
-//       const receipt = await transactionWait(tx)
-//       if (receipt?.status !== 1) {
-//         message.error('token approve failed')
-//         console.warn('transaction status:', receipt?.status, tx)
-//         return false
-//       }
-//     }
-//   }
+  // 授权token
+  {
+    const daoTokenContract = await contractService.getNormalTokenContract()
+    const allow = await daoTokenContract.allowance(
+      ownerAddress,
+      twostepInvestmentAddress,
+    )
+    console.log('🍻 contract allow :', allow, daoAmount)
+    if (allow < daoAmount) {
+      const tx = await daoTokenContract.approve(
+        twostepInvestmentAddress,
+        daoAmount,
+      )
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        message.error('token approve failed')
+        console.warn('transaction status:', receipt?.status, tx)
+        return false
+      }
+    }
+  }
 
-//   // 认购份额
-//   const twoStepInvestmentContract = await getTwoStepInvestmentContract()
-//   const tx = await twoStepInvestmentContract.invest(id, daoAmount)
-//   const receipt = await transactionWait(tx)
-//   if (receipt?.status !== 1) {
-//     console.warn('transaction status:', receipt?.status, tx)
-//     message.error(`Subscribe invest shares failed [${receipt?.status}]`)
-//     return false
-//   }
+  // 认购份额
+  const twoStepInvestmentContract = await contractService.getAcquiredContract()
+  const tx = await twoStepInvestmentContract.invest(id, daoAmount)
+  const receipt = await transactionWait(tx)
+  if (receipt?.status !== 1) {
+    console.warn('transaction status:', receipt?.status, tx)
+    message.error(`Subscribe invest shares failed [${receipt?.status}]`)
+    return false
+  }
 
-//   return true
-// }
+  return true
+}
 
 // 创建
 // 创建白名单投资
@@ -283,7 +283,7 @@ export {
   getSymbol,
   getDecimals,
   createWhitelistInvestment,
-  // subscribeInvestmentShare,
-  // endInvestment,
+  subscribeInvestmentShare,
+  endInvestment,
   chnageCommitteeProposal,
 }
