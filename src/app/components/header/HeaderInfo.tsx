@@ -7,6 +7,7 @@ import { contractService } from '@contracts/index'
 import { formatUnits } from 'ethers'
 import { Tag, Spin } from 'antd'
 import HeaderTokenTransferIcon from './HeaderTokenTransferIcon'
+import { ReloadOutlined } from '@ant-design/icons'
 
 const HeaderInfo = () => {
   const user = useUserStore()
@@ -38,7 +39,6 @@ const HeaderInfo = () => {
   function TokenInfo() {
     return (
       <div className='flex-center gap-4'>
-        <HeaderTokenTransferIcon />
 
         <div className='flex flex-col gap-2'>
           <div className='flex gap-2'>
@@ -50,6 +50,11 @@ const HeaderInfo = () => {
             <Tag>BDT</Tag>
           </div>
         </div>
+        <ReloadOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={(e) => {
+          e.stopPropagation();
+          reload();
+        }} />
+        <HeaderTokenTransferIcon />
       </div>
     )
   }
@@ -57,7 +62,7 @@ const HeaderInfo = () => {
   return (
     <>
       <div className='flex-center gap-2'>
-        <div className='flex-center' onClick={() => reload()}>
+        <div className='flex-center' >
           {loading && <Spin className='mr-4' size='small' />}
           {!loading && <TokenInfo />}
         </div>
