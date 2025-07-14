@@ -7,13 +7,20 @@ import {
 import {
   formatAmount
 } from '@utils/numberConverter'
+import useContractStore from '@hooks/useContract'
+
 
 const DaoTokenAmountCard: React.FC<{}> = () => {
+  const { update } = useContractStore((state) => ({
+    update: state.update,
+  }))
   const [info, setInfo] = useState<ContractTokenInfo>()
   useAsyncEffect(async () => {
     const token = await fetchTokenInfo()
     console.log(token)
     setInfo(token)
+    const devToken = token.dev
+    update(devToken.totalSupply, devToken.totalReleased, token.normal.totalSupply, devToken.symbol, devToken.decimals)
   }, [])
 
   if (!info?.dev || !info.normal) {

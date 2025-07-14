@@ -1,15 +1,8 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-// import { getContractInfo } from '@services/index'
-import {
-  contractService,
-} from '@contracts/index'
-
 import {
   contractProxyContract,
-  // getProjectContract,
-  // getProvider,
 } from './function'
 
 // 过期时间 5分钟
@@ -26,6 +19,16 @@ const useContractStore = create<ContractStoreDefine>()(
       expiration: 0,
       // fetch token's value in contract
       // TODO remove
+      update(totalSupply: number, totalReleased: number, totalUnreleased: number, symbol: string, decimals: number) {
+        console.log('update useContractStore', totalSupply, totalReleased, totalUnreleased, symbol, decimals)
+        set({
+          totalSupply,
+          totalReleased,
+          totalUnreleased,
+          symbol,
+          decimals,
+        })
+      },
     }),
     {
       name: 'contract_address',

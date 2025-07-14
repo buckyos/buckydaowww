@@ -277,6 +277,7 @@ interface ContractStoreDefine {
   // fetchToken: () => Promise<any>
   // getSignerComitteeContract: () => Promise<ethers.Contract>
   // getInvestMentContract: () => Promise<ethers.Contract>
+  update: (totalSupply: number, totalReleased: number, totalUnreleased: number, symbol: string, decimals: number) => void
 }
 
 interface TwoStepTokenRatio {

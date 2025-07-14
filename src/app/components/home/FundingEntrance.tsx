@@ -4,17 +4,8 @@ import Link from 'next/link'
 
 const FundingEntrance = () => {
   return (
-    <div className='border-round p-4 mt-10'>
-      <div className='flex justify-between items-center'>
-        <Link href='/invest'>
-          <Button type='primary' >
-            Funding Now
-          </Button>
-        </Link>
-
-      </div>
-
-      <div className='mt-10 text-sm leading-6  pl-12'>
+    <div className='flex flex-col gap-6 border-round p-4 mt-10'>
+      <div className='text-sm leading-6  pl-12'>
         <div className='leading-10 text-base'>
           Why Invest in Buckyos Source Token?
         </div>
@@ -30,6 +21,14 @@ const FundingEntrance = () => {
           <strong className='mr-1'>Share & Decide:</strong>
           Profit from Buckyos&apos;s success and participate in governance.
         </p>
+      </div>
+
+      <div className='flex justify-end items-center'>
+        <Link href='/invest'>
+          <Button type='primary' >
+            Funding Now
+          </Button>
+        </Link>
       </div>
     </div>
   )

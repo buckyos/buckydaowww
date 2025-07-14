@@ -1,15 +1,20 @@
 'use client'
 import useContractStore from '@hooks/useContract'
 import { useLayoutEffect } from 'react'
+import { fetchTokenInfo } from '@contracts/token'
 
 export default function Fetcher() {
-  // const { fetchToken } = useContractStore((state) => ({
-  //   fetchToken: state.fetchToken,
-  // }))
+  const { update } = useContractStore((state) => ({
+    update: state.update,
+  }))
 
   // header 最前面的地方先获取合约地址
   useLayoutEffect(() => {
-    console.log('🍻 Fetcher: get global data')
+
+    fetchTokenInfo().then(result => {
+      const token = result.dev
+      update(token.totalSupply, token.totalReleased,result.normal.totalSupply, token.symbol, token.decimals)
+    })
     // fetchToken()
 
     window.ethereum.request({ method: 'eth_chainId' }).then((chainId: any) => {
