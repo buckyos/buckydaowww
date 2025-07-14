@@ -6,100 +6,104 @@ import useUserStore from '@hooks/useUserStore'
 import { extractMessage, transactionWait } from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { contractService } from '@contracts/index'
+import { parseUnits } from 'ethers'
+import useContractStore from '@hooks/useContract'
 
 const TokenTransferModal: React.FC<{
-  showModal: boolean
-  setShowModal: Dispatch<SetStateAction<boolean>>
+    showModal: boolean
+    setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const user = useUserStore()
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const user = useUserStore()
+    const { decimals } = useContractStore((state => ({ decimals: state.decimals })))
 
-  const onCreateProposal = async (values: StoreValue) => {
-    console.log('🍻 values :', values)
-    setIsSubmitting(true)
-    const fn = async () => {
-      const comitteeContract = await contractService.getCommitteeContract()
-      const tx = await comitteeContract.perpareContractUpgrade(
-        values.contractProxyAddress,
-        values.implAddress,
-      )
+    const onTransfer = async (values: StoreValue) => {
+        console.log('🍻 values :', values)
+        setIsSubmitting(true)
+        const fn = async () => {
+            const devToken = await contractService.getDevTokenContract()
+            // const decimals = await getDecimals(daoTokenAddress)
+            const devTokenAmount = parseUnits(values.devTokenAmount.toString(), decimals)
+            {
+                const tx = await devToken.approve(
+                    contractService.getAddressOfNormalToken(),
+                    devTokenAmount,
+                )
+                const receipt = await transactionWait(tx)
+                if (receipt?.status !== 1) {
+                    console.warn('transaction status:', receipt?.status, tx)
+                    message.error(
+                        `transfer token approve failed[3][${receipt?.status}]`,
+                    )
+                    return
+                }
+            }
+            {
+                const tx = await devToken.dev2normal(devTokenAmount)
+                const receipt = await transactionWait(tx)
+                if (receipt?.status !== 1) {
+                    console.warn('transaction status:', receipt?.status, tx)
+                    message.error(
+                        `transfer token failed[3][${receipt?.status}]`,
+                    )
+                    return
+                }
+            }
 
-      const receipt = await transactionWait(tx)
-      if (receipt?.status !== 1) {
-        console.warn('transaction status:', receipt?.status, tx)
-        message.error(
-          `Create upgrade contract proposal failed[3][${receipt?.status}]`,
-        )
-        return
-      }
-      const result = await proposalSetExtraAndParams(
-        user.jwt,
-        [values.contractProxyAddress, values.implAddress, 'upgradeContract'],
-        values.title,
-        values.content,
-        receipt.hash,
-      )
-      if (result.code !== 0) {
-        message.error(
-          'Create upgrade contract proposal failed[4], please try again later',
-        )
-      } else {
-        message.success('Create upgrade contract proposal success')
-        setShowModal(false)
-      }
+            message.success("transfer BDDT to BDT success")
+        }
+
+        try {
+            await fn()
+        } catch (e) {
+            let msg = extractMessage(e)
+            message.error(`transfer token failed[1][${msg}]`, 10)
+        }
+
+        setIsSubmitting(false)
     }
 
-    try {
-      await fn()
-    } catch (e) {
-      let msg = extractMessage(e)
-      message.error(`Create proposal failed[1][${msg}]`, 10)
-    }
-
-    setIsSubmitting(false)
-  }
-
-  return (
-    <Modal
-      title='Transfer your BDDT to BDT'
-      open={showModal}
-      onCancel={() => {
-        setShowModal(false)
-      }}
-      footer={null}
-    >
-      <Spin tip='Waiting for confirmation...' spinning={isSubmitting}>
-        <Form
-          onFinish={onCreateProposal}
-          className='mt-6'
-          name=''
-          style={{ width: '100%' }}
-          autoComplete='off'
+    return (
+        <Modal
+            title='Transfer your BDDT to BDT'
+            open={showModal}
+            onCancel={() => {
+                setShowModal(false)
+            }}
+            footer={null}
         >
-          <Form.Item
-            name='amount'
-            rules={[
-              {
-                required: true,
-                message: 'BDDT amount is required ',
-              },
-            ]}
-          >
-            <Input 
-              className='' 
-              placeholder='amount'
-              suffix="BDDT"
-            />
-          </Form.Item>
-          <div className='flex justify-center'>
-            <Button loading={isSubmitting} type='primary' htmlType='submit'>
-              Transfer Proposal
-            </Button>
-          </div>
-        </Form>
-      </Spin>
-    </Modal>
-  )
+            <Spin tip='Waiting for confirmation...' spinning={isSubmitting}>
+                <Form
+                    onFinish={onTransfer}
+                    className='mt-6'
+                    name=''
+                    style={{ width: '100%' }}
+                    autoComplete='off'
+                >
+                    <Form.Item
+                        name='devTokenAmount'
+                        rules={[
+                            {
+                                required: true,
+                                message: 'BDDT amount is required ',
+                            },
+                        ]}
+                    >
+                        <Input
+                            className=''
+                            placeholder='amount'
+                            suffix="BDDT"
+                        />
+                    </Form.Item>
+                    <div className='flex justify-center'>
+                        <Button loading={isSubmitting} type='primary' htmlType='submit'>
+                            Transfer Proposal
+                        </Button>
+                    </div>
+                </Form>
+            </Spin>
+        </Modal>
+    )
 }
 
 export default TokenTransferModal
