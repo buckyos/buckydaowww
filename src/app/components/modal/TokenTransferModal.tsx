@@ -5,7 +5,7 @@ import TextArea from 'antd/es/input/TextArea'
 import useUserStore from '@hooks/useUserStore'
 import { extractMessage, transactionWait } from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
-import { contractService } from '@contracts/index'
+import { contractService, getDecimals } from '@contracts/index'
 import { parseUnits } from 'ethers'
 import useContractStore from '@hooks/useContract'
 
@@ -14,15 +14,15 @@ const TokenTransferModal: React.FC<{
     setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const user = useUserStore()
-    const { decimals } = useContractStore((state => ({ decimals: state.decimals })))
+    // const user = useUserStore()
+    // const { decimals } = useContractStore((state => ({ decimals: state.decimals })))
 
     const onTransfer = async (values: StoreValue) => {
         console.log('🍻 values :', values)
         setIsSubmitting(true)
         const fn = async () => {
             const devToken = await contractService.getDevTokenContract()
-            // const decimals = await getDecimals(daoTokenAddress)
+            const decimals = await getDecimals(contractService.getAddressOfDevToken())
             const devTokenAmount = parseUnits(values.devTokenAmount.toString(), decimals)
             {
                 const tx = await devToken.approve(
