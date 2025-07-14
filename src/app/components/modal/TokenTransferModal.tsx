@@ -51,6 +51,7 @@ const TokenTransferModal: React.FC<{
             }
 
             message.success("transfer BDDT to BDT success")
+            setShowModal(false)
         }
 
         try {
