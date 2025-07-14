@@ -6,6 +6,7 @@ import { useAsyncEffect } from 'ahooks'
 import { contractService } from '@contracts/index'
 import { formatUnits } from 'ethers'
 import { Tag, Spin } from 'antd'
+import HeaderTokenTransferIcon from './HeaderTokenTransferIcon'
 
 const HeaderInfo = () => {
   const user = useUserStore()
@@ -36,14 +37,18 @@ const HeaderInfo = () => {
 
   function TokenInfo() {
     return (
-      <div className='flex flex-col gap-2'>
-        <div className='flex gap-2'>
-          <div>{devTokenAmount ? devTokenAmount : 0}</div>
-          <Tag>BDDT</Tag>
-        </div>
-        <div className='flex gap-2'>
-          <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
-          <Tag>BDT</Tag>
+      <div className='flex-center gap-4'>
+        <HeaderTokenTransferIcon />
+
+        <div className='flex flex-col gap-2'>
+          <div className='flex gap-2'>
+            <div>{devTokenAmount ? devTokenAmount : 0}</div>
+            <Tag>BDDT</Tag>
+          </div>
+          <div className='flex gap-2'>
+            <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
+            <Tag>BDT</Tag>
+          </div>
         </div>
       </div>
     )
