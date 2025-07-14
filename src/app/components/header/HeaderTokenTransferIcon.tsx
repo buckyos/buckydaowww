@@ -13,7 +13,7 @@ const HeaderTokenTransferIcon = () => {
 
     return (
         <div>
-            <SwapOutlined style={{ fontSize: '20px' }} onClick={() => {
+            <SwapOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={() => {
                 setShow(true)
             }} />
 
