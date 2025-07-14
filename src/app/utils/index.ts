@@ -98,6 +98,18 @@ const checkProposalVote = (proposal: ProposalResponseData) => {
   }
 }
 
+/**
+ * 将版本号字符串转换为数字
+ * @param version 版本号字符串，格式为 'major.minor.patch'
+ * @returns 转换后的数字
+ * 
+ * @example
+ * convertVersion('1.2.3') // 返回 10000200003
+ * convertVersion('2.0.5') // 返回 20000000005
+ * convertVersion('0.1.0') // 返回 100000
+ * 
+ * @throws 当版本号格式不正确时抛出错误
+ */
 function convertVersion(version: string): number {
     let versions = version.split('.');
     if (versions.length < 3) {
