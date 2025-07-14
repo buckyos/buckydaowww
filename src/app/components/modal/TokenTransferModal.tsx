@@ -77,38 +77,20 @@ const TokenTransferModal: React.FC<{
           autoComplete='off'
         >
           <Form.Item
-            name='contractProxyAddress'
+            name='amount'
             rules={[
               {
                 required: true,
-                message: 'contract proxy address  is required ',
+                message: 'BDDT amount is required ',
               },
             ]}
           >
-            <Input className='' placeholder='contract proxy address' />
-          </Form.Item>
-
-          <Form.Item
-            name='implAddress'
-            rules={[{ required: true, message: 'impl address is required ' }]}
-          >
-            <Input className='' placeholder='impl address' />
-          </Form.Item>
-          <Form.Item
-            name='title'
-            rules={[{ required: true, message: 'title  is required ' }]}
-          >
-            <Input className='' placeholder='proposal title' />
-          </Form.Item>
-
-          <Form.Item name='content'>
-            <TextArea
-              className=''
-              placeholder='proposal content'
-              autoSize={{ minRows: 3, maxRows: 5 }}
+            <Input 
+              className='' 
+              placeholder='amount'
+              suffix="BDDT"
             />
           </Form.Item>
-
           <div className='flex justify-center'>
             <Button loading={isSubmitting} type='primary' htmlType='submit'>
               Transfer Proposal
