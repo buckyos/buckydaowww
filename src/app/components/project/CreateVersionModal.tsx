@@ -13,7 +13,7 @@ import useContractStore from '@hooks/useContract'
 import dayjs from 'dayjs'
 import { create } from 'zustand'
 import { unwrapUnits } from '@utils/numberConverter'
-import { createProjectVersionExtra } from '@services/index'
+import { createProjectVersionExtra, proposalSetExtraAndParams } from '@services/index'
 import TextArea from 'antd/es/input/TextArea'
 import { transactionWait, convertVersion } from '@utils/index'
 import { contractService } from '@contracts/index'
@@ -21,21 +21,25 @@ import { contractService } from '@contracts/index'
 interface CreateVersionModalProps {
   visible: boolean
   project_name: string
-  show: (project_name: string) => void
+  project_id: number
+  show: (project_name: string, project_id: number) => void
   close: () => void
 }
 
 const useCreateVersionModalStore = create<CreateVersionModalProps>((set) => ({
   visible: false,
   project_name: '',
-  show: (project_name: string) =>
+  project_id: 0,
+  show: (project_name: string, project_id: number) =>
     set({
       project_name: project_name,
+      project_id: project_id,
       visible: true,
     }),
   close: () =>
     set({
       project_name: '',
+      project_id: 0,
       visible: false,
     }),
 }))
@@ -44,7 +48,7 @@ const useCreateVersionModalStore = create<CreateVersionModalProps>((set) => ({
 const simpleVersionRegex = /^(\d+)\.(\d+)\.(\d+)$/
 
 const CreateVersionModal = () => {
-  const { visible, project_name, close } = useCreateVersionModalStore()
+  const { visible, project_name, close, project_id } = useCreateVersionModalStore()
   const contract = useContractStore()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -99,11 +103,21 @@ const CreateVersionModal = () => {
       if (result.code !== 0) {
         message.error('Create project version failed, please try again later')
         return false
-      } else {
-        message.success('Create project version success')
-        close()
-        return true
       }
+      const result2 = await proposalSetExtraAndParams(
+        jwt,
+        [project_id, budget, startDate, endDate, "createProject"],
+        values.title,
+        "",
+        receipt.hash,
+      )
+      if (result2.code !== 0) {
+        message.error('Create project version failed, please try again later')
+        return false
+      }
+
+      message.success('Create project version success')
+      close()
     })()
     setIsSubmitting(false)
   }

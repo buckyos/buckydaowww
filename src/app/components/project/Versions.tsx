@@ -50,8 +50,8 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
       return
     }
 
-    if (project_name) {
-      show(project_name)
+    if (project_name && projectId) {
+      show(project_name, Number(projectId))
     } else {
       message.error('error: missing project name')
     }
