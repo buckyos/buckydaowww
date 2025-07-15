@@ -40,21 +40,22 @@ const HeaderInfo = () => {
     return (
       <div className='flex-center gap-4'>
 
-        <div className='flex flex-col gap-2'>
-          <div className='flex gap-2'>
+        <div className='flex gap-2'>
+          <div className='flex gap-1'>
             <div>{devTokenAmount ? devTokenAmount : 0}</div>
-            <Tag>BDDT</Tag>
+            <div className='font-bold text-cyfs-green'>BDDT</div>
           </div>
-          <div className='flex gap-2'>
+          <HeaderTokenTransferIcon />
+
+          <div className='flex gap-1'>
             <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
-            <Tag>BDT</Tag>
+            <div className='font-bold text-cyfs-green'>BDT</div>
           </div>
         </div>
         <ReloadOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={(e) => {
           e.stopPropagation();
           reload();
         }} />
-        <HeaderTokenTransferIcon />
       </div>
     )
   }

@@ -1,5 +1,5 @@
 
-import { SwapOutlined } from '@ant-design/icons'
+import { RightOutlined } from '@ant-design/icons'
 import TokenTransferModal from '@components/modal/TokenTransferModal'
 import { useState } from 'react'
 
@@ -13,7 +13,7 @@ const HeaderTokenTransferIcon = () => {
 
     return (
         <div>
-            <SwapOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={() => {
+            <RightOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={() => {
                 setShow(true)
             }} />
 

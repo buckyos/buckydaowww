@@ -28,7 +28,7 @@ const UserInfoInput = () => {
         {isEdit && (
           <Input value={job} onChange={(e) => setJob(e.target.value)}></Input>
         )}
-        {!isEdit && <div>{user.user.job}</div>}
+        {!isEdit && <div>{user.user.job ? user.user.job : '---'}</div>}
       </div>
 
       <div className='flex  py-4'>
@@ -42,7 +42,7 @@ const UserInfoInput = () => {
             autoSize={{ minRows: 3, maxRows: 5 }}
           ></TextArea>
         )}
-        {!isEdit && <div>{user.user.desc}</div>}
+        {!isEdit && <div>{user.user.desc ? user.user.desc : '---'}</div>}
       </div>
     </>
   )
