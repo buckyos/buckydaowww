@@ -52,15 +52,15 @@ const HeaderUserAvatar = () => {
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
       <div className='flex-center gap-2'>
         <Image
-          width={56}
-          height={56}
+          width={60}
+          height={60}
           className='w-14 h-14 rounded-full overflow-hidden'
           src={user.user.avatar!}
           alt='avatar'
         />
-        <div className='flex flex-col'>
+        <div className='flex flex-col gap-2'>
           <div className='flex items-center'>
-            <span className='text-base cursor-default'>
+            <span className='text-lg cursor-default'>
               {user.user.nickname}
             </span>
             {isCommittee && (
