@@ -5,9 +5,8 @@ import HeaderUserAvatar from '../../header/HeaderUserAvatar'
 import { useAsyncEffect } from 'ahooks'
 import { contractService } from '@contracts/index'
 import { formatUnits } from 'ethers'
-import { Tag, Spin } from 'antd'
-import HeaderTokenTransferIcon from './HeaderTokenTransferIcon'
-import { ReloadOutlined } from '@ant-design/icons'
+import { Spin } from 'antd'
+import HeaderTokenInfo from './HeaderTokenInfo'
 
 const HeaderInfo = () => {
   const user = useUserStore()
@@ -34,38 +33,13 @@ const HeaderInfo = () => {
   useAsyncEffect(async () => {
     await reload()
   }, [user])
-
-
-  function TokenInfo() {
-    return (
-      <div className='flex-center gap-4'>
-
-        <div className='flex gap-2'>
-          <div className='flex gap-1'>
-            <div>{devTokenAmount ? devTokenAmount : 0}</div>
-            <div className='font-bold text-cyfs-green'>BDDT</div>
-          </div>
-          <HeaderTokenTransferIcon />
-
-          <div className='flex gap-1'>
-            <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
-            <div className='font-bold text-cyfs-green'>BDT</div>
-          </div>
-        </div>
-        <ReloadOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={(e) => {
-          e.stopPropagation();
-          reload();
-        }} />
-      </div>
-    )
-  }
-
+  
   return (
     <>
       <div className='flex-center gap-2'>
         <div className='flex-center' >
           {loading && <Spin className='mr-4' size='small' />}
-          {!loading && <TokenInfo />}
+          {!loading && <HeaderTokenInfo devTokenAmount={devTokenAmount} normalTokenAmount={normalTokenAmount} reload={reload}/>}
         </div>
         <HeaderUserAvatar />
       </div>
