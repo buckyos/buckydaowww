@@ -17,6 +17,7 @@ import { createProjectVersionExtra, proposalSetExtraAndParams } from '@services/
 import TextArea from 'antd/es/input/TextArea'
 import { transactionWait, convertVersion, showErrorMessage } from '@utils/index'
 import { contractService } from '@contracts/index'
+import { ethers } from 'ethers'
 
 interface CreateVersionModalProps {
   visible: boolean
@@ -76,7 +77,7 @@ const CreateVersionModal = () => {
       // function createProject(uint budget, bytes32 name, uint64 version, uint64 startDate, uint64 endDate, address[] calldata extraTokens, uint256[] calldata extraTokenAmunts) external nonReentrant returns(uint ProjectId)
       const tx = await projectContract.createProject(
         budget,
-        project_name,
+        ethers.encodeBytes32String(project_name),
         convertVersion(values.version),
         startDate,
         endDate,
