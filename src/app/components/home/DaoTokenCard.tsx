@@ -8,7 +8,7 @@ import {
   formatAmount
 } from '@utils/numberConverter'
 import useContractStore from '@hooks/useContract'
-import { InfoOutlined } from '@ant-design/icons'
+import { InfoCircleOutlined } from '@ant-design/icons'
 
 
 const DaoTokenAmountCard: React.FC<{}> = () => {
@@ -45,67 +45,59 @@ const DaoTokenAmountCard: React.FC<{}> = () => {
 
   return (
     <React.Fragment>
-      <div className='w-48 h-[90px] flex justify-center items-center border border-solid rounded-lg border-[#F0F0F0] relative'>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-baseline gap-1'>
-            <div className='text-xl font-medium'>{formatAmount(info?.dev.totalSupply, 3, false)}</div>
-            <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
-          </div>
-          <Tooltip title={`BDDT is a non-circulating equity token. Developers obtain it through project settlement and have greater rights when voting.
+      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+        <div className='flex items-baseline gap-1'>
+          <div className='text-xl font-medium'>{formatAmount(info?.dev.totalSupply, 3, false)}</div>
+          <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
+        </div>
+        <Tooltip title={`BDDT is a non-circulating equity token. Developers obtain it through project settlement and have greater rights when voting.
 Currently: 1 vote of BDDT = 4 votes of BDT`}>
-            <div className='text-sm text-black-secondary'>Total
-              <InfoOutlined />
-            </div>
-          </Tooltip>
-        </div>
-      </div>
-      <div className='w-48 h-[90px] flex justify-center items-center border border-solid rounded-lg border-[#F0F0F0] relative'>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-baseline gap-1'>
-            <div className='text-xl font-medium'>{formatAmount(info?.normal.totalSupply, 3, false)}</div>
-            <div className='font-bold text-cyfs-green'>{info?.normal.symbol}</div>
+          <div className='text-sm text-black-secondary'>Total
+            <InfoCircleOutlined />
           </div>
-          <Tooltip title={`BDT is a common circulated token. BDDT can be exchanged for BDT in a 1:1 one-way manner
+        </Tooltip>
+      </div>
+      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+        <div className='flex items-baseline gap-1'>
+          <div className='text-xl font-medium'>{formatAmount(info?.normal.totalSupply, 3, false)}</div>
+          <div className='font-bold text-cyfs-green'>{info?.normal.symbol}</div>
+        </div>
+        <Tooltip title={`BDT is a common circulated token. BDDT can be exchanged for BDT in a 1:1 one-way manner
 Currently: 1 vote of BDDT = 4 votes of BDT`}>
-            <div className='text-sm text-black-secondary'>Circulation
-              <InfoOutlined />
-            </div>
-          </Tooltip>
-        </div>
+          <div className='text-sm text-black-secondary'>Circulation
+            <InfoCircleOutlined />
+          </div>
+        </Tooltip>
       </div>
-      <div className='w-48 h-[90px] flex justify-center items-center border border-solid rounded-lg border-[#F0F0F0] relative'>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-baseline gap-1'>
-            <div className='text-xl font-medium'>{formatAmount(info?.dev.totalReleased, 3, false)}</div>
-            <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
-          </div>
-          <div className=' absolute top-0 right-0 scale-75'>
-            <Progress
-              steps={4}
-              percent={info?.dev.totalReleasedPercent}
-              size='small'
-              status='active'
-            />
-          </div>
-          <div className='text-sm text-black-secondary'>Released</div>
+      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+        <div className='flex items-baseline gap-1'>
+          <div className='text-xl font-medium'>{formatAmount(info?.dev.totalReleased, 3, false)}</div>
+          <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
         </div>
+        <div className=' absolute top-0 right-0 scale-75'>
+          <Progress
+            steps={4}
+            percent={info?.dev.totalReleasedPercent}
+            size='small'
+            status='active'
+          />
+        </div>
+        <div className='text-sm text-black-secondary'>Released</div>
       </div>
-      <div className='w-48 h-[90px] flex justify-center items-center border border-solid rounded-lg border-[#F0F0F0] relative'>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-baseline gap-1'>
-            <div className='text-xl font-medium'>{formatAmount(info?.dev.unrelease, 3, false)}</div>
-            <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
-          </div>
-          <div className=' absolute top-0 right-0 scale-75'>
-            <Progress
-              steps={4}
-              percent={info?.dev.unreleasePercent}
-              size='small'
-              status='active'
-            />
-          </div>
-          <div className='text-sm text-black-secondary'>Unreleased</div>
+      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+        <div className='flex items-baseline gap-1'>
+          <div className='text-xl font-medium'>{formatAmount(info?.dev.unrelease, 3, false)}</div>
+          <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
         </div>
+        <div className=' absolute top-0 right-0 scale-75'>
+          <Progress
+            steps={4}
+            percent={info?.dev.unreleasePercent}
+            size='small'
+            status='active'
+          />
+        </div>
+        <div className='text-sm text-black-secondary'>Unreleased</div>
       </div>
     </React.Fragment>
   )
