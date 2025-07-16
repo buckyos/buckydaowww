@@ -8,6 +8,7 @@ import {
   // updateProposalInfomation,
 } from '@services/index'
 import { Button, Progress, Tag, message } from 'antd'
+import { CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ethers } from 'ethers'
@@ -368,20 +369,28 @@ export default function ProposalDetailPage() {
         <ProposalExtraContent proposal={proposal} />
 
         <div className='mt-20 pt-20'>{proposal.extra}</div>
-        <div className='mt-20 flex'>
-          <div className='flex flex-col gap-4'>
-            <div className='flex'>
-              <label className='font-bold mr-4'>params:</label>
-              <div className='text-cyfs-gray'>{proposal.params.map((item, index) => <div key={index}>{JSON.stringify(item, null, 2)}</div>)}</div>
-            </div>
-            <div>
-              <label className='font-bold mr-4'>paramroot:</label>
-              <span className='text-cyfs-gray'>{proposal.paramroot}</span>
-            </div>
-            <div>
-              <label className='font-bold mr-4'>from group:</label>
-              <span className='text-cyfs-gray'>{proposal.fromGroup}</span>
-            </div>
+        <div className='mt-20 border-b border-solid border-[#F0F0F0]'></div>
+        <div className='flex flex-col gap-4'>
+          <div className='flex relative'>
+            <label className='font-bold w-28'>params:</label>
+            <div className='text-cyfs-gray'>{proposal.params.map((item, index) => <div key={index}>{JSON.stringify(item, null, 2)}</div>)}</div>
+            <CopyOutlined
+              className='absolute right-2 top-2 cursor-pointer hover:text-blue-500'
+              onClick={() => {
+                // 复制params到剪贴板
+                navigator.clipboard.writeText(JSON.stringify(proposal.params, null, 2))
+                  .then(() => message.success('Params Copied to clipboard'))
+                  .catch(() => message.error('Failed to copy'))
+              }}
+            />
+          </div>
+          <div className='flex'>
+            <label className='font-bold w-28'>paramroot:</label>
+            <span className='text-cyfs-gray'>{proposal.paramroot}</span>
+          </div>
+          <div className='flex'>
+            <label className='font-bold w-28'>from group:</label>
+            <span className='text-cyfs-gray'>{proposal.fromGroup}</span>
           </div>
         </div>
       </div>
