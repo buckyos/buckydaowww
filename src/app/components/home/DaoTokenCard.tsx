@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
-import { Progress, Spin } from 'antd'
+import { Progress, Spin, Tooltip } from 'antd'
 import {
   fetchTokenInfo,
 } from '@contracts/index'
@@ -8,6 +8,7 @@ import {
   formatAmount
 } from '@utils/numberConverter'
 import useContractStore from '@hooks/useContract'
+import { InfoOutlined } from '@ant-design/icons'
 
 
 const DaoTokenAmountCard: React.FC<{}> = () => {
@@ -50,7 +51,12 @@ const DaoTokenAmountCard: React.FC<{}> = () => {
             <div className='text-xl font-medium'>{formatAmount(info?.dev.totalSupply, 3, false)}</div>
             <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
           </div>
-          <div className='text-sm text-black-secondary'>Total</div>
+          <Tooltip title={`BDDT is a non-circulating equity token. Developers obtain it through project settlement and have greater rights when voting.
+Currently: 1 vote of BDDT = 4 votes of BDT`}>
+            <div className='text-sm text-black-secondary'>Total
+              <InfoOutlined />
+            </div>
+          </Tooltip>
         </div>
       </div>
       <div className='w-48 h-[90px] flex justify-center items-center border border-solid rounded-lg border-[#F0F0F0] relative'>
@@ -59,7 +65,12 @@ const DaoTokenAmountCard: React.FC<{}> = () => {
             <div className='text-xl font-medium'>{formatAmount(info?.normal.totalSupply, 3, false)}</div>
             <div className='font-bold text-cyfs-green'>{info?.normal.symbol}</div>
           </div>
-          <div className='text-sm text-black-secondary'>Destroyed</div>
+          <Tooltip title={`BDT is a common circulated token. BDDT can be exchanged for BDT in a 1:1 one-way manner
+Currently: 1 vote of BDDT = 4 votes of BDT`}>
+            <div className='text-sm text-black-secondary'>Circulation
+              <InfoOutlined />
+            </div>
+          </Tooltip>
         </div>
       </div>
       <div className='w-48 h-[90px] flex justify-center items-center border border-solid rounded-lg border-[#F0F0F0] relative'>
