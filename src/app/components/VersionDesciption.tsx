@@ -77,7 +77,7 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
           target='_blank'
         >
           <GithubOutlined />
-          <span className='ml-2'>#{version.issue}</span>
+          <span className='ml-2'>#{version.issue_link.split('/').pop()}</span>
         </a>
       ),
     },
