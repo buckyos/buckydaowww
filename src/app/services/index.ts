@@ -260,7 +260,6 @@ export async function getProjectVersionDetail(versionId: string) {
   return data
 }
 
-// 创建token释放
 export async function createProjectVersionExtra(
   jwt: string,
   title: string,

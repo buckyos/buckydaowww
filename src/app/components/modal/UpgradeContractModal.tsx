@@ -3,7 +3,7 @@ import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import useUserStore from '@hooks/useUserStore'
-import { extractMessage, transactionWait } from '@utils/index'
+import { showErrorMessage, transactionWait } from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { contractService } from '@contracts/index'
 
@@ -52,8 +52,7 @@ const UpgradeContractModal: React.FC<{
     try {
       await fn()
     } catch (e) {
-      let msg = extractMessage(e)
-      message.error(`Create proposal failed[1][${msg}]`, 10)
+      showErrorMessage(e, "Create proposal failed[1]")
     }
 
     setIsSubmitting(false)

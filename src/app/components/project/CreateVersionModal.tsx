@@ -15,7 +15,7 @@ import { create } from 'zustand'
 import { unwrapUnits } from '@utils/numberConverter'
 import { createProjectVersionExtra, proposalSetExtraAndParams } from '@services/index'
 import TextArea from 'antd/es/input/TextArea'
-import { transactionWait, convertVersion } from '@utils/index'
+import { transactionWait, convertVersion, showErrorMessage } from '@utils/index'
 import { contractService } from '@contracts/index'
 
 interface CreateVersionModalProps {
@@ -58,7 +58,7 @@ const CreateVersionModal = () => {
 
   const onFinish = async (values: any) => {
     setIsSubmitting(true)
-    await (async () => {
+    const fn = async () => {
       if (!project_name) {
         message.error('error: missing project name')
         return
@@ -118,7 +118,14 @@ const CreateVersionModal = () => {
 
       message.success('Create project version success')
       close()
-    })()
+    }
+
+    try {
+      await fn()
+    } catch (e) {
+      showErrorMessage(e, "Create proposal failed[1]")
+    }
+
     setIsSubmitting(false)
   }
 

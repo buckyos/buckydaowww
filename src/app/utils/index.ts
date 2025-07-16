@@ -43,6 +43,11 @@ function extractMessage(error: unknown) {
   }
 }
 
+function showErrorMessage(e: any, msg: string) {
+    let result = extractMessage(e)
+    message.error(`${msg}[${result}]`, 10)
+}
+
 async function transactionWait(tx: any) {
   message.info(
     'The contract has been called, tx is being confirmed, please wait...',
@@ -137,4 +142,5 @@ export {
   zeroPadLeft,
   extractMessage,
   convertVersion,
+  showErrorMessage,
 }
