@@ -45,31 +45,39 @@ const DaoTokenAmountCard: React.FC<{}> = () => {
 
   return (
     <React.Fragment>
-      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+      <div className='w-48 h-28 flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
         <div className='flex items-baseline gap-1'>
           <div className='text-xl font-medium'>{formatAmount(info?.dev.totalSupply, 3, false)}</div>
           <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
         </div>
-        <Tooltip title={`BDDT is a non-circulating equity token. Developers obtain it through project settlement and have greater rights when voting.
-Currently: 1 vote of BDDT = 4 votes of BDT`}>
+        <Tooltip title={
+          <div style={{ whiteSpace: 'pre-line' }}>
+            {`BDDT is a non-circulating equity token. Developers obtain it through project settlement and have greater rights when voting.
+Currently: 1 vote of BDDT = 4 votes of BDT`}
+          </div>
+        }>
           <div className='text-sm text-black-secondary'>Total
-            <InfoCircleOutlined />
+            <InfoCircleOutlined className='ml-1' />
           </div>
         </Tooltip>
       </div>
-      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+      <div className='w-48 h-28 flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
         <div className='flex items-baseline gap-1'>
           <div className='text-xl font-medium'>{formatAmount(info?.normal.totalSupply, 3, false)}</div>
           <div className='font-bold text-cyfs-green'>{info?.normal.symbol}</div>
         </div>
-        <Tooltip title={`BDT is a common circulated token. BDDT can be exchanged for BDT in a 1:1 one-way manner
-Currently: 1 vote of BDDT = 4 votes of BDT`}>
+        <Tooltip title={
+          <div style={{ whiteSpace: 'pre-line' }}>
+            {`BDT is a common circulated token. BDDT can be exchanged for BDT in a 1:1 one-way manner
+Currently: 1 vote of BDDT = 4 votes of BDT`}
+          </div>
+        }>
           <div className='text-sm text-black-secondary'>Circulation
-            <InfoCircleOutlined />
+            <InfoCircleOutlined className='ml-1'  />
           </div>
         </Tooltip>
       </div>
-      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+      <div className='w-48 h-28 flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
         <div className='flex items-baseline gap-1'>
           <div className='text-xl font-medium'>{formatAmount(info?.dev.totalReleased, 3, false)}</div>
           <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
@@ -84,7 +92,7 @@ Currently: 1 vote of BDDT = 4 votes of BDT`}>
         </div>
         <div className='text-sm text-black-secondary'>Released</div>
       </div>
-      <div className='w-48 h-[90px] flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
+      <div className='w-48 h-28 flex-center flex-col gap-2 border border-solid rounded-lg border-[#F0F0F0] relative'>
         <div className='flex items-baseline gap-1'>
           <div className='text-xl font-medium'>{formatAmount(info?.dev.unrelease, 3, false)}</div>
           <div className='font-bold text-cyfs-green'>{info?.dev.symbol}</div>
