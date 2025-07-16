@@ -1,6 +1,6 @@
 import { ethers, Interface, InterfaceAbi } from 'ethers'
 import { message } from 'antd'
-import { abis } from '@contracts/abis'
+import { abis, ISourceProject } from '@contracts/abis'
 
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
 
@@ -141,7 +141,7 @@ class ContractService {
   // public getInvestmentContract = this.generateContract(abis, 'INVESTMENT', this.INVESTMENT)
   public getLockupContract = this.generateContract(abis, 'LOCKUP', this.LOCKUP)
   public getMainContract = this.generateContract(abis, 'MAIN', this.MAIN)
-  public getProjectContract = this.generateContract(abis, 'PROJECT', this.PROJECT)
+  public getProjectContract = this.generateContract(ISourceProject, 'PROJECT', this.PROJECT)
   public getNormalTokenContract = this.generateContract(abis, 'NORMAL_TOKEN', this.NORMAL_TOKEN)
   public getDevTokenContract = this.generateContract(abis, 'DEV_TOKEN', this.DEV_TOKEN)
   public getAcquiredContract = this.generateContract(abis, 'ACQUIRED', this.ACQUIRED)
