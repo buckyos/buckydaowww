@@ -369,7 +369,7 @@ export default function ProposalDetailPage() {
         <ProposalExtraContent proposal={proposal} />
 
         <div className='mt-20 pt-20'>{proposal.extra}</div>
-        <div className='my-20 border-b border-[#F0F0F0]'></div>
+        <div className='my-20 border-b border-solid border-[#F0F0F0]'></div>
         <div className='flex flex-col gap-4'>
           <div className='flex relative'>
             <label className='font-bold w-28'>params:</label>
