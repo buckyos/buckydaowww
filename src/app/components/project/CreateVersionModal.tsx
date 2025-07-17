@@ -109,6 +109,7 @@ const CreateVersionModal = () => {
       // 获取 versionID（ 合约里命名为projectId）
       const event = receipt.events?.find((e: any) => e.event === "ProjectCreate");
       const version_id = event.args.projectId.toNumber();
+      console.log("get version_id from event: ", version_id)
       // 填入 params 用于投票
       const result2 = await proposalSetExtraAndParams(
         jwt,
