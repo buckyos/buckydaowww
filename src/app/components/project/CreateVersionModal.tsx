@@ -105,9 +105,14 @@ const CreateVersionModal = () => {
         message.error('Create project version failed, please try again later')
         return false
       }
+
+      // 获取 versionID（ 合约里命名为projectId）
+      const event = receipt.events?.find((e: any) => e.event === "ProjectCreate");
+      const version_id = event.args.projectId.toNumber();
+      // 填入 params 用于投票
       const result2 = await proposalSetExtraAndParams(
         jwt,
-        [project_id, budget, startDate, endDate, "createProject"],
+        [version_id, project_name, values.version, startDate, endDate, "createProject"],
         values.title,
         "",
         receipt.hash,
