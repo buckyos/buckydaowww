@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import TextArea from 'antd/es/input/TextArea'
 import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
-import { Modal, Form, Input, Button, message, Spin } from 'antd'
+import { Modal, Form, Input, Button, message, Spin, Switch } from 'antd'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
@@ -164,6 +164,18 @@ const ChangeCommitteeModal: React.FC<{
               )}
             </Form.List>
           )}
+
+          <Form.Item
+            name="isFullProposal"
+            label="Enable full voting"
+            valuePropName="checked"
+          >
+            <Switch
+              checkedChildren="Enable"
+              unCheckedChildren="Disable"
+              defaultChecked={false}
+            />
+          </Form.Item>
 
           <div className='flex justify-center'>
             <Button loading={isSubmitting} type='primary' htmlType='submit'>

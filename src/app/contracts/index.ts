@@ -46,7 +46,10 @@ async function chnageCommitteeProposal(
 
   // create proposal
   const comitteeContract = await contractService.getCommitteeContract()
-  const tx = await comitteeContract.prepareSetCommittees(addresses)
+  const tx = await comitteeContract.prepareSetCommittees(
+    addresses, 
+    values.isFullProposal // 是否开启全员投票
+  )
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
     console.warn('transaction status:', receipt?.status, tx)
