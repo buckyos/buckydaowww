@@ -133,12 +133,8 @@ const VersionSettlement: React.FC<{
   if (!proposal || proposal.params == null) {
     return null
   }
-  console.log('VersionSettlement proposal', proposal)
-  if (proposal.params.length === 0 || !proposal.params[0].contributions) {
-    return null
-  }
 
-  const budget = BigInt(proposal.params[0].budget)
+  // const budget = BigInt(proposal.params[0].budget)
   const totle = contributions.reduce((acc, cur) => {
     return acc + cur.value
   }, 0)
