@@ -114,15 +114,12 @@ const VersionSettlement: React.FC<{
           result.data,
           (item) => item.address == contribution.contributor,
         )
-        if (item) {
-          console.log('version contributions item', item)
-          return {
-            ...contribution,
-            hasClaim: item.isClaim,
-            amount: item.amount,
-          }
-        } else {
-          return contribution
+        // console.log('version contributions item', item)
+        return {
+          contributor: contribution.contributor,
+          value: Number(contribution.value),
+          hasClaim: item ? item.isClaim : contribution.hasClaim,
+          amount: item ? item.amount : undefined,
         }
       })
       setContributions(data)

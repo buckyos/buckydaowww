@@ -252,6 +252,12 @@ interface ContributionInfo {
   amount?: string
 }
 
+interface ContributionInfoV2 {
+  contributor: string
+  value: bigint
+  hasClaim: boolean
+}
+
 interface ContributionItem {
   address: string
   amount: string

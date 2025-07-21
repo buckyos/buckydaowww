@@ -16,7 +16,7 @@ import {getVersionSettlementInfo } from '@contracts/index'
 
 
 const ProposalSettlementContent: React.FC<{versionID: string}> = ({versionID}) => {
-  const [contributions, setContributions] = useState<ContributionInfo[]>([])
+  const [contributions, setContributions] = useState<ContributionInfoV2[]>([])
 
   useLayoutEffect(() => {
     getVersionSettlementInfo(Number(versionID)).then(result => {
@@ -40,7 +40,7 @@ const ProposalSettlementContent: React.FC<{versionID: string}> = ({versionID}) =
           settlement:
         </div>
         {contributions.map(
-          (item: ContributionInfo, index: number) => {
+          (item: ContributionInfoV2, index: number) => {
             return (
               <div key={index} className='flex items-center mt-4'>
                 <div className='w-[400px]'>
@@ -48,7 +48,7 @@ const ProposalSettlementContent: React.FC<{versionID: string}> = ({versionID}) =
                 </div>
                 <div className='mx-2'>
                   value:
-                  <Tag>{item.value}</Tag>
+                  <Tag>{item.value.toString()}</Tag>
                 </div>
               </div>
             )

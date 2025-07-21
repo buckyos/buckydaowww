@@ -21,7 +21,7 @@ export * from './token'
 
 
 // 获取项目版本的结算信息： 【结算地址，结算token，结算状态】
-async function getVersionSettlementInfo(versionID: number): Promise<{contributions: ContributionInfo[]}> {
+async function getVersionSettlementInfo(versionID: number): Promise<{contributions: ContributionInfoV2[]}> {
   const projectContract = await contractService.getProjectContract()
   const projectDetail = await projectContract.projectDetailOf(versionID)
 
