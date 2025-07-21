@@ -23,6 +23,16 @@ export async function fetchRepositoryList(): Promise<
   return data
 }
 
+// 获取合约代币信息
+export async function fetchContractTokenInfo(): Promise<
+  CommonResponse<ResponseTokenInfo>
+> {
+  const resp = await fetch('/api/contract/token')
+  const data = await resp.json()
+  return data
+}
+
+
 // 获取项目（版本）列表
 // export async function fetchProjectList(): Promise<ProjectItem[]> {
 //   const resp = await fetch('/api/project')

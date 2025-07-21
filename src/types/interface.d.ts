@@ -143,6 +143,18 @@ interface RepositoryItem {
   detail: string
 }
 
+interface ResponseTokenInfo {
+  normalTokenSymbol: string
+  normalTokenDecimals: number  
+  normalTokenTotalSupply: string
+  devTokenSymbol: string
+  devTokenDecimals: number
+  devTokenTotalSupply: string
+  devTokenTotalReleased: string
+  devTokenTotalUnreleased: string
+}
+
+
 interface ProjectItem {
   id: string
   project_id: string
