@@ -82,8 +82,9 @@ const WhitelistInvestmentModal: React.FC<{
           autoComplete='off'
           initialValues={{
             canEndEarly: true,
-            // xlayer usdt token 地址
-            tokenAddress: '0x1E4a5963aBFD975d8c9021ce480b42188849D41d',
+            // optimism 的 usdt token 地址
+            // https://www.oklink.com/zh-hans/optimism/token/0x94b008aa00579c1307b0ef2c499ad98a8ce58e58
+            tokenAddress: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58',
           }}
         >
           <Form.List name='whitelist' initialValue={formListInitValues}>
