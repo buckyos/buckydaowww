@@ -19,7 +19,7 @@ const UpgradeContractModal: React.FC<{
     setIsSubmitting(true)
     const fn = async () => {
       const comitteeContract = await contractService.getCommitteeContract()
-      const tx = await comitteeContract.perpareContractUpgrade(
+      const tx = await comitteeContract.prepareContractUpgrade(
         values.contractProxyAddress,
         values.implAddress,
       )
