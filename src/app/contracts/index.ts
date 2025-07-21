@@ -29,6 +29,7 @@ async function getVersionSettlementInfo(versionID: number): Promise<{contributio
   return projectDetail
 }
 
+// 修改委员会的提案
 async function chnageCommitteeProposal(
   values: StoreValue,
   jwt: string,
