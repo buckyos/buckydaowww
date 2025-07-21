@@ -8,6 +8,7 @@ import ISourceDevGroup from './Interface.sol/ISourceDevGroup.json'
 import ISourceTokenLockup from './Interface.sol/ISourceTokenLockup.json'
 import SourceDaoContractUpgradeable from './Interface.sol/SourceDaoContractUpgradeable.json'
 import ISourceProject from './Interface.sol/ISourceProject.json'
+import ProjectManagement from './Interface.sol/ProjectManagement.json'
 import erc20 from './ERC20.json'
 
 const abis = [
@@ -25,4 +26,4 @@ const abis = [
   ...SourceDaoContractUpgradeable,
 ]
 
-export { abis, erc20, ISourceProject }
+export { abis, erc20, ISourceProject, ProjectManagement }

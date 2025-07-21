@@ -1,4 +1,5 @@
 'use client'
+import { useState, useLayoutEffect } from 'react'
 import { Tag } from 'antd'
 import { wrapUnits } from '@utils/numberConverter'
 import _ from 'lodash'
@@ -10,6 +11,53 @@ import {
 import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
 import VersionDescription from '@components/VersionDesciption'
+import {getVersionSettlementInfo } from '@contracts/index'
+
+
+
+const ProposalSettlementContent: React.FC<{versionID: string}> = ({versionID}) => {
+  const [contributions, setContributions] = useState<ContributionInfo[]>([])
+
+  useLayoutEffect(() => {
+    getVersionSettlementInfo(Number(versionID)).then(result => {
+      setContributions(result.contributions)
+    })
+  }, [versionID])
+  return (
+    <>
+      <div className='pt-20'>
+        <div className='text-2xl '>Link:</div>
+
+        <Link
+          href={`/projects/1/version/${versionID}`}
+          target='_blank'
+        >
+          Corresponding settlement version infomation
+        </Link>
+
+        <div className='text-2xl mt-10'>
+          Corresponding contribution value of contributors in project
+          settlement:
+        </div>
+        {contributions.map(
+          (item: ContributionInfo, index: number) => {
+            return (
+              <div key={index} className='flex items-center mt-4'>
+                <div className='w-[400px]'>
+                  Contributor <Tag>{item.contributor}</Tag>
+                </div>
+                <div className='mx-2'>
+                  value:
+                  <Tag>{item.value}</Tag>
+                </div>
+              </div>
+            )
+          },
+        )}
+      </div>
+    </>
+  )
+}
 
 // 提起的内容区，额外的内容
 // 应该拆开每一个类型单独的组件
@@ -69,9 +117,8 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
             <div className='text-2xl '>Link:</div>
 
             <Link
-              href={`/projects/1/version/${
-                (proposal.project as ProjectVersionProps).id
-              }`}
+              href={`/projects/1/version/${(proposal.project as ProjectVersionProps).id
+                }`}
               target='_blank'
             >
               Corresponding Version
@@ -89,38 +136,7 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
       )}
 
       {proposalType === proposalTypeMap.SettlementVersion && (
-        <>
-          <div className='pt-20'>
-            <div className='text-2xl '>Link:</div>
-
-            <Link
-              href={`/projects/1/version/${proposal.params[0].projectId}`}
-              target='_blank'
-            >
-              Corresponding settlement version infomation
-            </Link>
-
-            <div className='text-2xl mt-10'>
-              Corresponding contribution value of contributors in project
-              settlement:
-            </div>
-            {(proposal.params[0].contributions as ContributionInfo[]).map(
-              (item: ContributionInfo, index: number) => {
-                return (
-                  <div key={index} className='flex items-center mt-4'>
-                    <div className='w-[400px]'>
-                      Contributor <Tag>{item.contributor}</Tag>
-                    </div>
-                    <div className='mx-2'>
-                      value:
-                      <Tag>{item.value}</Tag>
-                    </div>
-                  </div>
-                )
-              },
-            )}
-          </div>
-        </>
+        <ProposalSettlementContent versionID={proposal.params[0]} />
       )}
     </>
   )

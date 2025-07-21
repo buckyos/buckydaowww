@@ -8,6 +8,7 @@ import {
   postContributionWithdraw,
   getVersionContributionInfo,
 } from '@services/index'
+import { getVersionSettlementInfo } from '@contracts/index'
 import useUserStore from '@hooks/useUserStore'
 import { wrapUnits, calculateProportion } from '@utils/numberConverter'
 import { contractService } from '@contracts/index'
@@ -106,8 +107,7 @@ const VersionSettlement: React.FC<{
 
   useAsyncEffect(async () => {
     if (version && proposal) {
-      const contributions = proposal.params[0]
-        .contributions as ContributionInfo[]
+      const { contributions } = await getVersionSettlementInfo(version.id)
       const result = await getVersionContributionInfo(version.id.toString())
       const data = contributions.map((contribution) => {
         const item = _.find(

@@ -19,9 +19,18 @@ export * from './execute'
 export * from './contract'
 export * from './token'
 
+
+// 获取项目版本的结算信息： 【结算地址，结算token，结算状态】
+async function getVersionSettlementInfo(versionID: number): Promise<{contributions: ContributionInfo[]}> {
+  const projectContract = await contractService.getProjectContract()
+  const projectDetail = await projectContract.projectDetailOf(versionID)
+
+  console.log(projectDetail)
+  return projectDetail
+}
+
 async function chnageCommitteeProposal(
   values: StoreValue,
-  contract: ContractStoreDefine,
   jwt: string,
 ) {
   const addresses = (values.committee as CommitteeMember[]).map(
@@ -286,4 +295,5 @@ export {
   subscribeInvestmentShare,
   endInvestment,
   chnageCommitteeProposal,
+  getVersionSettlementInfo,
 }

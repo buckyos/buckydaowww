@@ -5,7 +5,7 @@ import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin } from 'antd'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
-import { useContractStore, useUserStore } from '@hooks/index'
+import { useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { fetchMembers } from '@services/index'
 import { chnageCommitteeProposal } from '@contracts/index'
@@ -19,7 +19,6 @@ const ChangeCommitteeModal: React.FC<{
   const [loading, setLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const contract = useContractStore()
   const user = useUserStore()
 
   useAsyncEffect(async () => {
@@ -55,7 +54,7 @@ const ChangeCommitteeModal: React.FC<{
 
     try {
       // 提交委员会变更提案
-      const isOk = await chnageCommitteeProposal(values, contract, user.jwt)
+      const isOk = await chnageCommitteeProposal(values, user.jwt)
       if (isOk) {
         message.success(
           'Change committee proposal submitted successfully, reloading...',
