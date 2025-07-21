@@ -11,13 +11,6 @@ export default function Fetcher() {
 
   // header 最前面的地方先获取合约地址
   useLayoutEffect(() => {
-    getVersionSettlementInfo(4).then(result => {
-      console.log('getVersionSettlementInfo', result)
-      result.contributions.map((item)=> {
-        console.log('result.contributions', item.contributor, item.hasClaim, item.value)
-      })
-    })
-
     fetchTokenInfo().then(result => {
       const token = result.dev
       update(token.totalSupply, token.totalReleased,result.normal.totalSupply, token.symbol, token.decimals)
