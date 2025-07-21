@@ -8,6 +8,8 @@ import { proposalSetparams } from '@services/index'
 import { extractMessage, transactionWait } from '@utils/index'
 import { contractService } from '@contracts/index'
 
+
+// 项目结算 提案
 const VersionSettlementModal = () => {
   const { visible, version, close } = useVersionSettlementModalStore()
 
@@ -51,18 +53,16 @@ const VersionSettlementModal = () => {
         return false
       }
 
+      // 提案的参数设置
       // set params
       const setparamResult = await proposalSetparams(
         jwt,
         [
-          {
-            result: values.result,
-            contributions: contributions,
-            projectId: version.id,
-            budget: version.budget,
-            startDate: version.start_date,
-            endDate: version.end_date,
-          },
+          version.id, 
+          version.pname, 
+          version.version, 
+          version.start_date, 
+          version.end_date,
           'acceptProject',
         ],
         receipt.hash,
