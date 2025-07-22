@@ -4,11 +4,33 @@ import { abis, ISourceProject, ProjectManagement } from '@contracts/abis'
 
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
 
+/**
+ * 检查浏览器是否安装了以太坊钱包插件
+ * @returns {boolean} 如果安装了钱包插件返回true，否则返回false
+ */
+export function isBrowserHasWallet(): boolean {
+  try {
+    // 检查window.ethereum是否存在
+    const hasEthereum = typeof window !== 'undefined' && !!window.ethereum;
+
+    // 检查是否支持基本的以太坊方法
+    const hasBasicEthereumMethods = hasEthereum &&
+      typeof window.ethereum.request === 'function' &&
+      typeof window.ethereum.isMetaMask !== 'undefined';
+
+    return hasBasicEthereumMethods;
+  } catch (error) {
+    console.warn('检查钱包插件时发生错误:', error);
+    return false;
+  }
+}
+
 export async function getProvider() {
-  if (!window.ethereum) {
-    message.error('Please install MetaMask first')
+  if (!isBrowserHasWallet()) {
+    message.info('The current browser does not install MetaMask , so the contract function cannot be used')
     console.log('MetaMask not installed; using read-only defaults')
-    throw new Error('MetaMask not installed')
+    // throw new Error('MetaMask not installed')
+    return false
   }
 
   const provider = new ethers.BrowserProvider(window.ethereum)
@@ -46,6 +68,9 @@ async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
 
 export async function newSignerContract(contractAddress: string, abi: Interface | InterfaceAbi,) {
   let provider = await getProvider()
+  if (!provider) {
+    throw new Error("newSignerContract failed")
+  }
   const signer = await provider.getSigner()
   const contract = new ethers.Contract(contractAddress, abi, signer)
   return contract
@@ -53,6 +78,9 @@ export async function newSignerContract(contractAddress: string, abi: Interface 
 
 export async function newProviderContract(contractAddress: string, abi: Interface | InterfaceAbi,) {
   let provider = await getProvider()
+  if (!provider) {
+    throw new Error("newProviderContract failed")
+  }
   const contract = new ethers.Contract(contractAddress, abi, provider)
   return contract
 }
@@ -122,7 +150,7 @@ class ContractService {
     if (address === undefined) throw new Error('address is undefined')
     if (key === undefined) throw new Error('key is undefined')
 
-    return async (): Promise<ethers.Contract> => {
+    return async (): Promise<ethers.Contract | null> => {
       if (this.Contracts[key] !== undefined) {
         console.log('[', key, '] get contract instance ', address, 'from cache')
         return this.Contracts[key] as ethers.Contract
@@ -147,7 +175,7 @@ class ContractService {
   public getAcquiredContract = this.generateContract(abis, 'ACQUIRED', this.ACQUIRED)
 }
 
- export const contractService = new ContractService()
+export const contractService = new ContractService()
 
 
 

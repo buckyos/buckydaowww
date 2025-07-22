@@ -3,12 +3,14 @@ import { useAsyncEffect } from 'ahooks'
 import { Progress, Spin, Tooltip } from 'antd'
 import {
   fetchTokenInfo,
+  isBrowserHasWallet,
 } from '@contracts/index'
 import {
   formatAmount
 } from '@utils/numberConverter'
 import useContractStore from '@hooks/useContract'
 import { InfoCircleOutlined } from '@ant-design/icons'
+import { fetchContractTokenInfo } from '@services/index'
 
 
 const DaoTokenAmountCard: React.FC<{}> = () => {
@@ -17,11 +19,17 @@ const DaoTokenAmountCard: React.FC<{}> = () => {
   }))
   const [info, setInfo] = useState<ContractTokenInfo>()
   useAsyncEffect(async () => {
-    const token = await fetchTokenInfo()
-    console.log(token)
-    setInfo(token)
-    const devToken = token.dev
-    update(devToken.totalSupply, devToken.totalReleased, token.normal.totalSupply, devToken.symbol, devToken.decimals)
+    if (!isBrowserHasWallet()) {
+      const token = await fetchTokenInfo()
+      setInfo(token)
+      const devToken = token.dev
+      update(devToken.totalSupply, devToken.totalReleased, token.normal.totalSupply, devToken.symbol, devToken.decimals)
+    } else {
+      const result = await fetchContractTokenInfo()
+      setInfo(result.data)
+      const devToken = result.data.dev
+      update(devToken.totalSupply, devToken.totalReleased, devToken.totalSupply, devToken.symbol, devToken.decimals)
+    }
   }, [])
 
   if (!info?.dev || !info.normal) {
@@ -73,7 +81,7 @@ Currently: 1 vote of BDDT = 4 votes of BDT`}
           </div>
         }>
           <div className='text-sm text-black-secondary'>Circulation
-            <InfoCircleOutlined className='ml-1'  />
+            <InfoCircleOutlined className='ml-1' />
           </div>
         </Tooltip>
       </div>

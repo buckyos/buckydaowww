@@ -1,5 +1,10 @@
 import { ethers, toBigInt } from 'ethers'
 
+export const transformNumber = (value: any, decimals: any) => {
+    return parseToFloat(wrapUnits(value, decimals))
+}
+
+
 /**
  * 格式化大数字余额，根据数值大小添加 K, M, B 单位，并控制小数位数。
  * @param balance - 需要格式化的 BigInt 类型的余额。

@@ -7,6 +7,7 @@ import { showErrorMessage, transactionWait } from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { contractService } from '@contracts/index'
 
+// 升级合约
 const UpgradeContractModal: React.FC<{
   showModal: boolean
   setShowModal: Dispatch<SetStateAction<boolean>>
@@ -19,7 +20,7 @@ const UpgradeContractModal: React.FC<{
     setIsSubmitting(true)
     const fn = async () => {
       const comitteeContract = await contractService.getCommitteeContract()
-      const tx = await comitteeContract.prepareContractUpgrade(
+      const tx = await comitteeContract?.prepareContractUpgrade(
         values.contractProxyAddress,
         values.implAddress,
       )

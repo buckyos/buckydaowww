@@ -5,12 +5,10 @@ import {
     parseToFloat,
     wrapUnits,
     bigTransformPercentNumber,
-    formatAmount
+    formatAmount,
+    transformNumber,
 } from '@utils/numberConverter'
 
-const transformNumber = (value: any, decimals: any) => {
-    return parseToFloat(wrapUnits(value, decimals))
-}
 
 export async function fetchTokenInfo(): Promise<ContractTokenInfo> {
     // BDT

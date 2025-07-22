@@ -1,4 +1,6 @@
 import { project_data } from '@vars/index'
+import { result } from 'lodash'
+import { transformNumber, bigTransformPercentNumber } from '@utils/index'
 
 // 获取DAO成员列表
 export async function fetchMembers() {
@@ -25,11 +27,50 @@ export async function fetchRepositoryList(): Promise<
 
 // 获取合约代币信息
 export async function fetchContractTokenInfo(): Promise<
-  CommonResponse<ResponseTokenInfo>
+  CommonResponse<ContractTokenInfo>
 > {
   const resp = await fetch('/api/contract/token')
-  const data = await resp.json()
-  return data
+  const result = await resp.json()
+
+  if (result.code != 0) {
+    throw new Error("failed")
+  }
+  const data = result.data as ResponseTokenInfo
+  const devTotalSupply = transformNumber(data.devTokenTotalSupply, data.devTokenDecimals)
+  const normalTotalSupply = transformNumber(data.normalTokenTotalSupply, data.normalTokenDecimals)
+  const devTotalReleased = transformNumber(data.devTokenTotalReleased, data.devTokenDecimals)
+  const devTokenTotalUnreleased = transformNumber(data.devTokenTotalUnreleased, data.devTokenDecimals)
+  const devTotalReleasedPercent = bigTransformPercentNumber(
+    BigInt(data.devTokenTotalReleased),
+    BigInt(data.devTokenTotalSupply),
+  )
+  const devTokenBalancePercent = bigTransformPercentNumber(
+    BigInt(data.devTokenTotalUnreleased),
+    BigInt(data.devTokenTotalSupply),
+  )
+  const reponseData: ContractTokenInfo = {
+    normal: {  // BDT
+      totalSupply: normalTotalSupply,
+      symbol: data.normalTokenSymbol,
+      decimals: data.normalTokenDecimals,
+    },
+    dev: {  // BDDT
+      totalSupply: devTotalSupply,
+      symbol: data.devTokenSymbol,
+      decimals: data.devTokenDecimals,
+      totalReleased: devTotalReleased,
+      totalReleasedPercent: devTotalReleasedPercent,
+      unrelease: devTokenTotalUnreleased,
+      unreleasePercent: devTokenBalancePercent,
+
+    }
+  }
+
+  return {
+    code: 0,
+    msg: "",
+    data: reponseData
+  }
 }
 
 

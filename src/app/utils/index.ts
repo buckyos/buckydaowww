@@ -5,6 +5,8 @@ import { message } from 'antd'
 import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import { decodeIfEncoded, decodePaddedAddress } from '@utils/encode'
 
+export * from "./numberConverter"
+
 const proposalExpiredTimeDisplay = (expired: number) => {
   const prefix =
     expired > nowTimestamp() ? 'Voting will end' : 'Voting ended about'
