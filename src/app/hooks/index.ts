@@ -16,6 +16,7 @@ import {
   // getCommitteeContract,
   // getAddressOfLockup,
   // getAddressOfToken,
+  newProviderContract,
   getProvider,
   contractService
 } from '@contracts/index'
@@ -30,6 +31,9 @@ function useBindWalletAddress() {
 
   const handleConnect = async () => {
     const provider = await getProvider()
+    if (!provider) {
+      return
+    }
     const signer = await provider.getSigner()
     const address = signer.address
     console.log('🍻 address :', address)
@@ -80,8 +84,7 @@ function useLockToken(ownerAddress: string) {
     if (ownerAddress == '') {
       return
     }
-    let provider = await getProvider()
-    const contract = new ethers.Contract(lockupAddress, abis, provider)
+    const contract = await newProviderContract(lockupAddress, abis)
     console.log('🍻 ownerAddress :', ownerAddress)
     const result = await Promise.all([
       contract.totalAssigned(ownerAddress),
@@ -89,7 +92,7 @@ function useLockToken(ownerAddress: string) {
       contract.totalLocked(ownerAddress),
     ])
 
-    const tokenContract = new ethers.Contract(contractService.getAddressOfDevToken(), abis, provider)
+    const tokenContract =  await newProviderContract(contractService.getAddressOfDevToken(), abis)
     const result2 = await tokenContract.balanceOf(ownerAddress)
     console.log('🍻 tokenContract token balanceOf :', result2)
 
