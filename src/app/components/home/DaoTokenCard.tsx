@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { Progress, Spin, Tooltip } from 'antd'

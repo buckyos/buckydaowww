@@ -1,5 +1,4 @@
-'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import { GithubOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import {
   contractService,
@@ -14,8 +13,6 @@ const font = localFont({
 })
 
 export default function DaoTokenBrief() {
-
-
   return (
     <div className='flex items-center justify-between md:flex-row md:items-start my-20'>
       <div className='flex flex-col w-[820px]'>
