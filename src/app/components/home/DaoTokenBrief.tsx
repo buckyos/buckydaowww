@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import { GithubOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import {
