@@ -31,10 +31,6 @@ export async function fetchContractTokenInfo(): Promise<
 > {
   const resp = await fetch('/api/contract/token')
   const result = await resp.json()
-
-  if (result.code != 0) {
-    throw new Error("failed")
-  }
   const data = result.data as ResponseTokenInfo
   const devTotalSupply = transformNumber(data.devTokenTotalSupply, data.devTokenDecimals)
   const normalTotalSupply = transformNumber(data.normalTokenTotalSupply, data.normalTokenDecimals)
