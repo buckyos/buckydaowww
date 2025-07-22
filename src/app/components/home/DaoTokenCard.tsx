@@ -20,7 +20,7 @@ const DaoTokenAmountCard: React.FC<{}> = () => {
   }))
   const [info, setInfo] = useState<ContractTokenInfo>()
   useAsyncEffect(async () => {
-    if (!isBrowserHasWallet()) {
+    if (isBrowserHasWallet()) {
       const token = await fetchTokenInfo()
       setInfo(token)
       const devToken = token.dev
