@@ -150,7 +150,7 @@ class ContractService {
     if (address === undefined) throw new Error('address is undefined')
     if (key === undefined) throw new Error('key is undefined')
 
-    return async (): Promise<ethers.Contract | null> => {
+    return async (): Promise<ethers.Contract> => {
       if (this.Contracts[key] !== undefined) {
         console.log('[', key, '] get contract instance ', address, 'from cache')
         return this.Contracts[key] as ethers.Contract
