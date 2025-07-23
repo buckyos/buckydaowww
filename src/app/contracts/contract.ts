@@ -1,6 +1,6 @@
 import { ethers, Interface, InterfaceAbi } from 'ethers'
 import { message } from 'antd'
-import { abis, ISourceProject, ProjectManagement } from '@contracts/abis'
+import { abis, ISourceProject, ProjectManagement, SourceDaoCommittee } from '@contracts/abis'
 
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
 
@@ -164,7 +164,7 @@ class ContractService {
     }
   }
 
-  public getCommitteeContract = this.generateContract(abis, 'COMMITTEE', this.COMMITTEE)
+  public getCommitteeContract = this.generateContract([...abis, ...SourceDaoCommittee], 'COMMITTEE', this.COMMITTEE)
   public getDividendContract = this.generateContract(abis, 'DIVIDEND', this.DIVIDEND)
   // public getInvestmentContract = this.generateContract(abis, 'INVESTMENT', this.INVESTMENT)
   public getLockupContract = this.generateContract(abis, 'LOCKUP', this.LOCKUP)

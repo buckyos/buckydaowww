@@ -1,6 +1,6 @@
 
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Progress, Tag } from 'antd'
 import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
@@ -9,6 +9,8 @@ import ProposalStateLine from '@components/ProposalStateLine'
 import { useUserStore } from '@hooks/index'
 import ProposalEdition from './ProposalEdition'
 import _ from 'lodash'
+import { useAsyncEffect } from 'ahooks'
+import { contractService } from '@contracts/contract'
 
 const ProposalProgress: React.FC<{
     proposal: ProposalResponseData,
@@ -22,7 +24,7 @@ const ProposalProgress: React.FC<{
         return { user: state.user, jwt: state.jwt }
     })
 
-    useEffect(() => {
+    useAsyncEffect(async () => {
         const votesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
             return {
                 address: item,
@@ -38,6 +40,11 @@ const ProposalProgress: React.FC<{
             transformPercentNumber(votesInfo.filter(o => o.isCommiittee).length, memberCount),
         )
         setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
+
+        const committeeContract = await contractService.getCommitteeContract()
+        const extra = await committeeContract.proposalExtraOf(proposal.proposalId)
+        console.log('proposal extra', extra)
+        console.log(extra.toString())
     }, [proposal])
 
 
