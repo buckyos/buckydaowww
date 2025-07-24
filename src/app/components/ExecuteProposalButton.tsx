@@ -130,9 +130,9 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
     // message.success('Execute proposal success')
   }
 
-  if (proposal.state > ProposalState.InProgress) {
-    return null
-  }
+  // if (proposal.state > ProposalState.InProgress) {
+  //   return null
+  // }
 
   return (
     <div className='flex-center mt-10'>
