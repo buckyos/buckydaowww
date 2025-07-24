@@ -44,7 +44,7 @@ const ProposalHeaderContent: React.FC<{
         setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
 
         // 判断是否全员投票
-        const extra = await getCommitteeProposalExtra(Number(proposal.proposalId))
+        const extra = await getCommitteeProposalExtra(Number(proposal.id))
         setIsFullVote(extra.from != "0x0000000000000000000000000000000000000000")
         console.log('proposal extra', extra)
         // console.log(extra.toString())
