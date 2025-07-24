@@ -20,7 +20,7 @@ const useContractStore = create<ContractStoreDefine>()(
       // fetch token's value in contract
       // TODO remove
       update(totalSupply: number, totalReleased: number, totalUnreleased: number, symbol: string, decimals: number) {
-        console.log('update useContractStore', totalSupply, totalReleased, totalUnreleased, symbol, decimals)
+        // console.log('update useContractStore', totalSupply, totalReleased, totalUnreleased, symbol, decimals)
         set({
           totalSupply,
           totalReleased,

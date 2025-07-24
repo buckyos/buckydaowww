@@ -34,7 +34,6 @@ export async function getProvider() {
   }
 
   const provider = new ethers.BrowserProvider(window.ethereum)
-  console.log('provider', provider)
   await checkEthNetworkId(provider)
   return provider
 }
@@ -49,9 +48,7 @@ async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
   const networkId = NETWORK_ID || '196'
   let hexString = Number(networkId).toString(16)
   let hexStringWithPrefix = '0x' + hexString
-  console.log('networkId: ', hexStringWithPrefix)
-
-  console.log('current network chainId', chainId, networkId)
+  console.log('current network chainId', chainId, networkId, hexStringWithPrefix)
   if (chainId !== networkId) {
     message.info('current network is not correct, switch to correct network...')
     const result = await window.ethereum.request({

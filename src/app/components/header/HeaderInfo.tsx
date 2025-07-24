@@ -23,7 +23,7 @@ const HeaderInfo = () => {
         devToken.balanceOf(user.user.address),
         normalToken.balanceOf(user.user.address)
       ])
-      console.log('token', token)
+      // console.log('token', token)
       setDevTokenAmount(parseFloat(formatUnits(token[0], 18)).toFixed(2))
       setNormalTokenAmount(parseFloat(formatUnits(token[1], 18)).toFixed(2))
       setLoading(false)

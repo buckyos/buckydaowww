@@ -10,7 +10,7 @@ import { useUserStore } from '@hooks/index'
 import ProposalEdition from './ProposalEdition'
 import _ from 'lodash'
 import { useAsyncEffect } from 'ahooks'
-import { contractService, getCommitteeProposalExtra } from '@contracts/index'
+import { getCommitteeProposalExtra } from '@contracts/index'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
 const ProposalHeaderContent: React.FC<{

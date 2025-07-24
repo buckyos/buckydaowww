@@ -117,20 +117,20 @@ function useCommittee(user: User) {
   const { update, ensureFetched, state } = useCommitteeStore()
   // const [_isCommittee, setIsCommittee] = useState<boolean>(false)
   useAsyncEffect(async () => {
-    console.log('useCommittee user', user)
+    // console.log('useCommittee user', user)
     if (!user.address) {
       // message.error('Please connect wallet first')
       return
     }
     if (ensureFetched()) {
-      console.log('useCommittee ensureFetched')
+      // console.log('useCommittee ensureFetched')
       return
     }
 
     const contract = await contractService.getCommitteeContract()
     // 需要注意,这里是user表的, 可能和钱包地址不一致
     const isMember = await contract.isMember(user.address)
-    console.log('isCommitteeMember: ', isMember, user.address)
+    // console.log('isCommitteeMember: ', isMember, user.address)
 
     update(isMember ? CommitteeType.committee : CommitteeType.normal)
   }, [user])

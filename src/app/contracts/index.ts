@@ -33,7 +33,7 @@ async function getVersionSettlementInfo(versionID: number): Promise<{contributio
 async function getCommitteeProposalExtra(proposalId: number): Promise<ContractProposalExtra> {
   const committee = await contractService.getCommitteeContract()
   const extra = await committee.proposalExtraOf(proposalId)
-  console.log("getCommitteeProposalExtra", extra)
+  // console.log("getCommitteeProposalExtra", extra)
 
   const result: ContractProposalExtra = {
     from: extra[0],
@@ -42,7 +42,6 @@ async function getCommitteeProposalExtra(proposalId: number): Promise<ContractPr
     reject: extra[3],
     settled: extra[4],
     totalReleasedToken: extra[5],
-
   }
   return result
 }
