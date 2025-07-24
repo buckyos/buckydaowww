@@ -1,7 +1,7 @@
 
 'use client'
 import React, { useState } from 'react'
-import { Progress, Tag } from 'antd'
+import { Progress, Tag, Tooltip } from 'antd'
 import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
 import ProposalType from '@components/proposal/ProposalType'
@@ -10,9 +10,10 @@ import { useUserStore } from '@hooks/index'
 import ProposalEdition from './ProposalEdition'
 import _ from 'lodash'
 import { useAsyncEffect } from 'ahooks'
-import { contractService } from '@contracts/contract'
+import { contractService, getCommitteeProposalExtra } from '@contracts/index'
+import { InfoCircleOutlined } from '@ant-design/icons'
 
-const ProposalProgress: React.FC<{
+const ProposalHeaderContent: React.FC<{
     proposal: ProposalResponseData,
     members: CommitteeMember[],
     fetchData: () => Promise<ProposalResponseData>
@@ -20,6 +21,7 @@ const ProposalProgress: React.FC<{
     const [supportPercent, setSupportPercent] = useState<number>(0)
     const [rejectPercent, setRejectPercent] = useState<number>(0)
     const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
+    const [isFUllVote, setIsFullVote] = useState(false)
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
     })
@@ -41,10 +43,11 @@ const ProposalProgress: React.FC<{
         )
         setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
 
-        const committeeContract = await contractService.getCommitteeContract()
-        const extra = await committeeContract.proposalExtraOf(proposal.proposalId)
+        // 判断是否全员投票
+        const extra = await getCommitteeProposalExtra(Number(proposal.proposalId))
+        setIsFullVote(extra.from != "0x0000000000000000000000000000000000000000")
         console.log('proposal extra', extra)
-        console.log(extra.toString())
+        // console.log(extra.toString())
     }, [proposal])
 
 
@@ -64,6 +67,14 @@ const ProposalProgress: React.FC<{
                 />
             </div>
             <ProposalType proposal={proposal} />
+            <div className='mt-2 flex gap-2'>
+                <Tooltip title="There are two types of voting: full voting and committee voting. Most proposals default to committee voting.">
+                    <span >Proposal Vote type:</span>
+                    <Tag>{isFUllVote ? "Full members vote" : "Committee vote"}</Tag>
+                    <InfoCircleOutlined />
+                </Tooltip>
+            </div>
+
             <div className='mt-4'></div>
             <div className='flex'>
                 <div className='w-20'>Agree</div>
@@ -102,4 +113,4 @@ const ProposalProgress: React.FC<{
     )
 }
 
-export default ProposalProgress
+export default ProposalHeaderContent

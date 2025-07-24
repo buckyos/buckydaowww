@@ -11,7 +11,7 @@ import { CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ProposalExtraContent from '@components/ProposalExtraContent'
-import ProposalProgress from './ProposalProgress'
+import ProposalHeaderContent from './ProposalHeaderContent'
 
 dayjs.extend(relativeTime)
 
@@ -19,6 +19,7 @@ export default function ProposalDetailPage() {
   const { proposalId } = useParams() as { proposalId: string }
   const [proposal, setProposal] = useState<ProposalResponseData>()
   const [members, setMembers] = useState<CommitteeMember[]>([])
+  
   const fetchData = async () => {
     const result = await fetchProposalId(proposalId)
     // console.log('result', result)
@@ -45,7 +46,7 @@ export default function ProposalDetailPage() {
     <>
       <div className='w-[1000px] mx-auto'>
         <h2 className='text-4xl font-medium'>{proposal.title}</h2>
-        <ProposalProgress
+        <ProposalHeaderContent
           proposal={proposal}
           members={members}
           fetchData={fetchData}

@@ -29,6 +29,24 @@ async function getVersionSettlementInfo(versionID: number): Promise<{contributio
   return projectDetail
 }
 
+// 获取提案额外信息
+async function getCommitteeProposalExtra(proposalId: number): Promise<ContractProposalExtra> {
+  const committee = await contractService.getCommitteeContract()
+  const extra = await committee.proposalExtraOf(proposalId)
+  console.log("getCommitteeProposalExtra", extra)
+
+  const result: ContractProposalExtra = {
+    from: extra[0],
+    threshold: extra[1],
+    agree: extra[2],
+    reject: extra[3],
+    settled: extra[4],
+    totalReleasedToken: extra[5],
+
+  }
+  return result
+}
+
 // 修改委员会的提案
 async function chnageCommitteeProposal(
   values: StoreValue,
@@ -300,4 +318,5 @@ export {
   endInvestment,
   chnageCommitteeProposal,
   getVersionSettlementInfo,
+  getCommitteeProposalExtra,
 }

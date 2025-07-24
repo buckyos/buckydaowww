@@ -145,7 +145,7 @@ interface RepositoryItem {
 
 interface ResponseTokenInfo {
   normalTokenSymbol: string
-  normalTokenDecimals: number  
+  normalTokenDecimals: number
   normalTokenTotalSupply: string
   devTokenSymbol: string
   devTokenDecimals: number
@@ -268,6 +268,15 @@ interface ContributionInfoV2 {
   contributor: string
   value: bigint
   hasClaim: boolean
+}
+
+interface ContractProposalExtra {
+  from: string
+  threshold: bigint
+  agree: bigint
+  reject: bigint
+  settled: bigint
+  totalReleasedToken: bigint
 }
 
 interface ContributionItem {
