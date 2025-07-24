@@ -32,7 +32,7 @@ const ChangeCommitteeModal: React.FC<{
   }, [showModal])
 
   const onChnageCommitteeProposal = async (values: StoreValue) => {
-    console.log('🍻 values :', values)
+    console.log('🍻 onChnageCommitteeProposal prepareSetCommittees values :', values)
 
     // 检查委员会地址不重复
     const addresses = (values.committee as CommitteeMember[]).map(

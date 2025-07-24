@@ -88,7 +88,7 @@ const ProposalHeaderContent: React.FC<{
                 />
             </div>
             {
-                voteInfo.length &&
+                !!voteInfo.length &&
                 <div className='flex flex-col px-8 py-2 text-sm'>
                     {voteInfo.map(item => {
                         return (<div className='flex gap-2' key={item.address}>
