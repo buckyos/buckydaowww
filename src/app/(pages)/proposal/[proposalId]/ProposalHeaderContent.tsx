@@ -48,7 +48,7 @@ const ProposalHeaderContent: React.FC<{
         setIsFullVote(extra.from != "0x0000000000000000000000000000000000000000")
         console.log('proposal extra', extra)
         // console.log(extra.toString())
-    }, [proposal])
+    }, [proposal, members])
 
 
     return (

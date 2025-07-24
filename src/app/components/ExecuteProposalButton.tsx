@@ -114,20 +114,6 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
 
   const executeReleaseToken = async () => {
     message.warning("current type no support")
-    // const tokenContract = await getTokenContract()
-
-    // const address = proposal?.params[0]
-    // const amounts = proposal?.params[1]
-
-    // const tx = await tokenContract.releaseTokens(proposal.id, address, amounts)
-    // console.log('🍻 contract releaseTokens result :', tx, address, amounts)
-    // const receipt = await transactionWait(tx)
-    // if (receipt?.status !== 1) {
-    //   console.warn('transaction status:', receipt?.status, tx)
-    //   message.error(`Create Investment failed[3][${receipt?.status}]`)
-    //   return
-    // }
-    // message.success('Execute proposal success')
   }
 
   // if (proposal.state > ProposalState.InProgress) {
