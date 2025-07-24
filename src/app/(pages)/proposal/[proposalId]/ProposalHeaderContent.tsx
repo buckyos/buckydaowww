@@ -77,14 +77,16 @@ const ProposalHeaderContent: React.FC<{
 
             <div className='mt-4'></div>
             <div className='flex'>
-                <div className='w-20'>Agree</div>
+                <div className='w-20'>Vote Progress: </div>
                 <Progress
                     // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
                     style={{ width: '100%', height: 20 }}
                     success={{ percent: supportPercent, strokeColor: '#52c41a' }}
-                    percent={rejectPercent}
+                    percent={
+                        // 总进度百分比
+                        rejectPercent + supportPercent
+                    }
                     strokeColor="#ff4d4f"
-                    status={rejectPercent > 50 ? 'exception' : 'normal'}
                 />
             </div>
             {
@@ -99,13 +101,6 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
 
-            <div className='flex'>
-                <div className='w-20'>Disgree</div>
-                <Progress
-                    status={rejectPercent > 50 ? 'exception' : 'normal'}
-                    percent={rejectPercent}
-                />
-            </div>
             <ExecuteProposalButton
                 disabled={supportPercent <= 50 && rejectPercent < 50}
                 proposal={proposal} />
