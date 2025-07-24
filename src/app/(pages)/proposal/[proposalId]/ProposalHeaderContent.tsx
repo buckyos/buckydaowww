@@ -74,8 +74,8 @@ const ProposalHeaderContent: React.FC<{
                     <InfoCircleOutlined />
                 </Tooltip>
             </div>
-            <div className='flex gap-2 mt-6'>
-                <div>Vote Progress: </div>
+            <div className='flex mt-6'>
+                <div className='w-40'>Vote Progress: </div>
                 <Progress
                     // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
                     style={{ width: '100%', height: 20 }}
