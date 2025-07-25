@@ -144,7 +144,7 @@ const ProposalHeaderContent: React.FC<{
                     })}
                 </div>
             }
-            <div className='flex-center gap-6'>
+            <div className='flex-center gap-6 mt-10'>
                 {isFullVote && <FullVoteExecuteButton proposal={proposal} />}
 
                 <ExecuteProposalButton

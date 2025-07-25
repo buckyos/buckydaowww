@@ -120,7 +120,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   // }
 
   return (
-    <div className='flex-center mt-10'>
+    <div className='flex-center gap-1'>
       <Button
         loading={loading}
         disabled={disabled}
@@ -132,7 +132,6 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
       </Button>
 
       <Tooltip
-        className='ml-4'
         placement='top'
         title={'Can only be implemented after voting'}
       >
