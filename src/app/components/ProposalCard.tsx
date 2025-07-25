@@ -5,6 +5,8 @@ import { proposalExpiredTimeDisplay } from '@utils/index'
 import UserAvatar from './UserAvatar'
 import { useRouter } from 'next/navigation'
 import ProposalStateTag from '@components/ProposalStateTag'
+import ProposalType from '@components/proposal/ProposalType'
+
 
 const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
   const router = useRouter()
@@ -73,6 +75,12 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
 
         <div className='text-sm text-black-secondary'>
           {proposalExtraDisplay()}
+        </div>
+
+        <div className='flex'>
+          <Tooltip title="Proposal type">
+            <ProposalType proposal={item} />
+          </Tooltip>
         </div>
 
         <div>
