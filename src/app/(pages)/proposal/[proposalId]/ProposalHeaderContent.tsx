@@ -34,6 +34,7 @@ const ProposalHeaderContent: React.FC<{
     // 当提案的投票方式是全员投票时，需要计算最大票数和提案生效所需票数
     const [maxVoteNumber, setMaxVoteNumber] = useState<string>("")
     const [validVoteNumber, setValidVoteNumber] = useState<string>("")
+    const [threshold, setThreshold] = useState<number>(0)
 
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
@@ -62,6 +63,9 @@ const ProposalHeaderContent: React.FC<{
         setIsFullVote(isFullVote)
         console.log('proposal extra', extra)
         if (isFullVote) {
+
+            setThreshold(Number(extra.threshold))
+
             const BDT = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
             const BDDT = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
 
@@ -111,16 +115,29 @@ const ProposalHeaderContent: React.FC<{
             </div>
             <div className='flex mt-6'>
                 <div className='w-40'>Vote Progress: </div>
-                <Progress
-                    // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
-                    style={{ width: '100%', height: 20 }}
-                    success={{ percent: supportPercent, strokeColor: '#52c41a' }}
-                    percent={
-                        // 总进度百分比
-                        rejectPercent + supportPercent
+                <div className='relative'>
+                    <Progress
+                        className='relative'
+                        // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
+                        style={{ width: '100%', height: 20 }}
+                        success={{ percent: supportPercent, strokeColor: '#52c41a' }}
+                        percent={
+                            // 总进度百分比
+                            rejectPercent + supportPercent
+                        }
+                        strokeColor="#ff4d4f"
+                        showInfo={false}
+                    />
+                    {isFullVote &&
+                        <div className='absolute z-10' style={{ left: threshold + "%" }}>
+                            <div
+                                className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                            />
+                        </div>
                     }
-                    strokeColor="#ff4d4f"
-                />
+
+                </div>
+
 
             </div>
             {maxVoteNumber ? <>
