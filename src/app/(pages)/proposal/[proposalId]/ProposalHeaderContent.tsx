@@ -22,7 +22,7 @@ const ProposalHeaderContent: React.FC<{
     const [supportPercent, setSupportPercent] = useState<number>(0)
     const [rejectPercent, setRejectPercent] = useState<number>(0)
     const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
-    const [isFUllVote, setIsFullVote] = useState(false)
+    const [isFullVote, setIsFullVote] = useState(false)
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
     })
@@ -49,7 +49,7 @@ const ProposalHeaderContent: React.FC<{
         const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
         setIsFullVote(isFullVote)
         console.log('proposal extra', extra)
-        if (isFUllVote) {
+        if (isFullVote) {
             // 计算最大票数
             const maxVoteNumber = 0
             const devRatio = await getDevRatio()
@@ -79,7 +79,7 @@ const ProposalHeaderContent: React.FC<{
             <div className='mt-2 flex gap-2'>
                 <Tooltip title="There are two types of voting: full voting and committee voting. Most proposals default to committee voting.">
                     <span >Proposal Vote type:</span>
-                    <Tag>{isFUllVote ? "Full members vote" : "Committee vote"}</Tag>
+                    <Tag>{isFullVote ? "Full members vote" : "Committee vote"}</Tag>
                     <InfoCircleOutlined />
                 </Tooltip>
             </div>
@@ -108,7 +108,7 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             <div className='flex-center gap-6'>
-                {isFUllVote && <FullVoteExecuteButton />}
+                {isFullVote && <FullVoteExecuteButton />}
 
                 <ExecuteProposalButton
                     disabled={supportPercent <= 50 && rejectPercent < 50}
