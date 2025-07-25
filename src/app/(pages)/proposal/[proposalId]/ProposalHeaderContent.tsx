@@ -129,7 +129,7 @@ const ProposalHeaderContent: React.FC<{
                         showInfo={false}
                     />
                     {isFullVote &&
-                        <div className='absolute z-10 t-[6px]' style={{ left: threshold + "%" }}>
+                        <div className='absolute z-10 top-[6px]' style={{ left: threshold + "%" }}>
                             <Tooltip title="full vote threshold">
                                 <div
                                     className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
