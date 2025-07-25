@@ -3,7 +3,7 @@
 import { contractService } from "@contracts/contract"
 import { Button, message, Tooltip } from "antd"
 import React, { useState } from "react"
-
+import dayjs from 'dayjs'
 import {
     transactionWait,
 } from '@utils/index'
@@ -37,11 +37,14 @@ const FullVoteExecuteButton: React.FC<{ proposal: ProposalResponseData }> = ({ p
 
     // 如果当前时间(UTC)大于投票过期时间(UTC)，按钮才可点
     const disabled = new Date().getTime() > new Date(proposal.expired).getTime()
-
+    // 计算当前时间和投票过期时间的差值（小时）
+    const hoursDiff = dayjs().diff(dayjs(proposal.expired), 'hour')
+    const text = `The settlement button can only be clicked after the voting time of the proposal ends. The proposal will expire in ${hoursDiff} hours.`
+    
     return (
         <div>
             {disabled ?
-                <Tooltip title="The button is clickable only if the current time is greater than the voting expiration time">
+                <Tooltip title={text}>
                     <Button
                         disabled={disabled}
                         onClick={onFullVoteExecute} loading={loading}>Full Vote Execute</Button>
