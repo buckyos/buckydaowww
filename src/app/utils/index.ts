@@ -6,6 +6,7 @@ import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import { decodeIfEncoded, decodePaddedAddress } from '@utils/encode'
 
 export * from "./numberConverter"
+export * from './time'
 
 const proposalExpiredTimeDisplay = (expired: number) => {
   const prefix =
