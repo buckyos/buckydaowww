@@ -40,7 +40,7 @@ const FullVoteExecuteButton: React.FC<{ proposal: ProposalResponseData }> = ({ p
     // 如果当前时间(UTC)大于投票过期时间(UTC)，按钮才可点
     const disabled = isBeforeNow(proposal.expired, 'second')
     // 计算当前时间和投票过期时间的差值（小时）
-    const hoursDiff = dayjs().diff(dayjs(proposal.expired * 1000), 'hour')
+    const hoursDiff = dayjs(proposal.expired * 1000).diff(dayjs(), 'hour')
     const text = `The settlement button can only be clicked after the voting time of the proposal ends. The proposal will expire in ${hoursDiff} hours.`
 
     return (
