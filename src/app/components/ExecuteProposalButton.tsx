@@ -11,7 +11,6 @@ import {
   decodePaddedAddress,
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { ProposalState } from '@vars/index'
 import {
   executeChangeCommittee,
   executeUpgradeContract,

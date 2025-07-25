@@ -124,13 +124,13 @@ const ProposalHeaderContent: React.FC<{
 
             </div>
             {maxVoteNumber ? <>
-                <div className='flex gap-2'>
+                <div className='flex gap-2 mt-4'>
                     <div>Maximum number of votes:</div>
-                    <div className='font-bold'>{maxVoteNumber}</div>
+                    <div className='font-bold'>{parseInt(maxVoteNumber)}</div>
                 </div>
                 <div className='flex gap-2'>
                     <div>Voting threshold count:</div>
-                    <div className='font-bold'>{validVoteNumber}</div>
+                    <div className='font-bold'>{parseInt(validVoteNumber)}</div>
                 </div>
             </> : ''}
             {
@@ -145,7 +145,7 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             <div className='flex-center gap-6'>
-                {isFullVote && <FullVoteExecuteButton />}
+                {isFullVote && <FullVoteExecuteButton proposal={proposal} />}
 
                 <ExecuteProposalButton
                     disabled={supportPercent <= 50 && rejectPercent < 50}
