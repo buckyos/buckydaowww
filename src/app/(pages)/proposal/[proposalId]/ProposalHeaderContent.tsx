@@ -115,7 +115,7 @@ const ProposalHeaderContent: React.FC<{
             </div>
             <div className='flex mt-6'>
                 <div className='w-40'>Vote Progress: </div>
-                <div className='relative'>
+                <div className='relative w-full'>
                     <Progress
                         className='relative'
                         // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
@@ -129,10 +129,12 @@ const ProposalHeaderContent: React.FC<{
                         showInfo={false}
                     />
                     {isFullVote &&
-                        <div className='absolute z-10' style={{ left: threshold + "%" }}>
-                            <div
-                                className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                            />
+                        <div className='absolute z-10 t-[6px]' style={{ left: threshold + "%" }}>
+                            <Tooltip title="full vote threshold">
+                                <div
+                                    className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                                />
+                            </Tooltip>
                         </div>
                     }
 
