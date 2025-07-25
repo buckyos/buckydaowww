@@ -11,7 +11,14 @@ import ProposalEdition from './ProposalEdition'
 import FullVoteExecuteButton from './FullVoteExecuteButton'
 import _ from 'lodash'
 import { useAsyncEffect } from 'ahooks'
-import { getCommitteeProposalExtra, getDevRatio } from '@contracts/index'
+import {
+    getCommitteeProposalExtra,
+    getDevRatio,
+    newProviderContract,
+    contractService,
+
+} from '@contracts/index'
+import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
 const ProposalHeaderContent: React.FC<{
@@ -50,14 +57,22 @@ const ProposalHeaderContent: React.FC<{
         setIsFullVote(isFullVote)
         console.log('proposal extra', extra)
         if (isFullVote) {
+            const BDT = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
+            const BDDT = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
+            
+            const [BDDTTotalReleased, BDTTotalSupply, devRatio] = await Promise.all([
+                BDDT.totalReleased(),
+                BDT.totalSupply(),
+                getDevRatio()
+            ]) as [bigint, bigint, bigint]
             // 计算最大票数
-            const maxVoteNumber = 0
-            const devRatio = await getDevRatio()
-            console.log("devRatio", devRatio)
+            // 最大票数：已释放的BDDT*ratio/100+已释放的BDT
+            const maxVoteNumber = BDDTTotalReleased * devRatio / 100n + BDTTotalSupply
+            console.log("maxVoteNumber", maxVoteNumber)
 
         }
         // console.log(extra.toString())
-    }, [proposal, members])
+    }, [JSON.stringify({ proposal, members })])
 
 
     return (

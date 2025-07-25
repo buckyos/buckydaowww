@@ -1,6 +1,5 @@
 import { contractService, newProviderContract } from './contract'
-import { erc20 } from './abis'
-import ISourceDAODevToken from './Interface.sol/ISourceDAODevToken.json'
+import { erc20, ISourceDAODevToken } from './abis'
 import {
     parseToFloat,
     wrapUnits,

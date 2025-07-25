@@ -32,5 +32,6 @@ export {
   erc20,
   ISourceProject,
   ProjectManagement,
-  SourceDaoCommittee
+  SourceDaoCommittee,
+  ISourceDAODevToken
 }
