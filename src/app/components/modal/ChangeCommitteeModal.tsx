@@ -8,7 +8,7 @@ import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { fetchMembers } from '@services/index'
-import { chnageCommitteeProposal } from '@contracts/index'
+import { changeCommitteeProposal } from '@contracts/index'
 import _ from 'lodash'
 
 const ChangeCommitteeModal: React.FC<{
@@ -54,7 +54,7 @@ const ChangeCommitteeModal: React.FC<{
 
     try {
       // 提交委员会变更提案
-      const isOk = await chnageCommitteeProposal(values, user.jwt)
+      const isOk = await changeCommitteeProposal(values, user.jwt)
       if (isOk) {
         message.success(
           'Change committee proposal submitted successfully, reloading...',

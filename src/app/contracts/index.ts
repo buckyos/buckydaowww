@@ -55,7 +55,7 @@ async function getCommitteeProposalExtra(proposalId: number): Promise<ContractPr
 }
 
 // 修改委员会的提案
-async function chnageCommitteeProposal(
+async function changeCommitteeProposal(
   values: StoreValue,
   jwt: string,
 ) {
@@ -324,7 +324,7 @@ export {
   createWhitelistInvestment,
   subscribeInvestmentShare,
   endInvestment,
-  chnageCommitteeProposal,
+  changeCommitteeProposal,
   getVersionSettlementInfo,
   getCommitteeProposalExtra,
   getDevRatio,
