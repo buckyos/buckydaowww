@@ -21,12 +21,20 @@ export * from './token'
 
 
 // 获取项目版本的结算信息： 【结算地址，结算token，结算状态】
-async function getVersionSettlementInfo(versionID: number): Promise<{contributions: ContributionInfoV2[]}> {
+async function getVersionSettlementInfo(versionID: number): Promise<{ contributions: ContributionInfoV2[] }> {
   const projectContract = await contractService.getProjectContract()
   const projectDetail = await projectContract.projectDetailOf(versionID)
 
   console.log(projectDetail)
   return projectDetail
+}
+
+// 获取BDDT的投票比例
+async function getDevRatio() {
+  const committee = await contractService.getCommitteeContract()
+  const devRatio = await committee.devRatio()
+  console.log("devRatio", devRatio)
+  return devRatio
 }
 
 // 获取提案额外信息
@@ -64,7 +72,7 @@ async function chnageCommitteeProposal(
   // create proposal
   const comitteeContract = await contractService.getCommitteeContract()
   const tx = await comitteeContract.prepareSetCommittees(
-    addresses, 
+    addresses,
     values.isFullProposal // 是否开启全员投票
   )
   const receipt = await transactionWait(tx)
@@ -318,4 +326,5 @@ export {
   chnageCommitteeProposal,
   getVersionSettlementInfo,
   getCommitteeProposalExtra,
+  getDevRatio,
 }

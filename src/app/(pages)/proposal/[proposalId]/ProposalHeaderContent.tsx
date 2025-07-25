@@ -8,9 +8,10 @@ import ProposalType from '@components/proposal/ProposalType'
 import ProposalStateLine from '@components/ProposalStateLine'
 import { useUserStore } from '@hooks/index'
 import ProposalEdition from './ProposalEdition'
+import FullVoteExecuteButton from './FullVoteExecuteButton'
 import _ from 'lodash'
 import { useAsyncEffect } from 'ahooks'
-import { getCommitteeProposalExtra } from '@contracts/index'
+import { getCommitteeProposalExtra, getDevRatio } from '@contracts/index'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
 const ProposalHeaderContent: React.FC<{
@@ -45,8 +46,16 @@ const ProposalHeaderContent: React.FC<{
 
         // 判断是否全员投票
         const extra = await getCommitteeProposalExtra(Number(proposal.id))
-        setIsFullVote(extra.from != "0x0000000000000000000000000000000000000000")
+        const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
+        setIsFullVote(isFullVote)
         console.log('proposal extra', extra)
+        if (isFUllVote) {
+            // 计算最大票数
+            const maxVoteNumber = 0
+            const devRatio = await getDevRatio()
+            console.log("devRatio", devRatio)
+
+        }
         // console.log(extra.toString())
     }, [proposal, members])
 
@@ -98,10 +107,14 @@ const ProposalHeaderContent: React.FC<{
                     })}
                 </div>
             }
+            <div className='flex-center gap-6'>
+                {isFUllVote && <FullVoteExecuteButton />}
 
-            <ExecuteProposalButton
-                disabled={supportPercent <= 50 && rejectPercent < 50}
-                proposal={proposal} />
+                <ExecuteProposalButton
+                    disabled={supportPercent <= 50 && rejectPercent < 50}
+                    proposal={proposal} />
+            </div>
+
         </>
     )
 }
