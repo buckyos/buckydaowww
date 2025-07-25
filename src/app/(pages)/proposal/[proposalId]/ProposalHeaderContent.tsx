@@ -30,6 +30,11 @@ const ProposalHeaderContent: React.FC<{
     const [rejectPercent, setRejectPercent] = useState<number>(0)
     const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
     const [isFullVote, setIsFullVote] = useState(false)
+
+    // 当提案的投票方式是全员投票时，需要计算最大票数和提案生效所需票数
+    const [maxVoteNumber, setMaxVoteNumber] = useState<string>("")
+    const [validVoteNumber, setValidVoteNumber] = useState<string>("")
+
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
     })
@@ -59,7 +64,7 @@ const ProposalHeaderContent: React.FC<{
         if (isFullVote) {
             const BDT = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
             const BDDT = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
-            
+
             const [BDDTTotalReleased, BDTTotalSupply, devRatio] = await Promise.all([
                 BDDT.totalReleased(),
                 BDT.totalSupply(),
@@ -68,7 +73,13 @@ const ProposalHeaderContent: React.FC<{
             // 计算最大票数
             // 最大票数：已释放的BDDT*ratio/100+已释放的BDT
             const maxVoteNumber = BDDTTotalReleased * devRatio / 100n + BDTTotalSupply
-            console.log("maxVoteNumber", maxVoteNumber)
+            setMaxVoteNumber(wrapUnits(maxVoteNumber, 18))
+
+            // 投票阈值。总票数要达到最大票数*threshold/100才可能结算
+            const validVoteNumber = maxVoteNumber * extra.threshold / 100n
+            setValidVoteNumber(wrapUnits(validVoteNumber, 18))
+
+            console.log("maxVoteNumber", maxVoteNumber, validVoteNumber)
 
         }
         // console.log(extra.toString())
@@ -110,7 +121,18 @@ const ProposalHeaderContent: React.FC<{
                     }
                     strokeColor="#ff4d4f"
                 />
+
             </div>
+            {maxVoteNumber ? <>
+                <div className='flex gap-2'>
+                    <div>Maximum number of votes:</div>
+                    <div className='font-bold'>{maxVoteNumber}</div>
+                </div>
+                <div className='flex gap-2'>
+                    <div>Voting threshold count:</div>
+                    <div className='font-bold'>{validVoteNumber}</div>
+                </div>
+            </> : ''}
             {
                 !!voteInfo.length &&
                 <div className='flex flex-col px-8 py-2 text-sm'>
