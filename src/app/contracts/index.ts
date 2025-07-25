@@ -86,7 +86,8 @@ async function chnageCommitteeProposal(
 
   // make vote params
   const params = addresses.map((addr) => ethers.zeroPadValue(addr, 32))
-  params.push(ethers.encodeBytes32String('setCommittees'))
+  // 这个是提案类型，不需要用byte32
+  params.push('setCommittees')
 
   const result = await proposalSetExtraAndParams(
     jwt,
