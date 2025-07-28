@@ -322,7 +322,7 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             {
-                !!voteInfo.length &&
+                !!voteInfo.length && currentVoteType == VoteType.Committee &&
                 <div className='flex flex-col px-8 py-2 text-sm'>
                     {voteInfo.map(item => {
                         return (<div className='flex gap-2' key={item.address}>
@@ -334,7 +334,6 @@ const ProposalHeaderContent: React.FC<{
             }
             <div className='flex-center gap-6 mt-10'>
                 {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
-
                 <ExecuteProposalButton
                     disabled={supportPercent <= 50 && rejectPercent < 50}
                     proposal={proposal} />

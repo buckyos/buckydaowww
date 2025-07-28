@@ -42,6 +42,7 @@ const FullVoteExecuteButton: React.FC<{ proposal: ProposalResponseData }> = ({ p
     // 计算当前时间和投票过期时间的差值（小时）
     const hoursDiff = dayjs(proposal.expired * 1000).diff(dayjs(), 'hour')
     const text = `The settlement button can only be clicked after the voting time of the proposal ends. The proposal will expire in ${hoursDiff} hours.`
+    const buttonText = 'Settle Full Vote'
 
     return (
         <div>
@@ -49,11 +50,11 @@ const FullVoteExecuteButton: React.FC<{ proposal: ProposalResponseData }> = ({ p
                 <Tooltip title={text}>
                     <Button
                         disabled={disabled}
-                        onClick={onFullVoteExecute} loading={loading}>Full Vote Execute</Button>
+                        onClick={onFullVoteExecute} loading={loading}>{buttonText}</Button>
                 </Tooltip> :
                 <Button
                     disabled={disabled}
-                    onClick={onFullVoteExecute} loading={loading}>Full Vote Execute</Button>
+                    onClick={onFullVoteExecute} loading={loading}>{buttonText}</Button>
             }
 
         </div>
