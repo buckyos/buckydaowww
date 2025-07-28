@@ -1,7 +1,7 @@
 
 'use client'
 import React, { useState } from 'react'
-import { Progress, Tag, Tooltip } from 'antd'
+import { Progress, Tag, Tooltip, Spin } from 'antd'
 import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
 import ProposalType from '@components/proposal/ProposalType'
@@ -21,6 +21,13 @@ import {
 import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
+
+enum VoteType {
+    Unkonw,
+    Committee,
+    FullMember,
+}
+
 const ProposalHeaderContent: React.FC<{
     proposal: ProposalResponseData,
     members: CommitteeMember[],
@@ -29,7 +36,7 @@ const ProposalHeaderContent: React.FC<{
     const [supportPercent, setSupportPercent] = useState<number>(0)
     const [rejectPercent, setRejectPercent] = useState<number>(0)
     const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
-    const [isFullVote, setIsFullVote] = useState(false)
+    const [currentVoteType, setCurrentVoteType] = useState<VoteType>(VoteType.Unkonw)
 
     // 当提案的投票方式是全员投票时，需要计算最大票数和提案生效所需票数
     const [maxVoteNumber, setMaxVoteNumber] = useState<string>("")
@@ -60,7 +67,7 @@ const ProposalHeaderContent: React.FC<{
         // 判断是否全员投票
         const extra = await getCommitteeProposalExtra(Number(proposal.id))
         const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
-        setIsFullVote(isFullVote)
+        setCurrentVoteType(isFullVote ? VoteType.FullMember: VoteType.Committee)
         console.log('proposal extra', extra)
         if (isFullVote) {
 
@@ -109,7 +116,11 @@ const ProposalHeaderContent: React.FC<{
             <div className='mt-2 flex gap-2'>
                 <Tooltip title="There are two types of voting: full voting and committee voting. Most proposals default to committee voting.">
                     <span >Proposal Vote type:</span>
-                    <Tag>{isFullVote ? "Full members vote" : "Committee vote"}</Tag>
+                    <Tag>
+                        {currentVoteType == VoteType.Unkonw && <Spin/>}
+                        {currentVoteType == VoteType.FullMember && 'Full members vote'}
+                        {currentVoteType == VoteType.Committee && 'Committee vote'}
+                    </Tag>
                     <InfoCircleOutlined />
                 </Tooltip>
             </div>
@@ -128,7 +139,7 @@ const ProposalHeaderContent: React.FC<{
                         strokeColor="#ff4d4f"
                         showInfo={false}
                     />
-                    {isFullVote &&
+                    {currentVoteType == VoteType.FullMember &&
                         <div className='absolute z-10 top-[6px]' style={{ left: threshold + "%" }}>
                             <Tooltip title="full vote threshold">
                                 <div
@@ -164,7 +175,7 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             <div className='flex-center gap-6 mt-10'>
-                {isFullVote && <FullVoteExecuteButton proposal={proposal} />}
+                {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
 
                 <ExecuteProposalButton
                     disabled={supportPercent <= 50 && rejectPercent < 50}
