@@ -215,6 +215,9 @@ const FullProposalProgress: React.FC<{
                 <div>Voting threshold count:</div>
                 <div className='font-bold'>{parseInt(wrapUnits(validVoteNumber, 18))}</div>
             </div>
+            <div className='mt-2'>
+                The number of votes for each address is calculated as: BDDT owned by this address * ratio / 100 + BDT owned by this address
+            </div>
             <Collapse className='mt-2' items={items}/>
         </>
     )
