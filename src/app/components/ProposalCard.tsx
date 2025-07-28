@@ -62,7 +62,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
           <div className='flex-1'></div>
           {!!item.investment && <Tag color='green'>Investment</Tag>}
           <ProposalStateTag
-            is_reject={rejectPercent() > 50}
+            is_reject={item.full ? rejectPercent() > 50 : item.state == 3 }
             state={item.state}
           />
         </div>
