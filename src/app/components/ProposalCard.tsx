@@ -75,18 +75,22 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
         <div className='text-sm text-black-secondary'>
           {proposalExtraDisplay()}
         </div>
-        <div>
-          {/* <div className='flex items-baseline gap-1 text-xs'>
-            <Progress percent={supportPercent()} showInfo={false} />
-            <div>{item.supportCount}</div>
-            <div>agree</div>
-          </div>
+        <div className='h-10 flex-center flex-col'>
+          {!!item.full &&
+            <>
+              <div className='flex items-baseline gap-1 text-xs'>
+                <Progress percent={supportPercent()} showInfo={false} />
+                <div>{item.supportCount}</div>
+                <div>agree</div>
+              </div>
 
-          <div className='flex items-baseline gap-1 text-xs'>
-            <Progress percent={rejectPercent()} showInfo={false} />
-            <div>{item.rejectCount}</div>
-            <div>disagree</div>
-          </div> */}
+              <div className='flex items-baseline gap-1 text-xs'>
+                <Progress percent={rejectPercent()} showInfo={false} />
+                <div>{item.rejectCount}</div>
+                <div>disagree</div>
+              </div>
+            </>
+          }
         </div>
 
         <div className='text-sm text-black-secondary'>

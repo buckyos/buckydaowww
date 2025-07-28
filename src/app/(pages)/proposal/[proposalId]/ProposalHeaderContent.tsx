@@ -278,7 +278,7 @@ const ProposalHeaderContent: React.FC<{
             <div className='flex justify-between text-cyfs-gray mt-2'>
                 <ProposalStateLine
                     proposal={proposal}
-                    rejectPercent={rejectPercent}
+                    rejectPercent={currentVoteType == VoteType.Committee ? rejectPercent: 0 }
                 />
 
                 <ProposalEdition
