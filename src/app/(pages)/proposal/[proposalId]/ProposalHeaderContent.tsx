@@ -1,8 +1,9 @@
 
 'use client'
 import React, { useState } from 'react'
-import { Progress, Tag, Tooltip, Spin, Collapse } from 'antd'
+import { Progress, Tag, Tooltip, Spin, Collapse, Button } from 'antd'
 import type { CollapseProps } from 'antd';
+import Link from 'next/link'
 import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
 import ProposalType from '@components/proposal/ProposalType'
@@ -218,7 +219,7 @@ const FullProposalProgress: React.FC<{
             <div className='mt-2'>
                 The number of votes for each address is calculated as: BDDT owned by this address * ratio / 100 + BDT owned by this address
             </div>
-            <Collapse className='mt-2' items={items}/>
+            <Collapse className='mt-2' items={items} />
         </>
     )
 }
@@ -336,6 +337,13 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             <div className='flex-center gap-6 mt-10'>
+                <Link href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
+                    <Button
+                        type='primary'
+                    >
+                        Vote
+                    </Button>
+                </Link>
                 {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
                 <ExecuteProposalButton
                     disabled={supportPercent <= 50 && rejectPercent < 50}
