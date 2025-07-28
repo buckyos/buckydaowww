@@ -147,8 +147,13 @@ const FullProposalProgress: React.FC<{
 
         console.log('支持票总数:', supportTotalVotes)
         console.log('反对票总数:', rejectTotalVotes)
-        setSupportPercent(Number(supportTotalVotes / maxVoteNumber))
-        setRejectPercent(Number(rejectTotalVotes / maxVoteNumber))
+        // 先将bigint转换为number，再计算百分比
+        const supportVotesNumber = Number(wrapUnits(supportTotalVotes, 18))
+        const maxVoteNumberConverted = Number(wrapUnits(maxVoteNumber, 18))
+        const rejectVotesNumber = Number(wrapUnits(rejectTotalVotes, 18))
+
+        setSupportPercent((supportVotesNumber / maxVoteNumberConverted) * 100)
+        setRejectPercent((rejectVotesNumber / maxVoteNumberConverted) * 100)
     }, [proposal, maxVoteNumber])
 
     const items: CollapseProps['items'] = [
@@ -164,7 +169,7 @@ const FullProposalProgress: React.FC<{
         },
         {
             key: '2',
-            label: 'Reject Vote Detail',    
+            label: 'Reject Vote Detail',
             children: <>{rejectAddressBalancesWithVotes.map((item) => (
                 <div className='flex gap-2' key={item.address}>
                     <div>{item.address}</div>
@@ -180,25 +185,26 @@ const FullProposalProgress: React.FC<{
         <>
             <div className='flex mt-6'>
                 <div className='w-40'>Vote Progress: </div>
-                <div className='relative w-full'></div>
-                <Progress
-                    className='relative'
-                    // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
-                    style={{ width: '100%', height: 20 }}
-                    success={{ percent: supportPercent, strokeColor: '#52c41a' }}
-                    percent={
-                        // 总进度百分比
-                        rejectPercent + supportPercent
-                    }
-                    strokeColor="#ff4d4f"
-                    showInfo={false}
-                />
-                <div className='absolute z-10 top-[6px]' style={{ left: Number(threshold) + "%" }}>
-                    <Tooltip title="full vote threshold">
-                        <div
-                            className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                        />
-                    </Tooltip>
+                <div className='relative w-full'>
+                    <Progress
+                        className='relative'
+                        // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
+                        style={{ width: '100%', height: 20 }}
+                        success={{ percent: supportPercent, strokeColor: '#52c41a' }}
+                        percent={
+                            // 总进度百分比
+                            rejectPercent + supportPercent
+                        }
+                        strokeColor="#ff4d4f"
+                        showInfo={false}
+                    />
+                    <div className='absolute z-10 top-[6px]' style={{ left: Number(threshold) + "%" }}>
+                        <Tooltip title="full vote threshold">
+                            <div
+                                className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                            />
+                        </Tooltip>
+                    </div>
                 </div>
             </div>
             <div className='flex gap-2 mt-4'>
