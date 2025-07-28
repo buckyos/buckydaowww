@@ -215,7 +215,7 @@ const FullProposalProgress: React.FC<{
                 <div>Voting threshold count:</div>
                 <div className='font-bold'>{parseInt(wrapUnits(validVoteNumber, 18))}</div>
             </div>
-            <Collapse items={items} defaultActiveKey={['1']} />
+            <Collapse className='mt-2' items={items}/>
         </>
     )
 }
