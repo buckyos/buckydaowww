@@ -1,7 +1,8 @@
 
 'use client'
 import React, { useState } from 'react'
-import { Progress, Tag, Tooltip, Spin } from 'antd'
+import { Progress, Tag, Tooltip, Spin, Collapse } from 'antd'
+import type { CollapseProps } from 'antd';
 import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
 import ProposalType from '@components/proposal/ProposalType'
@@ -28,6 +29,190 @@ enum VoteType {
     FullMember,
 }
 
+
+const FullProposalProgress: React.FC<{
+    proposal: ProposalResponseData,
+    extra?: ContractProposalExtra
+}> = ({ proposal, extra }) => {
+    // 当提案的投票方式是全员投票时，需要计算最大票数和提案生效所需票数
+    const [maxVoteNumber, setMaxVoteNumber] = useState<bigint>(0n)
+    const [validVoteNumber, setValidVoteNumber] = useState<bigint>(0n)
+    const [threshold, setThreshold] = useState<bigint>(0n)
+    const [devRatio, setDevRatio] = useState<bigint>(0n)
+    const [supportPercent, setSupportPercent] = useState<number>(0)
+    const [rejectPercent, setRejectPercent] = useState<number>(0)
+
+    const [supportAddressBalancesWithVotes, setSupportAddressBalancesWithVotes] = useState<{
+        address: string
+        votes: bigint
+    }[]>([])
+    const [rejectAddressBalancesWithVotes, setRejectAddressBalancesWithVotes] = useState<{
+        address: string
+        votes: bigint
+    }[]>([])
+
+
+
+    useAsyncEffect(async () => {
+        if (!extra) {
+            return
+        }
+
+        setThreshold(extra.threshold)
+
+        const BDT = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
+        const BDDT = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
+
+        const [BDDTTotalReleased, BDTTotalSupply, devRatio] = await Promise.all([
+            BDDT.totalReleased(),
+            BDT.totalSupply(),
+            getDevRatio()
+        ]) as [bigint, bigint, bigint]
+
+        setDevRatio(devRatio)
+
+
+        // 计算最大票数
+        // 最大票数：已释放的BDDT*ratio/100+已释放的BDT
+        const maxVoteNumber = BDDTTotalReleased * devRatio / 100n + BDTTotalSupply
+        setMaxVoteNumber(maxVoteNumber)
+
+        // 投票阈值。总票数要达到最大票数*threshold/100才可能结算
+        const validVoteNumber = maxVoteNumber * extra.threshold / 100n
+        setValidVoteNumber(validVoteNumber)
+
+        console.log("maxVoteNumber", maxVoteNumber, validVoteNumber)
+    }, [extra])
+
+
+    useAsyncEffect(async () => {
+        const BDTToken = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
+        const BDDTToken = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
+
+        // 获取每个投票地址的token余额
+        const supportBalances = await Promise.all(
+            proposal.support.flatMap(address => [
+                BDDTToken.balanceOf(address),
+                BDTToken.balanceOf(address)
+            ])
+        )
+        // 将结果两两组合,对应每个地址的BDDT和BDT余额
+        const supportAddressBalances = proposal.support.map((address, index) => ({
+            address,
+            BDDTBalance: supportBalances[index * 2],
+            BDTBalance: supportBalances[index * 2 + 1]
+        }))
+
+        // 获取每个拒绝投票地址的token余额
+        const rejectBalances = await Promise.all(
+            proposal.reject.flatMap(address => [
+                BDDTToken.balanceOf(address),
+                BDTToken.balanceOf(address)
+            ])
+        )
+        // 将结果两两组合,对应每个拒绝地址的BDDT和BDT余额
+        const rejectAddressBalances = proposal.reject.map((address, index) => ({
+            address,
+            BDDTBalance: rejectBalances[index * 2],
+            BDTBalance: rejectBalances[index * 2 + 1]
+        }))
+
+        console.log('投票地址余额:', supportAddressBalances)
+        console.log('rejectAddressBalances 投票地址余额:', rejectAddressBalances)
+        // 为每个支持票地址添加票数字段
+        const supportAddressBalancesWithVotes = supportAddressBalances.map(balance => ({
+            ...balance,
+            votes: (balance.BDDTBalance * devRatio / 100n) + balance.BDTBalance
+        }))
+
+        // 为每个反对票地址添加票数字段
+        const rejectAddressBalancesWithVotes = rejectAddressBalances.map(balance => ({
+            ...balance,
+            votes: (balance.BDDTBalance * devRatio / 100n) + balance.BDTBalance
+        }))
+
+        setRejectAddressBalancesWithVotes(rejectAddressBalancesWithVotes)
+        setSupportAddressBalancesWithVotes(supportAddressBalancesWithVotes)
+
+        // 计算总票数
+        const supportTotalVotes = supportAddressBalancesWithVotes.reduce((sum, item) => sum + item.votes, 0n)
+        const rejectTotalVotes = rejectAddressBalancesWithVotes.reduce((sum, item) => sum + item.votes, 0n)
+
+        console.log('支持票总数:', supportTotalVotes)
+        console.log('反对票总数:', rejectTotalVotes)
+        setSupportPercent(Number(supportTotalVotes / maxVoteNumber))
+        setRejectPercent(Number(rejectTotalVotes / maxVoteNumber))
+    }, [proposal])
+
+    const items: CollapseProps['items'] = [
+        {
+            key: '1',
+            label: 'Support Vote Detail',
+            children: <>{supportAddressBalancesWithVotes.map((item) => (
+                <div className='flex gap-2' key={item.address}>
+                    <div>{item.address}</div>
+                    <div>{parseInt(wrapUnits(item.votes, 18))}</div>
+                </div>
+            ))}</>,
+        },
+        {
+            key: '2',
+            label: 'Reject Vote Detail',    
+            children: <>{rejectAddressBalancesWithVotes.map((item) => (
+                <div className='flex gap-2' key={item.address}>
+                    <div>{item.address}</div>
+                    <div>{parseInt(wrapUnits(item.votes, 18))}</div>
+                </div>
+            ))}</>,
+        },
+    ]
+
+
+
+    return (
+        <>
+            <div className='flex mt-6'>
+                <div className='w-40'>Vote Progress: </div>
+                <div className='relative w-full'></div>
+                <Progress
+                    className='relative'
+                    // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
+                    style={{ width: '100%', height: 20 }}
+                    success={{ percent: supportPercent, strokeColor: '#52c41a' }}
+                    percent={
+                        // 总进度百分比
+                        rejectPercent + supportPercent
+                    }
+                    strokeColor="#ff4d4f"
+                    showInfo={false}
+                />
+                <div className='absolute z-10 top-[6px]' style={{ left: Number(threshold) + "%" }}>
+                    <Tooltip title="full vote threshold">
+                        <div
+                            className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                        />
+                    </Tooltip>
+                </div>
+            </div>
+            <div className='flex gap-2 mt-4'>
+                <div>Maximum number of votes:</div>
+                <div className='font-bold'>{parseInt(wrapUnits(maxVoteNumber, 18))}</div>
+            </div>
+            <div className='flex gap-2'>
+                <div>Voting threshold count:</div>
+                <div className='font-bold'>{parseInt(wrapUnits(validVoteNumber, 18))}</div>
+            </div>
+            <Collapse items={items} defaultActiveKey={['1']} />
+        </>
+    )
+}
+
+
+
+
+
+
+
 const ProposalHeaderContent: React.FC<{
     proposal: ProposalResponseData,
     members: CommitteeMember[],
@@ -38,10 +223,8 @@ const ProposalHeaderContent: React.FC<{
     const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
     const [currentVoteType, setCurrentVoteType] = useState<VoteType>(VoteType.Unkonw)
 
-    // 当提案的投票方式是全员投票时，需要计算最大票数和提案生效所需票数
-    const [maxVoteNumber, setMaxVoteNumber] = useState<string>("")
-    const [validVoteNumber, setValidVoteNumber] = useState<string>("")
-    const [threshold, setThreshold] = useState<number>(0)
+
+    const [extra, setExtra] = useState<ContractProposalExtra>()
 
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
@@ -67,33 +250,9 @@ const ProposalHeaderContent: React.FC<{
         // 判断是否全员投票
         const extra = await getCommitteeProposalExtra(Number(proposal.id))
         const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
-        setCurrentVoteType(isFullVote ? VoteType.FullMember: VoteType.Committee)
+        setCurrentVoteType(isFullVote ? VoteType.FullMember : VoteType.Committee)
         console.log('proposal extra', extra)
-        if (isFullVote) {
-
-            setThreshold(Number(extra.threshold))
-
-            const BDT = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
-            const BDDT = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
-
-            const [BDDTTotalReleased, BDTTotalSupply, devRatio] = await Promise.all([
-                BDDT.totalReleased(),
-                BDT.totalSupply(),
-                getDevRatio()
-            ]) as [bigint, bigint, bigint]
-            // 计算最大票数
-            // 最大票数：已释放的BDDT*ratio/100+已释放的BDT
-            const maxVoteNumber = BDDTTotalReleased * devRatio / 100n + BDTTotalSupply
-            setMaxVoteNumber(wrapUnits(maxVoteNumber, 18))
-
-            // 投票阈值。总票数要达到最大票数*threshold/100才可能结算
-            const validVoteNumber = maxVoteNumber * extra.threshold / 100n
-            setValidVoteNumber(wrapUnits(validVoteNumber, 18))
-
-            console.log("maxVoteNumber", maxVoteNumber, validVoteNumber)
-
-        }
-        // console.log(extra.toString())
+        setExtra(extra)
     }, [JSON.stringify({ proposal, members })])
 
 
@@ -117,52 +276,38 @@ const ProposalHeaderContent: React.FC<{
                 <Tooltip title="There are two types of voting: full voting and committee voting. Most proposals default to committee voting.">
                     <span >Proposal Vote type:</span>
                     <Tag>
-                        {currentVoteType == VoteType.Unkonw && <Spin/>}
+                        {currentVoteType == VoteType.Unkonw && <Spin />}
                         {currentVoteType == VoteType.FullMember && 'Full members vote'}
                         {currentVoteType == VoteType.Committee && 'Committee vote'}
                     </Tag>
                     <InfoCircleOutlined />
                 </Tooltip>
             </div>
-            <div className='flex mt-6'>
-                <div className='w-40'>Vote Progress: </div>
-                <div className='relative w-full'>
-                    <Progress
-                        className='relative'
-                        // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
-                        style={{ width: '100%', height: 20 }}
-                        success={{ percent: supportPercent, strokeColor: '#52c41a' }}
-                        percent={
-                            // 总进度百分比
-                            rejectPercent + supportPercent
-                        }
-                        strokeColor="#ff4d4f"
-                        showInfo={false}
-                    />
-                    {currentVoteType == VoteType.FullMember &&
-                        <div className='absolute z-10 top-[6px]' style={{ left: threshold + "%" }}>
-                            <Tooltip title="full vote threshold">
-                                <div
-                                    className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                                />
-                            </Tooltip>
-                        </div>
-                    }
+            {currentVoteType == VoteType.FullMember &&
+                <FullProposalProgress
+                    extra={extra}
+                    proposal={proposal}
+                />}
+            {currentVoteType == VoteType.Committee &&
+                <div className='flex mt-6'>
+                    <div className='w-40'>Vote Progress: </div>
+                    <div className='relative w-full'>
+                        <Progress
+                            className='relative'
+                            // size="large" 在 antd 5.x 版本中已废弃，改用 size={{ width: 300 }}
+                            style={{ width: '100%', height: 20 }}
+                            success={{ percent: supportPercent, strokeColor: '#52c41a' }}
+                            percent={
+                                // 总进度百分比
+                                rejectPercent + supportPercent
+                            }
+                            strokeColor="#ff4d4f"
+                            showInfo={false}
+                        />
 
+                    </div>
                 </div>
-
-
-            </div>
-            {maxVoteNumber ? <>
-                <div className='flex gap-2 mt-4'>
-                    <div>Maximum number of votes:</div>
-                    <div className='font-bold'>{parseInt(maxVoteNumber)}</div>
-                </div>
-                <div className='flex gap-2'>
-                    <div>Voting threshold count:</div>
-                    <div className='font-bold'>{parseInt(validVoteNumber)}</div>
-                </div>
-            </> : ''}
+            }
             {
                 !!voteInfo.length &&
                 <div className='flex flex-col px-8 py-2 text-sm'>

@@ -167,7 +167,11 @@ class ContractService {
   public getLockupContract = this.generateContract(abis, 'LOCKUP', this.LOCKUP)
   public getMainContract = this.generateContract(abis, 'MAIN', this.MAIN)
   public getProjectContract = this.generateContract([...ISourceProject, ...ProjectManagement], 'PROJECT', this.PROJECT)
+
+  // BDT
   public getNormalTokenContract = this.generateContract(abis, 'NORMAL_TOKEN', this.NORMAL_TOKEN)
+
+  // BDDT
   public getDevTokenContract = this.generateContract(abis, 'DEV_TOKEN', this.DEV_TOKEN)
   public getAcquiredContract = this.generateContract(abis, 'ACQUIRED', this.ACQUIRED)
 }
