@@ -81,6 +81,7 @@ interface ProposalResponseData {
   investment?: InvestmentResponseData
   project?: ProjectVersionProps
   paramroot?: string
+  full: boolean // 投票类型，是否全员投票
   params: any[]
 }
 
