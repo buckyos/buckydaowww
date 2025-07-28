@@ -47,7 +47,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
 
   return (
     <div
-      className='flex items-center border border-solid rounded-lg border-[#F0F0F0] p-4 cursor-pointer'
+      className='flex items-center border border-solid rounded-lg border-[#F0F0F0] hover:border-cyfs-blue p-4 cursor-pointer'
       onClick={handleCardClicked}
       aria-hidden
     >
