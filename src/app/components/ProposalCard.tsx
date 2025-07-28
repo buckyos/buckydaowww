@@ -62,7 +62,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
           <div className='flex-1'></div>
           {!!item.investment && <Tag color='green'>Investment</Tag>}
           <ProposalStateTag
-            is_reject={item.full ? rejectPercent() > 50 : item.state == 3 }
+            is_reject={!item.full ? rejectPercent() > 50 : item.state == 3 }
             state={item.state}
           />
         </div>
@@ -76,15 +76,15 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
           {proposalExtraDisplay()}
         </div>
         <div className='h-10 flex-center flex-col'>
-          {!!item.full &&
+          {!item.full &&
             <>
-              <div className='flex items-baseline gap-1 text-xs'>
+              <div className='flex w-full items-baseline gap-1 text-xs'>
                 <Progress percent={supportPercent()} showInfo={false} />
                 <div>{item.supportCount}</div>
                 <div>agree</div>
               </div>
 
-              <div className='flex items-baseline gap-1 text-xs'>
+              <div className='flex w-full items-baseline gap-1 text-xs'>
                 <Progress percent={rejectPercent()} showInfo={false} />
                 <div>{item.rejectCount}</div>
                 <div>disagree</div>
