@@ -86,6 +86,13 @@ const FullProposalProgress: React.FC<{
 
 
     useAsyncEffect(async () => {
+        if (maxVoteNumber == 0n) {
+            return
+        }
+        if (proposal.support.length == 0 && proposal.reject.length == 0) {
+            return
+        }
+
         const BDTToken = await newProviderContract(contractService.getAddressOfNormalToken(), erc20)
         const BDDTToken = await newProviderContract(contractService.getAddressOfDevToken(), ISourceDAODevToken)
 
@@ -142,7 +149,7 @@ const FullProposalProgress: React.FC<{
         console.log('反对票总数:', rejectTotalVotes)
         setSupportPercent(Number(supportTotalVotes / maxVoteNumber))
         setRejectPercent(Number(rejectTotalVotes / maxVoteNumber))
-    }, [proposal])
+    }, [proposal, maxVoteNumber])
 
     const items: CollapseProps['items'] = [
         {
