@@ -41,7 +41,7 @@ function decodeIfEncoded(inputString: string) {
 
 // 还原 zeroPadValue 处理过的地址
 function decodePaddedAddress(paddedAddress: string) {
-  return getAddress(paddedAddress.replace(/^0x0*/, '0x'))
+  return getAddress(paddedAddress.replace(/^0x000000000000000000000000/, '0x'))
 }
 
 export { decodeIfEncoded, decodePaddedAddress }
