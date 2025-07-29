@@ -291,7 +291,7 @@ const ProposalHeaderContent: React.FC<{
             <div className='flex justify-between text-cyfs-gray mt-2'>
                 <ProposalStateLine
                     proposal={proposal}
-                    rejectPercent={currentVoteType == VoteType.Committee ? rejectPercent: 0 }
+                    rejectPercent={currentVoteType == VoteType.Committee ? rejectPercent : 0}
                 />
 
                 <ProposalEdition
@@ -350,16 +350,12 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             <div className='flex-center gap-6 mt-10'>
-                <Link href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
-                    <div
-                        className='text-cyfs-blue'
-                    >
-                        How to vote
-                    </div>
+                <Link className='text-cyfs-blue' href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
+                    How to vote?
                 </Link>
                 {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
                 <ExecuteProposalButton
-                    disabled={proposal.full ? proposal.state != ProposalState.Accepted  : (supportPercent <= 50 && rejectPercent < 50)}
+                    disabled={proposal.full ? proposal.state != ProposalState.Accepted : (supportPercent <= 50 && rejectPercent < 50)}
                     proposal={proposal} />
             </div>
 
