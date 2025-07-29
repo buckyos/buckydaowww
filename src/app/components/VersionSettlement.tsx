@@ -187,7 +187,7 @@ const VersionSettlement: React.FC<{
     <>
       <div className='flex mt-20 items-center gap-4'>
         <div>settlement proposal status</div>
-        <ProposalStateTag state={proposal.state} />
+        <ProposalStateTag proposal={proposal} state={proposal.state} />
       </div>
       <h3 className='font-normal mt-10'>
         Corresponding contribution value of contributors in project settlement
