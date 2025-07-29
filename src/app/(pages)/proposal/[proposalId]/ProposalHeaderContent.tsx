@@ -30,6 +30,19 @@ enum VoteType {
     FullMember,
 }
 
+enum ProposalState {
+    // default
+    NotFound = 0,
+    // voting
+    Inprogress = 1,
+    // accept by committee
+    Accepted = 2,
+    // reject by committee
+    Rejected = 3,
+    Executed = 4,
+    Expired = 5
+}
+
 
 const FullProposalProgress: React.FC<{
     proposal: ProposalResponseData,
@@ -338,15 +351,15 @@ const ProposalHeaderContent: React.FC<{
             }
             <div className='flex-center gap-6 mt-10'>
                 <Link href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
-                    <Button
-                        type='primary'
+                    <div
+                        className='text-cyfs-blue'
                     >
-                        Vote
-                    </Button>
+                        How to vote
+                    </div>
                 </Link>
                 {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
                 <ExecuteProposalButton
-                    disabled={supportPercent <= 50 && rejectPercent < 50}
+                    disabled={proposal.full ? proposal.state == ProposalState.Accepted  : (supportPercent <= 50 && rejectPercent < 50)}
                     proposal={proposal} />
             </div>
 
