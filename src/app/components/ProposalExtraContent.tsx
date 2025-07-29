@@ -75,12 +75,7 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
           <div className='pt-20'>
             <div className='text-3xl'>New Committee list:</div>
 
-            {proposal.params.map((paddedAddress: string, index: number) => {
-              // 数组最后一个是类型，不是地址
-              if (index == proposal.params.length - 1) {
-                return null
-              }
-
+            {_.initial(proposal.params).map((paddedAddress: string, index: number) => {
               return (
                 <div key={index} className='mt-4'>
                   <Tag>Committe Address:</Tag>
