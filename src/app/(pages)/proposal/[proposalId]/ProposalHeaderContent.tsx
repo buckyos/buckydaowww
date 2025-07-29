@@ -22,26 +22,13 @@ import {
 } from '@contracts/index'
 import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
-
+import { ProposalState } from '@vars/index'
 
 
 enum VoteType {
     Unkonw,
     Committee,
     FullMember,
-}
-
-enum ProposalState {
-    // default
-    NotFound = 0,
-    // voting
-    Inprogress = 1,
-    // accept by committee
-    Accepted = 2,
-    // reject by committee
-    Rejected = 3,
-    Executed = 4,
-    Expired = 5
 }
 
 

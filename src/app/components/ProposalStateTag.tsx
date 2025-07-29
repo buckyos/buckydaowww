@@ -50,15 +50,19 @@ const stateStyles: {
 interface ProposalStateTagProps {
   state: ProposalState
   is_reject?: boolean
+  proposal: ProposalResponseData
 }
 
 const ProposalStateTag: React.FC<ProposalStateTagProps> = ({
   state,
   is_reject,
+  proposal,
 }) => {
   let properties
   if (is_reject) {
     properties = stateStyles[ProposalState.Rejected]
+  } else if (!proposal.full && proposal.state == ProposalState.InProgress && proposal.expired < Date.now()) { // 非全员投票，而且没有执行，且已经过期
+    properties = stateStyles[ProposalState.Expired]
   } else {
     properties = stateStyles[state]
   }
