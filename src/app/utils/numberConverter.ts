@@ -179,6 +179,32 @@ export const formatAmount = (
     : `${parseFloat(fixedNumber)}${unit}`
 }
 
+
+/**
+ * 将数字转换为带千位分隔符的字符串形式
+ * @param n - 需要转换的数值，可以是 number 或 string
+ * @returns 带千位分隔符的字符串
+ * @example
+ * formatNumberWithCommas(1234567.89) // '1,234,567.89'
+ * formatNumberWithCommas('1234567.89') // '1,234,567.89'
+ * formatNumberWithCommas(1000) // '1,000'
+ */
+export const formatNumberWithCommas = (n: number | string): string => {
+  // 将输入转换为字符串
+  const str = n.toString();
+  
+  // 处理小数点
+  const parts = str.split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+  
+  // 对整数部分添加千位分隔符
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  
+  // 返回完整的格式化字符串
+  return formattedInteger + decimalPart;
+}
+
 /**
  * 将数值转换为 BigInt 类型。
  * @param n - 需要转换的数值，可以是 number, bigint 或 string。

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Progress, Tag, Tooltip, Spin, Collapse, Button } from 'antd'
 import type { CollapseProps } from 'antd';
 import Link from 'next/link'
-import { transformPercentNumber, wrapUnits } from '@utils/numberConverter'
+import { transformPercentNumber, wrapUnits, formatNumberWithCommas } from '@utils/numberConverter'
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
 import ProposalType from '@components/proposal/ProposalType'
 import ProposalStateLine from '@components/ProposalStateLine'
@@ -22,6 +22,7 @@ import {
 } from '@contracts/index'
 import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
+
 
 
 enum VoteType {
@@ -177,7 +178,7 @@ const FullProposalProgress: React.FC<{
             children: <>{supportAddressBalancesWithVotes.map((item) => (
                 <div className='flex gap-2' key={item.address}>
                     <div>{item.address}</div>
-                    <div>{parseInt(wrapUnits(item.votes, 18))}</div>
+                    <div>{formatNumberWithCommas(parseInt(wrapUnits(item.votes, 18)))}</div>
                 </div>
             ))}</>,
         },
@@ -187,7 +188,7 @@ const FullProposalProgress: React.FC<{
             children: <>{rejectAddressBalancesWithVotes.map((item) => (
                 <div className='flex gap-2' key={item.address}>
                     <div>{item.address}</div>
-                    <div>{parseInt(wrapUnits(item.votes, 18))}</div>
+                    <div>{formatNumberWithCommas(parseInt(wrapUnits(item.votes, 18)))}</div>
                 </div>
             ))}</>,
         },
@@ -223,11 +224,11 @@ const FullProposalProgress: React.FC<{
             </div>
             <div className='flex gap-2 mt-4'>
                 <div>Maximum number of votes:</div>
-                <div className='font-bold'>{parseInt(wrapUnits(maxVoteNumber, 18))}</div>
+                <div className='font-bold'>{formatNumberWithCommas(parseInt(wrapUnits(maxVoteNumber, 18)))}</div>
             </div>
             <div className='flex gap-2'>
                 <div>Voting threshold count:</div>
-                <div className='font-bold'>{parseInt(wrapUnits(validVoteNumber, 18))}</div>
+                <div className='font-bold'>{formatNumberWithCommas(parseInt(wrapUnits(validVoteNumber, 18)))}</div>
             </div>
             <div className='mt-2'>
                 The number of votes for each address is calculated as: BDDT owned by this address * ratio / 100 + BDT owned by this address
