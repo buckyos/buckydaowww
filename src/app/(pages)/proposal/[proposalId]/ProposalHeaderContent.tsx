@@ -359,7 +359,7 @@ const ProposalHeaderContent: React.FC<{
                 </Link>
                 {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
                 <ExecuteProposalButton
-                    disabled={proposal.full ? proposal.state == ProposalState.Accepted  : (supportPercent <= 50 && rejectPercent < 50)}
+                    disabled={proposal.full ? proposal.state != ProposalState.Accepted  : (supportPercent <= 50 && rejectPercent < 50)}
                     proposal={proposal} />
             </div>
 
