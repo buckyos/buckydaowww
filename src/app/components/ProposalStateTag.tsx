@@ -61,7 +61,7 @@ const ProposalStateTag: React.FC<ProposalStateTagProps> = ({
   let properties
   if (is_reject) {
     properties = stateStyles[ProposalState.Rejected]
-  } else if (!proposal.full && proposal.state == ProposalState.InProgress && proposal.expired < Date.now()) { // 非全员投票，而且没有执行，且已经过期
+  } else if (!proposal.full && proposal.state == ProposalState.InProgress && proposal.expired * 1000 < Date.now()) { // 非全员投票，而且没有执行，且已经过期
     properties = stateStyles[ProposalState.Expired]
   } else {
     properties = stateStyles[state]
