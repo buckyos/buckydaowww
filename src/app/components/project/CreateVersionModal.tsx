@@ -107,7 +107,15 @@ const CreateVersionModal = () => {
       }
 
       // 获取 versionID（ 合约里命名为projectId）
-      const event = receipt.events?.find((e: any) => e.event === "ProjectCreate");
+      console.log("receipt", receipt)
+      let event: any
+      try {
+        event = receipt.events?.find((e: any) => e.event === "ProjectCreate");
+      } catch (e) {
+        event = receipt.logs?.find((e: any) => e.event === "ProjectCreate");
+      }
+      console.log("receipt event", event)
+
       const version_id = event.args.projectId.toNumber();
       console.log("get version_id from event: ", version_id)
       // 填入 params 用于投票
