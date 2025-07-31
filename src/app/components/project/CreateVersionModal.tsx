@@ -48,24 +48,28 @@ const useCreateVersionModalStore = create<CreateVersionModalProps>((set) => ({
 // 按照主版本号.次版本号.修订号的规则来校验
 const simpleVersionRegex = /^(\d+)\.(\d+)\.(\d+)$/
 
-function parseReceiptLog(receipt: any) {
-  const eventAbi = ["event ProjectCreated(uint indexed ProjectId)"];
-  const iface = new ethers.Interface(eventAbi);
-
-  let projectId = ''
+function parseReceiptLog(receipt: any): number {
+  // const eventAbi = ["event ProjectCreated(uint indexed ProjectId)"];
+  // const iface = new ethers.Interface(eventAbi);
+  console.log('receipt logs', receipt.logs)
   for (const log of receipt.logs) {
-    try {
-      const event = iface.parseLog(log);
-      if (event?.name === "ProjectCreated") {
-        console.log("Project ID:", event.args.ProjectId.toString());
-        projectId = event.args.ProjectId.toString()
-        break;
-      }
-    } catch (error) {
-      console.error("解析失败:", error);
+    console.log('receipt log length', log.topics.length)
+    if (log.topics.length == 3 ) {
+      const projectId = log.args[0]
+      return Number(projectId)
     }
+    // try {
+    //   const event = iface.parseLog(log);
+    //   if (event?.name === "ProjectCreated") {
+    //     console.log("Project ID:", event.args.ProjectId.toString());
+    //     projectId = event.args.ProjectId.toString()
+    //     break;
+    //   }
+    // } catch (error) {
+    //   console.error("解析失败:", error);
+    // }
   }
-  return projectId
+  return 0
 }
 
 const CreateVersionModal = () => {
