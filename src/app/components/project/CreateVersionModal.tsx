@@ -95,7 +95,7 @@ const CreateVersionModal = () => {
       const result = await createProjectVersionExtra(
         jwt,
         values.title,
-        values.extra,
+        values.extra ? values.extra : '', // 传空字符串。
         project_name,
         values.version,
         issueLink,
