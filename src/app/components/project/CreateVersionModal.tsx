@@ -49,8 +49,6 @@ const useCreateVersionModalStore = create<CreateVersionModalProps>((set) => ({
 const simpleVersionRegex = /^(\d+)\.(\d+)\.(\d+)$/
 
 function parseReceiptLog(receipt: any): number {
-  // const eventAbi = ["event ProjectCreated(uint indexed ProjectId)"];
-  // const iface = new ethers.Interface(eventAbi);
   console.log('receipt logs', receipt.logs)
   for (const log of receipt.logs) {
     console.log('receipt log length', log.topics.length)
@@ -58,16 +56,6 @@ function parseReceiptLog(receipt: any): number {
       const projectId = log.args[0]
       return Number(projectId)
     }
-    // try {
-    //   const event = iface.parseLog(log);
-    //   if (event?.name === "ProjectCreated") {
-    //     console.log("Project ID:", event.args.ProjectId.toString());
-    //     projectId = event.args.ProjectId.toString()
-    //     break;
-    //   }
-    // } catch (error) {
-    //   console.error("解析失败:", error);
-    // }
   }
   return 0
 }
@@ -133,14 +121,6 @@ const CreateVersionModal = () => {
       // 获取 versionID（ 合约里命名为projectId）
       console.log("receipt", receipt)
       const version_id = parseReceiptLog(receipt)
-      // let event: any
-      // try {
-      //   event = receipt.events?.find((e: any) => e.event === "ProjectCreate");
-      // } catch (e) {
-      //   event = receipt.logs?.find((e: any) => e.event === "ProjectCreate");
-      // }
-      // console.log("receipt event", event)
-      // const version_id = event.args.projectId.toNumber();
       console.log("get version_id from event: ", version_id)
       // 填入 params 用于投票
       const result2 = await proposalSetExtraAndParams(
