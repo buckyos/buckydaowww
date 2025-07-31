@@ -11,11 +11,11 @@ import {
 import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
 import VersionDescription from '@components/VersionDesciption'
-import {getVersionSettlementInfo } from '@contracts/index'
+import { getVersionSettlementInfo } from '@contracts/index'
 
 
 
-const ProposalSettlementContent: React.FC<{versionID: string}> = ({versionID}) => {
+const ProposalSettlementContent: React.FC<{ versionID: string }> = ({ versionID }) => {
   const [contributions, setContributions] = useState<ContributionInfoV2[]>([])
 
   useLayoutEffect(() => {
@@ -74,15 +74,16 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
         <>
           <div className='pt-20'>
             <div className='text-3xl'>New Committee list:</div>
-
-            {_.initial(proposal.params).map((paddedAddress: string, index: number) => {
-              return (
-                <div key={index} className='mt-4'>
-                  <Tag>Committe Address:</Tag>
-                  <div>{decodePaddedAddress(paddedAddress)}</div>
-                </div>
-              )
-            })}
+            <div className='flex flex-col mt-10 gap-4'>
+              {_.initial(proposal.params).map((paddedAddress: string, index: number) => {
+                return (
+                  <div key={index} className='flex gap-2' >
+                    <Tag>Committe Address:</Tag>
+                    <div>{decodePaddedAddress(paddedAddress)}</div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </>
       )}
