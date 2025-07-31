@@ -239,7 +239,7 @@ const ProposalHeaderContent: React.FC<{
     const [supportPercent, setSupportPercent] = useState<number>(0)
     const [rejectPercent, setRejectPercent] = useState<number>(0)
     const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
-    const [currentVoteType, setCurrentVoteType] = useState<VoteType>(VoteType.Unkonw)
+    // const [currentVoteType, setCurrentVoteType] = useState<VoteType>(VoteType.Unkonw)
 
 
     const [extra, setExtra] = useState<ContractProposalExtra>()
@@ -264,15 +264,14 @@ const ProposalHeaderContent: React.FC<{
             transformPercentNumber(votesInfo.filter(o => o.isCommiittee).length, memberCount),
         )
         setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
-
         // 判断是否全员投票
         const extra = await getCommitteeProposalExtra(Number(proposal.id))
-        const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
-        setCurrentVoteType(isFullVote ? VoteType.FullMember : VoteType.Committee)
-        console.log('proposal extra', extra)
+        // const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
+        // console.log('proposal extra', extra)
         setExtra(extra)
     }, [JSON.stringify({ proposal, members })])
 
+    const currentVoteType = proposal.full ? VoteType.FullMember : VoteType.Committee
 
     return (
         <>
@@ -294,7 +293,6 @@ const ProposalHeaderContent: React.FC<{
                 <Tooltip title="There are two types of voting: full voting and committee voting. Most proposals default to committee voting.">
                     <span >Proposal Vote type:</span>
                     <Tag>
-                        {currentVoteType == VoteType.Unkonw && <Spin />}
                         {currentVoteType == VoteType.FullMember && 'Full members vote'}
                         {currentVoteType == VoteType.Committee && 'Committee vote'}
                     </Tag>
