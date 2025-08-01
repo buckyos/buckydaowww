@@ -13,6 +13,7 @@ import Loading from '@components/Loading'
 import { useVersionSettlementModalStore } from '@hooks/modal'
 import useUserStore from '@hooks/useUserStore'
 import { message } from 'antd'
+import { transformVersionStateWord } from '@utils/index'
 
 interface VersionDescriptionProps {
   version?: ProjectVersionProps
@@ -98,7 +99,9 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
       ),
     })
   }
-  items.push({ key: '8', label: 'state', children: version?.state })
+  items.push({ 
+    key: '8', label: 'state', children: transformVersionStateWord(version?.state) 
+  })
   items.push({
     label: (
       <>
