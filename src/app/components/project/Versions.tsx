@@ -103,7 +103,7 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
       title: 'version state',
       dataIndex: 'state',
       render: (state: number) => {
-        return <div className='w-24'>{transformVersionStateWord(state)}</div>
+        return <div className='w-32'>{transformVersionStateWord(state)}</div>
       },
     },
     {
