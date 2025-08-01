@@ -18,7 +18,7 @@ import {
   CalendarOutlined,
 } from '@ant-design/icons'
 import useUserStore from '@hooks/useUserStore'
-import { transformVersionStateWord } from '@utils/index'
+import { transformVersionStateWord, formatNumberWithCommas } from '@utils/index'
 
 interface VersionsProps {
   project_name?: string
@@ -77,7 +77,7 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
       title: 'budget',
       dataIndex: 'budget',
       render: (budget: number) => {
-        const display = parseToFloat(wrapUnits(budget, decimals))
+        const display = formatNumberWithCommas(parseToFloat(wrapUnits(budget, decimals)))
         return (
           <div>
             {display} {symbol}
