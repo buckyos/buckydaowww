@@ -102,7 +102,13 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
       title: 'version state',
       dataIndex: 'state',
       render: (state: number) => {
-        return <div className='w-24'>{state}</div>
+        if (state === 0) {
+          return <div className='w-24'>Waiting vote</div>
+        } else if (state === 1) {
+          return <div className='w-24'>Proposal passed</div>
+        } else {
+          return <div className='w-24'>{state}</div>
+        }
       },
     },
     {
