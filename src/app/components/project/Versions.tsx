@@ -18,6 +18,7 @@ import {
   CalendarOutlined,
 } from '@ant-design/icons'
 import useUserStore from '@hooks/useUserStore'
+import { transformVersionStateWord } from '@utils/index'
 
 interface VersionsProps {
   project_name?: string
@@ -102,13 +103,7 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
       title: 'version state',
       dataIndex: 'state',
       render: (state: number) => {
-        if (state === 0) {
-          return <div className='w-24'>Waiting vote</div>
-        } else if (state === 1) {
-          return <div className='w-24'>Proposal passed</div>
-        } else {
-          return <div className='w-24'>{state}</div>
-        }
+        return <div className='w-24'>{transformVersionStateWord(state)}</div>
       },
     },
     {

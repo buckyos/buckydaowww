@@ -131,6 +131,20 @@ function convertVersion(version: string): number {
     return major*10000000000+minor*100000+patch
 }
 
+
+function transformVersionStateWord(state: number | string) {
+  if (state == 0) {
+    return 'Waiting vote'
+  }
+  if (state == 1) {
+    return 'Proposal passed'
+  }
+  if (state == 3) {
+    return 'Version settled'
+  }
+  return 'Unknown'
+}
+
 export {
   // number
   parseToFloat,
@@ -146,4 +160,5 @@ export {
   extractMessage,
   convertVersion,
   showErrorMessage,
+  transformVersionStateWord,
 }
