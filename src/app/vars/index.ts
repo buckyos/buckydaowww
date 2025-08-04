@@ -23,21 +23,32 @@ export enum ProposalResult {
   Executed,
 }
 
-export const project_data = {
-  project_name: 'OpenDAN AIOS',
-  state: 'developing',
-  date: '2023-05-13',
-  current_version: '1.0.0',
-  github_url: 'https://github.com/fiatrete/OpenDAN-Personal-AI-OS',
-  descption: ` OpenDAN (Open and Do Anything Now with AI) is revolutionizing the AI
-landscape with its Personal AI Operating System. Designed for seamless
-integration of diverse AI modules, it ensures unmatched
-interoperability. OpenDAN empowers users to craft powerful AI
-agents—from butlers and assistants to personal tutors and digital
-companions—all while retaining control. These agents can team up to
-tackle complex challenges, integrate with existing services, and
-command smart(IoT) devices. With OpenDAN, we're putting AI in your
-hands, making life simpler and smarter. This project is still in its
-very early stages, and there may be significant changes in the future.
-    `,
+// 项目版本的结果，评级
+export enum ProjectVersionResult {
+  // still in progress, no result
+  InProgress,
+  // over time after endDate
+  Expired,
+  // project failed
+  Failed,
+  // a normal result
+  Normal,
+  // a good result
+  Good,
+  // a excellent result
+  Excellent
+}
+
+// 版本状态
+export enum ProjectVersionState {
+  // wating committe votes for start this project
+  Preparing,
+  // in development
+  Developing,
+  // waiting committe votes for project's result
+  Accepting,
+  // project has finished, check its result
+  Finished,
+  // project failed
+  Rejected
 }

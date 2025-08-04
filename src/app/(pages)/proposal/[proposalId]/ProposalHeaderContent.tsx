@@ -43,6 +43,7 @@ const FullProposalProgress: React.FC<{
     const [devRatio, setDevRatio] = useState<bigint>(0n)
     const [supportPercent, setSupportPercent] = useState<number>(0)
     const [rejectPercent, setRejectPercent] = useState<number>(0)
+    const [loading, setLoading] = useState<boolean>(true)
 
     const [supportAddressBalancesWithVotes, setSupportAddressBalancesWithVotes] = useState<{
         address: string
@@ -156,6 +157,8 @@ const FullProposalProgress: React.FC<{
 
         setSupportPercent((supportVotesNumber / maxVoteNumberConverted) * 100)
         setRejectPercent((rejectVotesNumber / maxVoteNumberConverted) * 100)
+
+        setLoading(false)
     }, [proposal, maxVoteNumber])
 
     const items: CollapseProps['items'] = [
@@ -180,6 +183,17 @@ const FullProposalProgress: React.FC<{
             ))}</>,
         },
     ]
+
+    if (loading) {
+        return (
+            <div className='flex-center flex-col py-10 gap-1'>
+                <Spin />
+                <div>
+                    Full vote information loading...
+                </div>
+            </div>
+        )
+    }
 
 
 

@@ -1,5 +1,3 @@
-import { project_data } from '@vars/index'
-import { result } from 'lodash'
 import { transformNumber, bigTransformPercentNumber } from '@utils/index'
 
 // 获取DAO成员列表
