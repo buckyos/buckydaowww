@@ -25,7 +25,7 @@ const ProposalStateLine: React.FC<ProposalStateLineProps> = ({
         {proposalExpiredTimeDisplay(proposal.expired)}
       </span>
       <ProposalStateTag proposal={proposal} state={proposal.state} is_reject={rejectPercent > 50} />
-      {isExpired && (
+      {isExpired && !proposal.full && (
         <Tag className='ml-2' color='magenta'>
           proposal expired
         </Tag>
