@@ -14,8 +14,8 @@ const useContractStore = create<ContractStoreDefine>()(
       totalSupply: 0,
       totalReleased: 0,
       totalUnreleased: 0,
-      symbol: '',
-      decimals: 0,
+      symbol: 'BDT',
+      decimals: 18, // 默认值设置一个18
       expiration: 0,
       // fetch token's value in contract
       // TODO remove
