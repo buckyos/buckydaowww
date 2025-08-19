@@ -39,10 +39,14 @@ const ProjectBreadcrumb: React.FC<{
   ]
 
   if (version) {
+    // 从当前URL中提取项目路径
+    const currentPath = window.location.pathname
+    const projectPath = currentPath.match(/\/projects\/\d+/)?.[0] || '/projects'
     items = _.initial(items)
+    // 项目link
     items.push({
       title: (
-        <Link href={`/projects/${project?.project_id}`} key='version1'>
+        <Link href={projectPath} key='version1'>
           {project?.project_name}
         </Link>
       ),

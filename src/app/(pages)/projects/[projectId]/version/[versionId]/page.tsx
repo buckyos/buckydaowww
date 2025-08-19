@@ -12,6 +12,8 @@ import VersionSettlementModal from '@components/modal/VersionSettlementModal'
 import VersionDescription from '@components/VersionDesciption'
 import VersionSettlement from '@components/VersionSettlement'
 
+
+// 版本详情页
 const ProjectVersionPage = () => {
   const [version, setVersion] = useState<ProjectVersionProps>()
   const { projectId, versionId } = useParams()
