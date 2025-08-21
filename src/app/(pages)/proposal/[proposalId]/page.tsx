@@ -58,7 +58,15 @@ export default function ProposalDetailPage() {
         <div className='flex flex-col gap-4'>
           <div className='flex relative'>
             <label className='font-bold w-28'>params:</label>
-            <div className='text-cyfs-gray'>{proposal.params.map((item, index) => <div key={index}>{JSON.stringify(item, null, 2)}</div>)}</div>
+            <div className='text-cyfs-gray'>
+              {/* 防止params为空或undefined导致页面报错 */}
+              {Array.isArray(proposal.params) ? 
+                proposal.params.map((item, index) => (
+                  <div key={index}>{JSON.stringify(item, null, 2)}</div>
+                )) : 
+                'Empty params'
+              }
+            </div>
             <CopyOutlined
               className='absolute right-2 top-2 cursor-pointer hover:text-blue-500'
               onClick={() => {
