@@ -1,5 +1,5 @@
 'use client'
-import { useState, useLayoutEffect } from 'react'
+import { useState } from 'react'
 import { Tag } from 'antd'
 import { wrapUnits } from '@utils/numberConverter'
 import _ from 'lodash'
@@ -12,17 +12,22 @@ import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
 import VersionDescription from '@components/VersionDesciption'
 import { getVersionSettlementInfo } from '@contracts/index'
+import { useAsyncEffect } from 'ahooks'
 
 
 
 const ProposalSettlementContent: React.FC<{ versionID: string }> = ({ versionID }) => {
   const [contributions, setContributions] = useState<ContributionInfoV2[]>([])
 
-  useLayoutEffect(() => {
-    getVersionSettlementInfo(Number(versionID)).then(result => {
-      setContributions(result.contributions)
-    })
+  useAsyncEffect(async () => {
+    if (!versionID) {
+      return
+    }
+    const result = await getVersionSettlementInfo(Number(versionID))
+    setContributions(result.contributions)
   }, [versionID])
+
+
   return (
     <>
       <div className='pt-20'>
