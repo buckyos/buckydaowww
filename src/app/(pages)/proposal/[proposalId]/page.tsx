@@ -6,7 +6,7 @@ import {
   fetchProposalId,
   fetchMembers,
 } from '@services/index'
-import { message } from 'antd'
+import { message, Tag } from 'antd'
 import { CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -64,7 +64,7 @@ export default function ProposalDetailPage() {
                 proposal.params.map((item, index) => (
                   <div key={index}>{JSON.stringify(item, null, 2)}</div>
                 )) : 
-                'Empty params'
+                <Tag color='red'>Empty params</Tag>
               }
             </div>
             <CopyOutlined
