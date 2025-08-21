@@ -2,6 +2,9 @@ import { getAddress, encodeBytes32String, decodeBytes32String } from 'ethers'
 
 // 判断字符串是否被 ethers.encodeBytes32String 编码过
 function isEncodedString(encodedString: string) {
+  if (encodedString == undefined) {
+    return false
+  }
   // 检查长度
   if (encodedString.length !== 66) {
     return false
