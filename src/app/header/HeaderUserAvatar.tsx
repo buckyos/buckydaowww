@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Dropdown, MenuProps, Tag, Tooltip } from 'antd'
-import { LogoutOutlined, ContactsOutlined } from '@ant-design/icons'
+import { LogoutOutlined, ContactsOutlined, UserOutlined } from '@ant-design/icons'
 import ConnectWalletButton from '@components/header/ConnectWalletButton'
 import useUserStore from '@hooks/useUserStore'
 import { useCommittee, useBindWalletAddress } from '@hooks/index'
@@ -11,6 +11,8 @@ const HeaderUserAvatar = () => {
   const user = useUserStore()
   const userBind = useBindWalletAddress()
   const { isCommittee } = useCommittee(userBind.governanceAddress)
+  const hasProfile = !!user.user.avatar && !!user.user.nickname
+  const displayName = user.user.nickname || 'Wallet'
 
   const items: MenuProps['items'] = [
     {
@@ -50,17 +52,23 @@ const HeaderUserAvatar = () => {
   return (
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
       <div className='flex-center gap-2'>
-        <Image
-          width={60}
-          height={60}
-          className='w-14 h-14 rounded-full overflow-hidden'
-          src={user.user.avatar!}
-          alt='avatar'
-        />
+        {hasProfile ? (
+          <Image
+            width={60}
+            height={60}
+            className='w-14 h-14 rounded-full overflow-hidden'
+            src={user.user.avatar!}
+            alt='avatar'
+          />
+        ) : (
+          <div className='w-14 h-14 rounded-full overflow-hidden bg-gray-100 text-gray-500 flex items-center justify-center'>
+            <UserOutlined className='text-xl' />
+          </div>
+        )}
         <div className='flex flex-col gap-2'>
           <div className='flex items-center'>
             <span className='text-lg cursor-default'>
-              {user.user.nickname}
+              {displayName}
             </span>
             {isCommittee && (
               <div className='ml-2'>

@@ -1,21 +1,30 @@
 'use client'
 import { useUserStore } from '@hooks/index'
 import HeaderInfo from '@components/header/HeaderInfo'
+import { message } from 'antd'
 
 const HeaderRight = () => {
   const user = useUserStore()
+  const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
+
   const handleLoginGithub = () => {
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
-    const redirectUri =
-      process.env.NEXT_PUBLIC_GITHUB_CALLBACK_URL +
-      encodeURIComponent('?redirect=' + window.location.href)
-    console.log('clientId', clientId, redirectUri)
+    const callbackUrl = process.env.NEXT_PUBLIC_GITHUB_CALLBACK_URL
+
+    if (!clientId || !callbackUrl) {
+      message.error('Missing GitHub OAuth configuration')
+      return
+    }
+
+    const redirectUrl = new URL(callbackUrl)
+    redirectUrl.searchParams.set('redirect', window.location.href)
+
+    const redirectUri = redirectUrl.toString()
     const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`
-    // TODO 小窗处理
     window.location.href = url
   }
 
-  if (user.isLogin()) {
+  if (user.isLogin() || isLocalChainMode) {
     return <HeaderInfo />
   }
 

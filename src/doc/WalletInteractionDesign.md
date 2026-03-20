@@ -39,6 +39,15 @@
    - `WhitelistInvestmentModal`
    - `InvestmentSubscriptionModal`
 
+6. GitHub OAuth redirect_uri 构造已修正
+   - 不再把 `?redirect=...` 编码进 callback path
+   - 改为基于 `URL` 正常拼接 query 参数
+
+7. 本地链模式支持跳过 GitHub 登录
+   - 仅当 `NEXT_PUBLIC_NETWORK_ID === '31337'`
+   - Header 直接进入钱包/链交互模式
+   - 目的仅是支持本地 `Hardhat Local` 联调
+
 因此，本文档下面的“当前实现概览”和“当前设计的主要问题”部分，既包含历史基线，也包含仍然值得继续优化的剩余问题。
 
 ---
@@ -67,6 +76,59 @@
 - `app/hooks/useUserStore.ts`
 - `app/hooks/useCommittee.ts`
 - `app/header/Fetcher.tsx`
+
+---
+
+## GitHub 登录与本地链测试边界
+
+当前前端有两套不同的入口语义：
+
+### 1. 正常登录模式
+
+适用于：
+
+- 生产网络
+- 测试网
+- 任何需要后端用户态的环境
+
+流程是：
+
+1. 点击 `Login with GitHub`
+2. 跳转 GitHub OAuth
+3. GitHub 回调到 `NEXT_PUBLIC_GITHUB_CALLBACK_URL`
+4. 前端从 `/api/user/githublogin?code=...` 换取 jwt
+5. 再通过 `/api/user/info` 获取用户资料
+6. 之后用户再绑定钱包地址
+
+这条路径依赖：
+
+- GitHub OAuth 应用配置
+- callback URL 与 GitHub 配置完全匹配
+- 后端 `/api/user/githublogin`
+
+### 2. 本地链测试模式
+
+适用于：
+
+- `Hardhat Local`
+- 只验证钱包和链交互
+- 不依赖后端用户体系
+
+触发条件：
+
+- `NEXT_PUBLIC_NETWORK_ID === '31337'`
+
+行为：
+
+- Header 不再阻塞在 GitHub 登录
+- 直接展示钱包入口和链上读取入口
+- 用户可以只用浏览器钱包完成本地联调
+
+这条模式的边界非常明确：
+
+- 只服务本地开发和手工 smoke
+- 不改变生产或测试网的登录流程
+- 不替代真实的 GitHub 登录与 wallet bind
 
 ---
 

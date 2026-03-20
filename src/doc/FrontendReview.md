@@ -259,6 +259,33 @@
 
 - `app/contracts/contract.ts`
 
+---
+
+## 2026-03-20 补充说明
+
+### GitHub OAuth 与本地链联调边界
+
+本轮额外确认并修正了两个与登录相关的问题：
+
+1. GitHub OAuth 的 `redirect_uri` 原先拼接方式有误  
+   之前会把 `?redirect=...` 编码进 callback path，本身就可能导致 GitHub 报：
+   `The redirect_uri is not associated with this application.`
+
+2. 链交互层联调不应继续被 GitHub OAuth 阻塞  
+   因为本地 `Hardhat Local` 的核心目标是验证：
+   - 钱包检测
+   - 当前活动地址
+   - committee 身份切换
+   - 只读链上状态
+   - 交易入口 signer / 权限边界
+
+因此当前前端已经补充了一个严格限定的本地测试模式：
+
+- 仅当 `NEXT_PUBLIC_NETWORK_ID === '31337'`
+- Header 允许跳过 GitHub 登录，直接进入钱包/链交互模式
+
+这条逻辑只服务本地联调，不改变正式环境的登录语义。
+
 **问题**
 
 当前网络不匹配时直接调用 `wallet_switchEthereumChain`，然后延时刷新页面。
