@@ -1,13 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import Nav from './nav'
-import dynamic from 'next/dynamic'
 import images from '@images'
-import { Suspense } from 'react'
-const HeaderRight = dynamic(() => import('@components/header/HeaderRight'), {
-  ssr: false,
-  suspense: true,
-})
+import HeaderRight from '@components/header/HeaderRight'
 
 export default function Header() {
   return (
@@ -19,9 +14,7 @@ export default function Header() {
         </Link>
         <Nav />
         <div className='flex-1'></div>
-        <Suspense fallback={<div>Loading...</div>}>
-          <HeaderRight />
-        </Suspense>
+        <HeaderRight />
       </div>
     </header>
   )
