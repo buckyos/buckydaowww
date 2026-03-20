@@ -12,6 +12,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ProposalExtraContent from '@components/ProposalExtraContent'
 import ProposalHeaderContent from './ProposalHeaderContent'
+import { extractUpgradeCalldataFromExtra } from '@utils/index'
 
 dayjs.extend(relativeTime)
 
@@ -42,6 +43,10 @@ export default function ProposalDetailPage() {
     </div>)
   }
 
+  const { content: proposalExtraContent } = extractUpgradeCalldataFromExtra(
+    proposal.extra || '',
+  )
+
   return (
     <>
       <div className='w-[1000px] mx-auto'>
@@ -53,7 +58,7 @@ export default function ProposalDetailPage() {
         />
         <ProposalExtraContent proposal={proposal} />
 
-        <div className='mt-20 pt-20'>{proposal.extra}</div>
+        <div className='mt-20 pt-20'>{proposalExtraContent}</div>
         <div className='my-20 border-b border-solid border-[#F0F0F0]'></div>
         <div className='flex flex-col gap-4'>
           <div className='flex relative'>

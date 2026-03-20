@@ -7,6 +7,7 @@ import {
   getProposalType,
   proposalTypeMap,
   decodePaddedAddress,
+  extractUpgradeCalldataFromExtra,
 } from '@utils/index'
 import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
@@ -72,6 +73,7 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
 }) => {
   const proposalType = getProposalType(proposal)
   const contract = useContractStore()
+  const { calldata } = extractUpgradeCalldataFromExtra(proposal.extra || '')
 
   return (
     <>
@@ -138,6 +140,31 @@ const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
 
       {proposalType === proposalTypeMap.SettlementVersion && (
         <ProposalSettlementContent versionID={proposal.params[0]} />
+      )}
+
+      {proposalType === proposalTypeMap.UpgradeContract && (
+        <div className='pt-20'>
+          <div className='text-3xl'>Upgrade proposal details:</div>
+          <div className='mt-6 flex flex-col gap-3'>
+            <div>
+              Proxy Contract: <Tag>{proposal.params[0]}</Tag>
+            </div>
+            <div>
+              New Implementation: <Tag>{proposal.params[1]}</Tag>
+            </div>
+            {proposal.params.length >= 4 && (
+              <div>
+                Approved Calldata Hash: <Tag>{proposal.params[2]}</Tag>
+              </div>
+            )}
+            <div>
+              Migration Calldata:{' '}
+              <Tag color={calldata === '0x' ? 'default' : 'blue'}>
+                {calldata}
+              </Tag>
+            </div>
+          </div>
+        </div>
       )}
     </>
   )

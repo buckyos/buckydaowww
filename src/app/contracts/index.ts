@@ -159,7 +159,7 @@ async function getDecimals(tokenAddress: string): Promise<number> {
 // 结束两步投资
 async function endInvestment(id: string) {
   const twoStepInvestmentContract = await contractService.getAcquiredContract()
-  const tx = await twoStepInvestmentContract.endInventment(id)
+  const tx = await twoStepInvestmentContract.endInvestment(id)
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
     console.warn('transaction status:', receipt?.status, tx)

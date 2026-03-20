@@ -18,12 +18,19 @@ async function voteUpgradeContract(
   const committeeContract = await contractService.getCommitteeContract()
   const contractProxyAddress = params[0]
   const implAddress = params[1]
-  const upgradeContract = params[2]
-  const tx = await committeeContract.support(proposalId, [
+  const upgradeContract = params[params.length - 1]
+  const encodedParams = [
     ethers.zeroPadValue(contractProxyAddress as string, 32),
     ethers.zeroPadValue(implAddress as string, 32),
-    ethers.encodeBytes32String(upgradeContract),
-  ])
+  ]
+
+  if (params.length >= 4) {
+    encodedParams.push(params[2] as string)
+  }
+
+  encodedParams.push(ethers.encodeBytes32String(upgradeContract))
+
+  const tx = await committeeContract.support(proposalId, encodedParams)
   return tx
 }
 

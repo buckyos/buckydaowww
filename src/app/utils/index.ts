@@ -145,6 +145,48 @@ function transformVersionStateWord(state: number | string) {
   return 'Unknown'
 }
 
+const UPGRADE_CALLDATA_BLOCK_START = '[upgrade-calldata]'
+const UPGRADE_CALLDATA_BLOCK_END = '[/upgrade-calldata]'
+
+function normalizeUpgradeCalldata(calldata?: string) {
+  const trimmed = calldata?.trim() || ''
+  if (!trimmed) {
+    return '0x'
+  }
+  if (!ethers.isHexString(trimmed)) {
+    throw new Error('Migration calldata must be a hex string')
+  }
+  return trimmed
+}
+
+function appendUpgradeCalldataToExtra(extra: string, calldata?: string) {
+  const normalizedCalldata = normalizeUpgradeCalldata(calldata)
+  const trimmedExtra = extra.trimEnd()
+  if (normalizedCalldata === '0x') {
+    return trimmedExtra
+  }
+
+  const markerBlock = `${UPGRADE_CALLDATA_BLOCK_START}\n${normalizedCalldata}\n${UPGRADE_CALLDATA_BLOCK_END}`
+  return trimmedExtra ? `${trimmedExtra}\n\n${markerBlock}` : markerBlock
+}
+
+function extractUpgradeCalldataFromExtra(extra: string) {
+  const regex = /\n?\[upgrade-calldata\]\n(0x[a-fA-F0-9]*)\n\[\/upgrade-calldata\]\s*$/s
+  const match = extra.match(regex)
+
+  if (!match) {
+    return {
+      content: extra,
+      calldata: '0x',
+    }
+  }
+
+  return {
+    content: extra.slice(0, match.index).trimEnd(),
+    calldata: normalizeUpgradeCalldata(match[1]),
+  }
+}
+
 export {
   // number
   parseToFloat,
@@ -161,4 +203,7 @@ export {
   convertVersion,
   showErrorMessage,
   transformVersionStateWord,
+  normalizeUpgradeCalldata,
+  appendUpgradeCalldataToExtra,
+  extractUpgradeCalldataFromExtra,
 }

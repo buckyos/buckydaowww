@@ -1,6 +1,8 @@
+import { ethers } from 'ethers'
 import { transactionWait } from '@utils/index'
 import { message } from 'antd'
 import { contractProxyContract } from '@hooks/index'
+import { extractUpgradeCalldataFromExtra } from '@utils/index'
 import { contractService } from './contract'
 
 // 执行委员会变更
@@ -26,12 +28,28 @@ async function executeChangeCommittee(
 async function executeUpgradeContract(
   contractAddress: string,
   upgradeAddress: string,
+  proposalExtra: string,
+  approvedCalldataHash?: string,
 ) {
+  const { calldata } = extractUpgradeCalldataFromExtra(proposalExtra || '')
+  const calldataHash = ethers.keccak256(calldata)
+  const emptyCalldataHash = ethers.keccak256('0x')
+
+  if (approvedCalldataHash && approvedCalldataHash !== emptyCalldataHash && calldata === '0x') {
+    message.error('This proposal requires migration calldata, but no calldata metadata was found in the proposal content')
+    return false
+  }
+
+  if (approvedCalldataHash && approvedCalldataHash !== calldataHash) {
+    message.error('The stored migration calldata does not match the approved calldata hash')
+    return false
+  }
+
   const proxyContract = await contractProxyContract(contractAddress)
   console.log('🍻 proposal :', proxyContract)
   const tx = await proxyContract.upgradeToAndCall(
     upgradeAddress,
-    new Uint8Array(0),
+    calldata,
   )
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {
@@ -40,6 +58,7 @@ async function executeUpgradeContract(
     return
   }
   message.success('Execute upgrade contract proposal success')
+  return true
 }
 
 export { executeChangeCommittee, executeUpgradeContract }

@@ -50,8 +50,12 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
           'Execute settlement version proposal success',
         )
       } else if (proposalType === proposalTypeMap.UpgradeContract) {
-        // await executeUpgradeContract()
-        await executeUpgradeContract(proposal.params[0], proposal.params[1])
+        await executeUpgradeContract(
+          proposal.params[0],
+          proposal.params[1],
+          proposal.extra,
+          proposal.params.length >= 4 ? proposal.params[2] : undefined,
+        )
       } else if (proposalType === proposalTypeMap.ChangeCommittee) {
         await executeChangeCommittee(
           proposal.id.toString(),

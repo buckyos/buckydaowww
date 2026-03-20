@@ -353,7 +353,12 @@ const ProposalHeaderContent: React.FC<{
                 <Link className='text-cyfs-blue' href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
                     How to vote?
                 </Link>
-                {currentVoteType == VoteType.FullMember && <FullVoteExecuteButton proposal={proposal} />}
+                {currentVoteType == VoteType.FullMember &&
+                    <FullVoteExecuteButton
+                        proposal={proposal}
+                        extra={extra}
+                        fetchData={fetchData}
+                    />}
                 <ExecuteProposalButton
                     disabled={proposal.full ? proposal.state != ProposalState.Accepted : (supportPercent <= 50 && rejectPercent < 50)}
                     proposal={proposal} />

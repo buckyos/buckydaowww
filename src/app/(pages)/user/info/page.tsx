@@ -65,17 +65,19 @@ export default function UserInfoPage() {
               {contract.symbol}
             </div>
             <div>
-              <label className='inline-block w-48 font-bold'>
-                Unlocked Token
-              </label>
-              {parseToFloat(token.unlocked)}
+              <label className='inline-block w-48 font-bold'>Assigned Lockup</label>
+              {parseToFloat(token.assigned)}
               {contract.symbol}
             </div>
 
             <div>
-              <label className='inline-block w-48 font-bold'>
-                Locked Token
-              </label>
+              <label className='inline-block w-48 font-bold'>Claimed Lockup</label>
+              {parseToFloat(token.claimed)}
+              {contract.symbol}
+            </div>
+
+            <div>
+              <label className='inline-block w-48 font-bold'>Remaining Locked</label>
               {parseToFloat(token.locked)}
               {contract.symbol}
             </div>

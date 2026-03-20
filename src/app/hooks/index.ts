@@ -70,15 +70,15 @@ function useLockToken(ownerAddress: string) {
   const lockupAddress = contractService.getAddressOfLockup()
 
   const [token, setToken] = useState<{
-    token: number
-    assigned: number
-    unlocked: number
-    locked: number
+    token: bigint
+    assigned: bigint
+    claimed: bigint
+    locked: bigint
   }>({
-    token: 0,
-    assigned: 0,
-    unlocked: 0,
-    locked: 0,
+    token: 0n,
+    assigned: 0n,
+    claimed: 0n,
+    locked: 0n,
   })
   useAsyncEffect(async () => {
     if (ownerAddress == '') {
@@ -86,23 +86,25 @@ function useLockToken(ownerAddress: string) {
     }
     const contract = await newProviderContract(lockupAddress, abis)
     console.log('🍻 ownerAddress :', ownerAddress)
-    const result = await Promise.all([
+    const [totalAssigned, totalClaimed] = await Promise.all([
       contract.totalAssigned(ownerAddress),
-      contract.totalUnlocked(ownerAddress),
-      contract.totalLocked(ownerAddress),
+      contract.totalClaimed(ownerAddress),
     ])
 
     const tokenContract =  await newProviderContract(contractService.getAddressOfDevToken(), abis)
-    const result2 = await tokenContract.balanceOf(ownerAddress)
-    console.log('🍻 tokenContract token balanceOf :', result2)
+    const tokenBalance = await tokenContract.balanceOf(ownerAddress)
+    const locked = totalAssigned > totalClaimed
+      ? totalAssigned - totalClaimed
+      : 0n
+    console.log('🍻 tokenContract token balanceOf :', tokenBalance)
 
     setToken({
-      token: result2,
-      assigned: result[0],
-      unlocked: result[1],
-      locked: result[2],
+      token: tokenBalance,
+      assigned: totalAssigned,
+      claimed: totalClaimed,
+      locked,
     })
-    console.log('🍻 result totalLocked:', result)
+    console.log('🍻 lockup totals:', { totalAssigned, totalClaimed, locked })
   }, [ownerAddress])
   return { token }
 }
