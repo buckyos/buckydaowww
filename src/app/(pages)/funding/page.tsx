@@ -5,7 +5,7 @@ import useUserStore from '@hooks/useUserStore'
 import ContractAbout from '@components/funding/ContractAbout'
 import { RightOutlined } from '@ant-design/icons'
 import { wrapUnits } from '@utils/numberConverter'
-import { useCommittee } from '@hooks/index'
+import { useBindWalletAddress, useCommittee } from '@hooks/index'
 
 const InvestmentInfo: React.FC<{ decimals: number }> = ({ decimals }) => {
   return null
@@ -51,7 +51,8 @@ export default function Funding() {
       user: state.user,
     }
   })
-  const { isCommittee, decimals } = useCommittee(user)
+  const { governanceAddress } = useBindWalletAddress()
+  const { isCommittee, decimals } = useCommittee(governanceAddress)
 
   return (
     <main className='w-[1200px] mx-auto my-10'>
@@ -61,7 +62,7 @@ export default function Funding() {
         {isCommittee ? (
           <>
             <div className={cx('break-all mr-2')}>
-              Address {user.address} already in the whitelist.
+              Address {governanceAddress || user.address} already in the whitelist.
             </div>
             <CheckCircleOutlined className={cx('text-[#52C41A]')} />
           </>

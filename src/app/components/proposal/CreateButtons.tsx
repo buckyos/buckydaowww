@@ -2,21 +2,27 @@
 import { useState } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { message } from 'antd'
-import { useCommittee, useUserStore } from '@hooks/index'
+import { useBindWalletAddress, useCommittee, useUserStore } from '@hooks/index'
 import UpgradeContractModal from '@components/modal/UpgradeContractModal'
 import ChangeCommitteeModal from '@components/modal/ChangeCommitteeModal'
 
 const CreateButtons = () => {
   const user = useUserStore()
+  const { governanceAddress, hasActiveWallet } = useBindWalletAddress()
   const [showUpgradeContractModal, setShowUpgradeContractModal] =
     useState(false)
   const [showChangeCommitteeModal, setChangeCommitteeModal] = useState(false)
-  const { isCommittee } = useCommittee(user.user)
+  const { isCommittee } = useCommittee(governanceAddress)
 
   const generateCheck = (fn: any) => {
     return () => {
       if (!user.isLogin()) {
         message.error('error: please login first')
+        return
+      }
+
+      if (!hasActiveWallet) {
+        message.error('Please connect your browser wallet first')
         return
       }
 

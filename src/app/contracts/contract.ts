@@ -57,13 +57,21 @@ export function isBrowserHasWallet(): boolean {
 let readOnlyProvider: ethers.JsonRpcProvider | undefined
 let browserProvider: ethers.BrowserProvider | undefined
 let walletListenersBound = false
+const walletChangeListeners = new Set<() => void>()
 
 function clearWalletDerivedState() {
   browserProvider = undefined
   contractService.clearCachedContracts()
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('committee-type')
-  }
+}
+
+function notifyWalletChangeListeners() {
+  walletChangeListeners.forEach((listener) => {
+    try {
+      listener()
+    } catch (error) {
+      console.warn('wallet change listener failed', error)
+    }
+  })
 }
 
 function bindWalletEvents() {
@@ -78,13 +86,56 @@ function bindWalletEvents() {
 
   injectedProvider.on('accountsChanged', () => {
     clearWalletDerivedState()
+    notifyWalletChangeListeners()
   })
 
   injectedProvider.on('chainChanged', () => {
     clearWalletDerivedState()
+    notifyWalletChangeListeners()
   })
 
   walletListenersBound = true
+}
+
+export function subscribeWalletChanges(listener: () => void) {
+  const injectedProvider = getInjectedProvider()
+  if (!injectedProvider) {
+    return () => {}
+  }
+
+  bindWalletEvents()
+  walletChangeListeners.add(listener)
+
+  return () => {
+    walletChangeListeners.delete(listener)
+  }
+}
+
+export async function getInjectedWalletState() {
+  const injectedProvider = getInjectedProvider()
+  if (!injectedProvider) {
+    return {
+      hasWallet: false,
+      activeAddress: '',
+      chainId: '',
+    }
+  }
+
+  bindWalletEvents()
+
+  const [accounts, chainIdHex] = await Promise.all([
+    injectedProvider.request({ method: 'eth_accounts' }) as Promise<string[]>,
+    injectedProvider.request({ method: 'eth_chainId' }) as Promise<string>,
+  ])
+
+  const activeAddress = accounts?.[0] ? ethers.getAddress(accounts[0]) : ''
+  const chainId = chainIdHex ? BigInt(chainIdHex).toString() : ''
+
+  return {
+    hasWallet: true,
+    activeAddress,
+    chainId,
+  }
 }
 
 export function getReadOnlyProvider() {
@@ -227,6 +278,11 @@ class ContractService {
     return this.ACQUIRED
   }
 
+  public getAddressOfCommittee() {
+    if (!this.COMMITTEE) throw new Error('COMMITTEE is undefined')
+    return this.COMMITTEE
+  }
+
 
   public getNetworkId() {
     if (!this.NETWORK_ID) throw new Error('NETWORK_ID is undefined')
@@ -268,6 +324,11 @@ class ContractService {
   // BDDT
   public getDevTokenContract = this.generateContract(abis, 'DEV_TOKEN', this.DEV_TOKEN)
   public getAcquiredContract = this.generateContract(abis, 'ACQUIRED', this.ACQUIRED)
+
+  public async getReadonlyCommitteeContract() {
+    if (!this.COMMITTEE) throw new Error('COMMITTEE is undefined')
+    return newProviderContract(this.COMMITTEE, [...abis, ...SourceDaoCommittee])
+  }
 }
 
 export const contractService = new ContractService()

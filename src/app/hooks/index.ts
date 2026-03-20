@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
 import { bindAddress, fetchRepositoryList } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
-import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
-import { useCommitteeStore, CommitteeType } from './useCommittee'
+import { CommitteeType } from './useCommittee'
+import { useWalletStore } from './useWallet'
 import {
   // getProvider,
   // getProjectContract,
@@ -18,8 +18,73 @@ import {
   // getAddressOfToken,
   newProviderContract,
   getProvider,
-  contractService
+  contractService,
+  getInjectedWalletState,
+  subscribeWalletChanges,
 } from '@contracts/index'
+
+function ellipsisAddress(address: string) {
+  if (!address) {
+    return ''
+  }
+
+  if (address.length < 15) {
+    return address
+  }
+
+  return `${address.slice(0, 6)}...${address.slice(address.length - 5)}`
+}
+
+function useWalletAddress() {
+  const activeAddress = useWalletStore((state) => state.activeAddress)
+  const chainId = useWalletStore((state) => state.chainId)
+  const hasWallet = useWalletStore((state) => state.hasWallet)
+  const initialized = useWalletStore((state) => state.initialized)
+  const updateWalletState = useWalletStore((state) => state.updateWalletState)
+  const resetWalletState = useWalletStore((state) => state.resetWalletState)
+
+  useEffect(() => {
+    let disposed = false
+
+    const refreshWalletState = async () => {
+      try {
+        const walletState = await getInjectedWalletState()
+        if (disposed) {
+          return
+        }
+
+        updateWalletState({
+          ...walletState,
+          initialized: true,
+        })
+      } catch (error) {
+        console.warn('refresh wallet state failed', error)
+        if (!disposed) {
+          resetWalletState()
+        }
+      }
+    }
+
+    void refreshWalletState()
+    const unsubscribe = subscribeWalletChanges(() => {
+      void refreshWalletState()
+    })
+
+    return () => {
+      disposed = true
+      unsubscribe()
+    }
+  }, [resetWalletState, updateWalletState])
+
+  return {
+    activeAddress,
+    chainId,
+    hasWallet,
+    initialized,
+    hasActiveWallet: !!activeAddress,
+    addressEllipsis: (address = activeAddress) => ellipsisAddress(address),
+  }
+}
 
 function useBindWalletAddress() {
   const { isConnect, user, updateUser, jwt } = useUserStore((state) => ({
@@ -28,6 +93,9 @@ function useBindWalletAddress() {
     updateUser: state.updateUser,
     jwt: state.jwt,
   }))
+  const { activeAddress, hasActiveWallet, hasWallet, initialized, chainId } =
+    useWalletAddress()
+  const updateWalletState = useWalletStore((state) => state.updateWalletState)
 
   const handleConnect = async () => {
     const provider = await getProvider()
@@ -35,7 +103,7 @@ function useBindWalletAddress() {
       return
     }
     const signer = await provider.getSigner()
-    const address = signer.address
+    const address = await signer.getAddress()
     console.log('🍻 address :', address)
     message.success('get user address success')
 
@@ -46,22 +114,39 @@ function useBindWalletAddress() {
       console.log('🍻 refetch userinfo  ')
       updateUser()
     }
+
+    const network = await provider.getNetwork()
+    updateWalletState({
+      activeAddress: address,
+      chainId: network.chainId.toString(),
+      hasWallet: true,
+      initialized: true,
+    })
   }
 
-  // ellipsis
-  const addressEllipsis = () => {
-    const displayed = user.address
-    if (displayed.length < 15) {
-      return displayed
-    }
-    return `${displayed.slice(0, 6)}...${displayed.slice(displayed.length - 5)}`
-  }
+  const boundAddress = user.address
+  const displayAddress = activeAddress || boundAddress
+  const governanceAddress = activeAddress || boundAddress
+  const isAddressMismatch =
+    !!activeAddress &&
+    !!boundAddress &&
+    activeAddress.toLowerCase() !== boundAddress.toLowerCase()
 
   return {
-    isConnect,
+    isConnect: () => hasActiveWallet || isConnect(),
     user,
+    boundAddress,
+    activeAddress,
+    displayAddress,
+    governanceAddress,
+    hasWallet,
+    initialized,
+    chainId,
+    hasActiveWallet,
+    hasBoundAddress: !!boundAddress,
+    isAddressMismatch,
     handleConnect,
-    addressEllipsis,
+    addressEllipsis: (address = displayAddress) => ellipsisAddress(address),
   }
 }
 
@@ -112,36 +197,34 @@ function useLockToken(ownerAddress: string) {
 }
 
 // 是否是委员会成员
-function useCommittee(user: User) {
+function useCommittee(address: string) {
   const { decimals } = useContractStore((state) => ({
-    // getComitteeContract: state.getComitteeContract,
     decimals: state.decimals,
   }))
+  const [state, setState] = useState(CommitteeType.unknown)
 
-  const { update, ensureFetched, state } = useCommitteeStore()
-  // const [_isCommittee, setIsCommittee] = useState<boolean>(false)
   useAsyncEffect(async () => {
-    // console.log('useCommittee user', user)
-    if (!user.address) {
-      // message.error('Please connect wallet first')
-      return
-    }
-    if (ensureFetched()) {
-      // console.log('useCommittee ensureFetched')
+    if (!address) {
+      setState(CommitteeType.unknown)
       return
     }
 
-    const contract = await contractService.getCommitteeContract()
-    // 需要注意,这里是user表的, 可能和钱包地址不一致
-    const isMember = await contract.isMember(user.address)
-    // console.log('isCommitteeMember: ', isMember, user.address)
+    setState(CommitteeType.unknown)
 
-    update(isMember ? CommitteeType.committee : CommitteeType.normal)
-  }, [user])
+    try {
+      const contract = await contractService.getReadonlyCommitteeContract()
+      const isMember = await contract.isMember(address)
+      setState(isMember ? CommitteeType.committee : CommitteeType.normal)
+    } catch (error) {
+      console.warn('useCommittee failed', error)
+      setState(CommitteeType.unknown)
+    }
+  }, [address])
 
   return {
     isCommittee: state === CommitteeType.committee,
     isUnknown: state === CommitteeType.unknown,
+    checkedAddress: address,
     decimals,
   }
 }
@@ -176,9 +259,9 @@ export {
   useLockToken,
   useCommittee,
   useBindWalletAddress,
+  useWalletAddress,
   useUserStore,
   useGetProjectQuery,
-  useCommitteeStore,
   useContractStore,
   getProvider,
   contractProxyContract,

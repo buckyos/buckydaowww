@@ -15,9 +15,16 @@ import UserInfoInput from './UserInfoInput'
 export default function UserInfoPage() {
   const user = useUserStore()
   const contract = useContractStore()
-  const { handleConnect } = useBindWalletAddress()
-  const { token } = useLockToken(user.user.address)
-  const { isCommittee } = useCommittee(user.user)
+  const {
+    handleConnect,
+    boundAddress,
+    activeAddress,
+    governanceAddress,
+    hasActiveWallet,
+    isAddressMismatch,
+  } = useBindWalletAddress()
+  const { token } = useLockToken(governanceAddress)
+  const { isCommittee } = useCommittee(governanceAddress)
 
   return (
     <div className='flex flex-col px-40 mt-20 pb-80'>
@@ -48,16 +55,27 @@ export default function UserInfoPage() {
         </div>
 
         <div>
-          <label className='inline-block w-48 font-bold'>wallet address</label>
-          <span>{user.user.address}</span>
+          <label className='inline-block w-48 font-bold'>bound wallet</label>
+          <span>{boundAddress || '-'}</span>
+        </div>
 
-          {user.user.address && (
+        <div>
+          <label className='inline-block w-48 font-bold'>active wallet</label>
+          <span>{activeAddress || '-'}</span>
+
+          {(boundAddress || hasActiveWallet) && (
             <Button className='ml-10' type='primary' onClick={handleConnect}>
-              Change wallet
+              {hasActiveWallet ? 'Switch wallet' : 'Connect wallet'}
             </Button>
           )}
         </div>
-        {user.user.address && (
+        {isAddressMismatch && (
+          <div>
+            <label className='inline-block w-48 font-bold'>wallet status</label>
+            <Tag color='warning'>Active wallet differs from bound address</Tag>
+          </div>
+        )}
+        {governanceAddress && (
           <>
             <div>
               <label className='inline-block w-48 font-bold'>Total Token</label>

@@ -10,8 +10,7 @@ import { useCommittee, useBindWalletAddress } from '@hooks/index'
 const HeaderUserAvatar = () => {
   const user = useUserStore()
   const userBind = useBindWalletAddress()
-
-  const { isCommittee } = useCommittee(user.user)
+  const { isCommittee } = useCommittee(userBind.governanceAddress)
 
   const items: MenuProps['items'] = [
     {
@@ -70,15 +69,21 @@ const HeaderUserAvatar = () => {
             )}
           </div>
 
-          {userBind.user.address && (
-            <Tooltip title={userBind.user.address}>
+          {userBind.displayAddress && (
+            <Tooltip title={userBind.displayAddress}>
               <div className='text-cyfs-green text-sm'>
                 {userBind.addressEllipsis()}
               </div>
             </Tooltip>
           )}
 
-          {!userBind.user.address && (
+          {userBind.isAddressMismatch && (
+            <div className='text-amber-500 text-xs cursor-default'>
+              Active wallet differs from bound address
+            </div>
+          )}
+
+          {!userBind.hasActiveWallet && (
             <div
               className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-6 px-4 rounded-lg cursor-pointer text-sm'
               onClick={() => {

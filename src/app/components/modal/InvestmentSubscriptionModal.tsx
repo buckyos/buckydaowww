@@ -10,7 +10,7 @@ import {
   // getAddressOfToken,
   contractService
 } from '@contracts/index'
-import { useContractStore, useUserStore } from '@hooks/index'
+import { useBindWalletAddress, useContractStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
 import { formatUnits, parseUnits, toBigInt } from 'ethers'
@@ -65,12 +65,12 @@ const InvestmentSubscriptionModal: React.FC<{
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
   const [maxTokenAmount, setMaxTokenAmount] = useState(0)
-  const { user } = useUserStore()
+  const { activeAddress, hasActiveWallet } = useBindWalletAddress()
 
   const DAO_TOKEN_ADDRESS = contractService.getAddressOfDevToken()
 
   useAsyncEffect(async () => {
-    if (!data || !user.address) {
+    if (!data || !activeAddress) {
       return
     }
     console.log('🍻 cout max token amount data :', data)
@@ -79,16 +79,20 @@ const InvestmentSubscriptionModal: React.FC<{
       toBigInt(data.totalAmount),
       // formatUnits(data.totalAmount, tokenDecimals),
       data,
-      user.address,
+      activeAddress,
     )
     setMaxTokenAmount(maxDaoTokenAmount)
 
     // 获取投资token的symbol
-  }, [data, user])
+  }, [activeAddress, data])
 
   // 认购投资份额
   const onSubscribe = async (values: StoreValue) => {
     console.log('🍻 values :', values)
+    if (!activeAddress || !hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      return
+    }
     setIsSubmitting(true)
     setloadingTx(true)
 
@@ -96,7 +100,7 @@ const InvestmentSubscriptionModal: React.FC<{
       const result = await subscribeInvestmentShare(
         values,
         data!.id.toString(),
-        user.address,
+        activeAddress,
       )
       if (result) {
         message.success('Create Investment success')

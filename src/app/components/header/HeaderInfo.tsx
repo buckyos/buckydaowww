@@ -1,38 +1,43 @@
 'use client'
 import { useState } from 'react'
-import useUserStore from '@hooks/useUserStore'
+import { useBindWalletAddress } from '@hooks/index'
 import HeaderUserAvatar from '../../header/HeaderUserAvatar'
 import { useAsyncEffect } from 'ahooks'
-import { contractService } from '@contracts/index'
+import { abis } from '@contracts/abis'
+import { contractService, newProviderContract } from '@contracts/index'
 import { formatUnits } from 'ethers'
 import { Spin } from 'antd'
 import HeaderTokenInfo from './HeaderTokenInfo'
 
 const HeaderInfo = () => {
-  const user = useUserStore()
+  const { displayAddress } = useBindWalletAddress()
   const [loading, setLoading] = useState<boolean>(false)
   const [devTokenAmount, setDevTokenAmount] = useState<string>('')
   const [normalTokenAmount, setNormalTokenAmount] = useState<string>('')
 
   const reload = async () => {
-    if (user.user.address) {
+    if (displayAddress) {
       setLoading(true)
-      const devToken = await contractService.getDevTokenContract()
-      const normalToken = await contractService.getNormalTokenContract()
+      const devToken = await newProviderContract(contractService.getAddressOfDevToken(), abis)
+      const normalToken = await newProviderContract(contractService.getAddressOfNormalToken(), abis)
       const token = await Promise.all([
-        devToken.balanceOf(user.user.address),
-        normalToken.balanceOf(user.user.address)
+        devToken.balanceOf(displayAddress),
+        normalToken.balanceOf(displayAddress)
       ])
       // console.log('token', token)
       setDevTokenAmount(parseFloat(formatUnits(token[0], 18)).toFixed(2))
       setNormalTokenAmount(parseFloat(formatUnits(token[1], 18)).toFixed(2))
       setLoading(false)
+      return
     }
+
+    setDevTokenAmount('')
+    setNormalTokenAmount('')
   }
 
   useAsyncEffect(async () => {
     await reload()
-  }, [user])
+  }, [displayAddress])
   
   return (
     <>

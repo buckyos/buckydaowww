@@ -114,10 +114,17 @@ interface UserAvatar {
 }
 
 interface WalletStoreDefine {
-  defaultChannelIdentifier: string
-  connectingChannelIdentifier: string
-  isConnecting: () => boolean
-  setConnectingChannel: (channel: string) => void
+  activeAddress: string
+  chainId: string
+  hasWallet: boolean
+  initialized: boolean
+  updateWalletState: (payload: {
+    activeAddress?: string
+    chainId?: string
+    hasWallet?: boolean
+    initialized?: boolean
+  }) => void
+  resetWalletState: () => void
 }
 
 type UserLoginData = User

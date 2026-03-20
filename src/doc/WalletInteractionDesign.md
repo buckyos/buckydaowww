@@ -11,6 +11,38 @@
 
 ---
 
+## 2026-03-20 当前状态更新
+
+本轮已经完成第一阶段重构，当前前端状态与本文档前半部分的“原始问题描述”相比有以下变化：
+
+1. 只读 provider 与 signer 已分层
+   - 只读调用默认走 `ethers.JsonRpcProvider`
+   - 发交易和签名仍走 `ethers.BrowserProvider(window.ethereum)`
+
+2. 浏览器钱包状态已独立表达
+   - `activeAddress`
+   - `chainId`
+   - `hasWallet`
+   - `initialized`
+
+3. `committee` 身份不再跨地址持久化
+   - 不再使用全局 `committee-type`
+   - 当前实现改为按地址实时查询 `committee.isMember(...)`
+
+4. 页面层已开始区分两类地址
+   - 后端绑定地址 `boundAddress`
+   - 浏览器当前活动地址 `activeAddress`
+
+5. 交易型入口已开始收紧到当前活动钱包
+   - `CreateButtons`
+   - `ExecuteProposalButton`
+   - `WhitelistInvestmentModal`
+   - `InvestmentSubscriptionModal`
+
+因此，本文档下面的“当前实现概览”和“当前设计的主要问题”部分，既包含历史基线，也包含仍然值得继续优化的剩余问题。
+
+---
+
 ## 当前实现概览
 
 当前前端**没有使用 MetaMask SDK**，而是直接依赖浏览器钱包插件注入的 `window.ethereum`。

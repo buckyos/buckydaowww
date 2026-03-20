@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button, message, Tooltip } from 'antd'
-import { useCommittee } from '@hooks/index'
+import { useBindWalletAddress, useCommittee } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
 import _ from 'lodash'
 import {
@@ -27,14 +27,22 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   disabled,
 }) => {
   const user = useUserStore()
+  const { governanceAddress, hasActiveWallet } = useBindWalletAddress()
   // const contract = useContractStore()
-  const { isCommittee } = useCommittee(user.user)
+  const { isCommittee } = useCommittee(governanceAddress)
   const [loading, setLoading] = useState(false)
 
   const executeProposal = async () => {
     setLoading(true)
+    if (!hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      setLoading(false)
+      return
+    }
+
     if (!isCommittee) {
       message.error('You are not a committee member')
+      setLoading(false)
       return
     }
 

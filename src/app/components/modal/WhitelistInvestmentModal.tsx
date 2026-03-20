@@ -15,7 +15,7 @@ import {
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { createWhitelistInvestment } from '@contracts/index'
-import { useContractStore, useUserStore } from '@hooks/index'
+import { useBindWalletAddress, useContractStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 
 // 禁止选择今天之前的日期
@@ -33,16 +33,20 @@ const WhitelistInvestmentModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
-  const user = useUserStore()
+  const { activeAddress, hasActiveWallet } = useBindWalletAddress()
 
   // 创建白名单投资
   const onCreateInvestment = async (values: StoreValue) => {
     console.log('🍻 values :', values)
+    if (!activeAddress || !hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      return
+    }
     setIsSubmitting(true)
     setloadingTx(true)
 
     try {
-      const result = await createWhitelistInvestment(values, user.user.address)
+      const result = await createWhitelistInvestment(values, activeAddress)
       if (result) {
         message.success('Create Investment success')
         setShowModal(false)

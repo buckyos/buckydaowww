@@ -71,7 +71,7 @@
 
 ### P0-02 钱包检测与 provider 设计不符合当前目标
 
-**状态**：部分完成
+**状态**：已完成
 
 **位置**
 
@@ -196,7 +196,7 @@
 
 ### P1-01 committee 身份缓存会跨用户污染
 
-**状态**：待处理
+**状态**：已完成
 
 **位置**
 
@@ -440,6 +440,44 @@
   - `npm run build`
   - 当前 build 通过，仅剩一个既有的 `no-img-element` warning
 - 当前状态：
+  - `P0-04` 已完成
+
+### 2026-03-20 P0-02 / P1-01 钱包与地址状态拆分
+
+- 处理项：`P0-02`, `P1-01`
+- 改动文件：
+  - `app/contracts/contract.ts`
+  - `app/hooks/index.ts`
+  - `app/hooks/useCommittee.ts`
+  - `app/hooks/useWallet.ts`
+  - `app/hooks/useUserStore.ts`
+  - `app/components/header/HeaderInfo.tsx`
+  - `app/components/header/ConnectWalletButton.tsx`
+  - `app/header/HeaderUserAvatar.tsx`
+  - `app/components/proposal/CreateButtons.tsx`
+  - `app/components/ExecuteProposalButton.tsx`
+  - `app/components/modal/InvestmentSubscriptionModal.tsx`
+  - `app/components/modal/WhitelistInvestmentModal.tsx`
+  - `app/(pages)/funding/page.tsx`
+  - `app/(pages)/invest/page.tsx`
+  - `app/(pages)/user/info/page.tsx`
+  - `types/interface.d.ts`
+- 修改内容：
+  - 浏览器钱包状态独立为非持久化的 `activeAddress / chainId / hasWallet / initialized`
+  - 新增钱包事件订阅和 `eth_accounts / eth_chainId` 同步逻辑
+  - `committee` 身份改为按当前地址实时查询，不再跨地址持久化 `committee-type`
+  - 只读 `committee.isMember(...)` 改为走 readonly provider
+  - UI 明确区分 `bound wallet` 和 `active wallet`
+  - 交易入口和 committee-only 入口要求存在当前活动钱包
+  - `HeaderInfo` 的 token 读取改为走 readonly provider，并按 `activeAddress || boundAddress` 展示
+- 是否影响用户行为：是
+- 是否与链上合约语义对齐：是，且降低了绑定地址与当前 signer 混用的风险
+- 验证方式：
+  - `npm run build`
+- 当前状态：
+  - `P0-02` 已完成
+  - `P1-01` 已完成
+  - 当前仍保留一个既有 warning：`user/info/page.tsx` 使用 `<img>`
   - `P0-02` 部分完成，仍缺更完善的切链错误处理和 OKX 实机验证
   - `P0-03` 部分完成，committee 身份和用户状态尚未完全跟随钱包事件刷新
 

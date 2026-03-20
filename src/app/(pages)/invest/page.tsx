@@ -8,7 +8,7 @@ import { useAsyncEffect } from 'ahooks'
 import dayjs from 'dayjs'
 import WhitelistInvestmentModal from '@components/modal/WhitelistInvestmentModal'
 import { getTwoStepInvestment } from '@services/index'
-import { useCommittee, useUserStore } from '@hooks/index'
+import { useBindWalletAddress, useCommittee, useUserStore } from '@hooks/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
 import { contractService } from '@contracts/index'
@@ -133,7 +133,8 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
 // main page
 export default function InvestmentPage() {
   const user = useUserStore()
-  const { isCommittee, isUnknown } = useCommittee(user.user)
+  const { governanceAddress } = useBindWalletAddress()
+  const { isCommittee, isUnknown } = useCommittee(governanceAddress)
   const [showModal, setShowModal] = useState(false)
   const [data, setData] = useState<TwoStepInvestmentData[]>([])
   const [loading, setLoading] = useState(false)

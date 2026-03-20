@@ -1,14 +1,24 @@
-import _ from 'lodash'
 import { create } from 'zustand'
 
 export const useWalletStore = create<WalletStoreDefine>((set, get) => ({
-  defaultChannelIdentifier: '',
-  connectingChannelIdentifier: '',
-  isConnecting: () => {
-    const sound = get().connectingChannelIdentifier
-    return sound !== ''
+  activeAddress: '',
+  chainId: '',
+  hasWallet: false,
+  initialized: false,
+  updateWalletState(payload) {
+    set({
+      activeAddress: payload.activeAddress ?? get().activeAddress,
+      chainId: payload.chainId ?? get().chainId,
+      hasWallet: payload.hasWallet ?? get().hasWallet,
+      initialized: payload.initialized ?? get().initialized,
+    })
   },
-  setConnectingChannel(channel) {
-    set({ connectingChannelIdentifier: channel })
+  resetWalletState() {
+    set({
+      activeAddress: '',
+      chainId: '',
+      hasWallet: false,
+      initialized: true,
+    })
   },
 }))
