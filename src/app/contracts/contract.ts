@@ -3,64 +3,157 @@ import { message } from 'antd'
 import { abis, ISourceProject, ProjectManagement, SourceDaoCommittee } from '@contracts/abis'
 
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL
 
 /**
  * 检查浏览器是否安装了以太坊钱包插件
  * @returns {boolean} 如果安装了钱包插件返回true，否则返回false
  */
+function getInjectedProvider() {
+  if (typeof window === 'undefined') {
+    return undefined
+  }
+
+  const injectedProvider = window.ethereum
+  if (!injectedProvider || typeof injectedProvider.request !== 'function') {
+    return undefined
+  }
+
+  return injectedProvider
+}
+
+function getExpectedNetworkId() {
+  return NETWORK_ID || '10'
+}
+
+function getExpectedChainIdHex() {
+  return `0x${Number(getExpectedNetworkId()).toString(16)}`
+}
+
+function getDefaultRpcUrl(networkId: string) {
+  switch (networkId) {
+    case '10':
+      return 'https://mainnet.optimism.io'
+    case '11155420':
+      return 'https://sepolia.optimism.io'
+    case '1':
+      return 'https://ethereum.publicnode.com'
+    case '5':
+      return 'https://ethereum-goerli.publicnode.com'
+    default:
+      return ''
+  }
+}
+
 export function isBrowserHasWallet(): boolean {
   try {
-    // 检查window.ethereum是否存在
-    const hasEthereum = typeof window !== 'undefined' && !!window.ethereum;
-
-    // 检查是否支持基本的以太坊方法
-    const hasBasicEthereumMethods = hasEthereum &&
-      typeof window.ethereum.request === 'function' &&
-      typeof window.ethereum.isMetaMask !== 'undefined';
-
-    return hasBasicEthereumMethods;
+    return !!getInjectedProvider()
   } catch (error) {
     console.warn('检查钱包插件时发生错误:', error);
     return false;
   }
 }
 
+let readOnlyProvider: ethers.JsonRpcProvider | undefined
+let browserProvider: ethers.BrowserProvider | undefined
+let walletListenersBound = false
+
+function clearWalletDerivedState() {
+  browserProvider = undefined
+  contractService.clearCachedContracts()
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('committee-type')
+  }
+}
+
+function bindWalletEvents() {
+  if (walletListenersBound) {
+    return
+  }
+
+  const injectedProvider = getInjectedProvider()
+  if (!injectedProvider || typeof injectedProvider.on !== 'function') {
+    return
+  }
+
+  injectedProvider.on('accountsChanged', () => {
+    clearWalletDerivedState()
+  })
+
+  injectedProvider.on('chainChanged', () => {
+    clearWalletDerivedState()
+  })
+
+  walletListenersBound = true
+}
+
+export function getReadOnlyProvider() {
+  if (!readOnlyProvider) {
+    const rpcUrl = RPC_URL || getDefaultRpcUrl(getExpectedNetworkId())
+    if (!rpcUrl) {
+      throw new Error('Readonly RPC URL is not configured')
+    }
+
+    readOnlyProvider = new ethers.JsonRpcProvider(
+      rpcUrl,
+      Number(getExpectedNetworkId()),
+    )
+  }
+
+  return readOnlyProvider
+}
+
 export async function getProvider() {
-  if (!isBrowserHasWallet()) {
-    message.info('The current browser does not install MetaMask , so the contract function cannot be used')
-    console.log('MetaMask not installed; using read-only defaults')
-    // throw new Error('MetaMask not installed')
+  const injectedProvider = getInjectedProvider()
+  if (!injectedProvider) {
+    message.info('No compatible browser wallet was detected')
     return false
   }
 
-  const provider = new ethers.BrowserProvider(window.ethereum)
-  await checkEthNetworkId(provider)
-  return provider
+  bindWalletEvents()
+
+  if (!browserProvider) {
+    browserProvider = new ethers.BrowserProvider(injectedProvider)
+  }
+
+  browserProvider = await checkEthNetworkId(browserProvider, injectedProvider)
+  return browserProvider
 }
 
-async function checkEthNetworkId(ethProvider: ethers.BrowserProvider) {
+async function checkEthNetworkId(
+  ethProvider: ethers.BrowserProvider,
+  injectedProvider: any,
+) {
   if (!ethProvider) return
 
   const chainId = await ethProvider
     .getNetwork()
     .then((network) => network.chainId.toString())
 
-  const networkId = NETWORK_ID || '196'
-  let hexString = Number(networkId).toString(16)
-  let hexStringWithPrefix = '0x' + hexString
+  const networkId = getExpectedNetworkId()
+  const hexStringWithPrefix = getExpectedChainIdHex()
   console.log('current network chainId', chainId, networkId, hexStringWithPrefix)
   if (chainId !== networkId) {
-    message.info('current network is not correct, switch to correct network...')
-    const result = await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: hexStringWithPrefix }],
-    })
-    console.log('wallet_switchEthereumChain result', result)
-    message.info('network switched, window reloading...')
-    setTimeout(() => {
-      window.location.reload()
-    }, 1500)
+    message.info('Current network is not correct, attempting to switch...')
+    try {
+      const result = await injectedProvider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: hexStringWithPrefix }],
+      })
+      console.log('wallet_switchEthereumChain result', result)
+      clearWalletDerivedState()
+      return new ethers.BrowserProvider(injectedProvider)
+    } catch (error: any) {
+      if (error?.code === 4902) {
+        message.error('The configured chain is not added in the wallet')
+      } else {
+        message.error('Please switch to the configured network in your wallet')
+      }
+      throw error
+    }
   }
+
+  return ethProvider
 }
 
 export async function newSignerContract(contractAddress: string, abi: Interface | InterfaceAbi,) {
@@ -74,10 +167,7 @@ export async function newSignerContract(contractAddress: string, abi: Interface 
 }
 
 export async function newProviderContract(contractAddress: string, abi: Interface | InterfaceAbi,) {
-  let provider = await getProvider()
-  if (!provider) {
-    throw new Error("newProviderContract failed")
-  }
+  const provider = getReadOnlyProvider()
   const contract = new ethers.Contract(contractAddress, abi, provider)
   return contract
 }
@@ -143,6 +233,10 @@ class ContractService {
     return this.NETWORK_ID
   }
 
+  public clearCachedContracts() {
+    this.Contracts = {}
+  }
+
   private generateContract(abi: any, key?: string, address?: string) {
     if (address === undefined) throw new Error('address is undefined')
     if (key === undefined) throw new Error('key is undefined')
@@ -182,4 +276,3 @@ export const contractService = new ContractService()
 
 
 // // Export individual functions for backward compatibility if needed, or remove them if not.
-

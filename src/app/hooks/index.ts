@@ -86,14 +86,16 @@ function useLockToken(ownerAddress: string) {
     }
     const contract = await newProviderContract(lockupAddress, abis)
     console.log('🍻 ownerAddress :', ownerAddress)
-    const [totalAssigned, totalClaimed] = await Promise.all([
+    const [totalAssignedRaw, totalClaimedRaw] = await Promise.all([
       contract.totalAssigned(ownerAddress),
       contract.totalClaimed(ownerAddress),
     ])
+    const totalAssigned = BigInt(totalAssignedRaw.toString())
+    const totalClaimed = BigInt(totalClaimedRaw.toString())
 
     const tokenContract =  await newProviderContract(contractService.getAddressOfDevToken(), abis)
-    const tokenBalance = await tokenContract.balanceOf(ownerAddress)
-    const locked = totalAssigned > totalClaimed
+    const tokenBalance = BigInt((await tokenContract.balanceOf(ownerAddress)).toString())
+    const locked: bigint = totalAssigned > totalClaimed
       ? totalAssigned - totalClaimed
       : 0n
     console.log('🍻 tokenContract token balanceOf :', tokenBalance)

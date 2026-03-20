@@ -134,7 +134,7 @@
 
 ### P0-04 Upgrade proposal 流程已落后于当前合约语义
 
-**状态**：待处理
+**状态**：部分完成
 
 **位置**
 
@@ -167,7 +167,7 @@
 
 ### P0-05 部分前端调用与当前合约 ABI / 方法名不一致
 
-**状态**：待处理
+**状态**：部分完成
 
 **位置**
 
@@ -419,6 +419,29 @@
 - 是否与链上合约语义对齐：是，已对齐当前 `calldataHash` 治理模型
 - 验证方式：静态代码核对；当前前端目录缺少 `node_modules`，尚未执行 build / lint
 - 当前状态：已完成
+
+### 2026-03-20 P0-02 / P0-03 第一轮钱包层重构
+
+- 处理项：`P0-02`, `P0-03`
+- 改动文件：
+  - `package.json`
+  - `app/contracts/contract.ts`
+  - `app/header/Fetcher.tsx`
+- 修改内容：
+  - 移除了未实际使用的 `@metamask/sdk` 和 `@metamask/detect-provider`
+  - 钱包检测改为通用 EIP-1193 注入检查，不再依赖 `window.ethereum.isMetaMask`
+  - 增加只读 `JsonRpcProvider`，`newProviderContract(...)` 不再依赖浏览器钱包
+  - signer contract cache 增加 `accountsChanged / chainChanged` 驱动的失效逻辑
+  - header 初始化 token 信息改为默认走只读链路
+- 是否影响用户行为：是
+- 是否与链上合约语义对齐：是
+- 验证方式：
+  - `npm i`
+  - `npm run build`
+  - 当前 build 通过，仅剩一个既有的 `no-img-element` warning
+- 当前状态：
+  - `P0-02` 部分完成，仍缺更完善的切链错误处理和 OKX 实机验证
+  - `P0-03` 部分完成，committee 身份和用户状态尚未完全跟随钱包事件刷新
 
 ---
 
