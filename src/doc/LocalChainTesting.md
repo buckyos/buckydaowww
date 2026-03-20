@@ -54,6 +54,26 @@ bash -lc 'source "$HOME/.nvm/nvm.sh" && npm run node:local'
 bash -lc 'source "$HOME/.nvm/nvm.sh" && npm run deploy:frontend-local'
 ```
 
+如果希望部署完成后自动把前端 `.env.local` 写到默认位置
+`/home/bucky/work/buckydaowww/src/.env.local`，可以直接使用：
+
+```bash
+bash -lc 'source "$HOME/.nvm/nvm.sh" && npm run deploy:frontend-local:write'
+```
+
+也支持显式控制输出路径：
+
+```bash
+bash -lc 'source "$HOME/.nvm/nvm.sh" && FRONTEND_ENV_OUTPUT=../buckydaowww/src/.env.local npm run deploy:frontend-local'
+```
+
+说明：
+
+- `hardhat run` 本身不会透传自定义 CLI 参数，所以不推荐直接在 `hardhat run ... -- ...` 后面拼自定义 flag。
+- 当前推荐的控制方式是：
+  - 默认写入：`npm run deploy:frontend-local:write`
+  - 自定义路径：`FRONTEND_ENV_OUTPUT=... npm run deploy:frontend-local`
+
 脚本会部署一套最小 SourceDAO 组件：
 
 - `SourceDao`
@@ -67,6 +87,22 @@ bash -lc 'source "$HOME/.nvm/nvm.sh" && npm run deploy:frontend-local'
 
 并输出一段可直接复制到前端 `.env.local` 的配置。
 
+同时会预置一组便于手工联调的链上状态：
+
+- `deployer / committee member 1`
+- `committee member 2`
+- `committee member 3`
+- `viewer / token holder`
+- `viewer` 预置 `BDT` 余额
+- `viewer` 预置一条未解锁的 `lockup`
+- `viewer` 预置一笔来自已完成项目的 `DevToken` 奖励
+
+这样前端一启动，就可以直接看到：
+
+- Header 的 `DevToken / BDT` 余额
+- `/user/info` 的 `Assigned / Claimed / Remaining Locked`
+- committee 身份在不同钱包之间切换
+
 脚本文件位置：
 
 - [deploy_frontend_local.ts](/home/bucky/work/SourceDAO/scripts/deploy_frontend_local.ts)
@@ -75,7 +111,7 @@ bash -lc 'source "$HOME/.nvm/nvm.sh" && npm run deploy:frontend-local'
 
 ## 3. 配置前端 `.env.local`
 
-在 `buckydaowww/src` 目录新建 `.env.local`，把上一步输出的内容复制进去。
+如果你没有使用自动写入模式，就需要在 `buckydaowww/src` 目录手动新建 `.env.local`，把上一步输出的内容复制进去。
 
 最小需要这些字段：
 
@@ -157,6 +193,7 @@ npm run build
    - 地址显示应更新
    - committee 身份应重新计算
    - token 余额应重新读取
+   - `viewer` 应显示预置的 `DevToken / BDT / lockup`
 
 ### B. Committee 身份和权限 UI
 
@@ -174,6 +211,12 @@ npm run build
 3. committee-only 入口应随地址切换而变化
 4. 未连接钱包时，不应继续假装拥有 committee 权限
 
+推荐测试账户切换顺序：
+
+1. `deployer / committee member 1`
+2. `committee member 2`
+3. `viewer / token holder`
+
 ### C. 只读链上数据
 
 重点页面：
@@ -186,6 +229,11 @@ npm run build
 1. 不发交易时，页面应通过 readonly RPC 正常读取数据
 2. Header token balance 应按当前显示地址刷新
 3. `Assigned / Claimed / Remaining Locked` 应能正常读取
+4. `viewer` 账户下建议确认：
+   - `DevToken` 有项目奖励余额
+   - `BDT` 有普通余额
+   - `Assigned Lockup > 0`
+   - `Claimed Lockup = 0`
 
 ### D. 交易入口
 
@@ -229,3 +277,15 @@ npm run build
 - GitHub 登录
 - wallet bind
 - 完整 proposal 创建 / 投票 / 执行
+
+---
+
+## 9. 推荐的本轮手工 smoke 路径
+
+如果只想先快速确认“链交互层”是否正常，建议按下面顺序点击：
+
+1. 用 `viewer / token holder` 打开首页，确认 Header 余额出现
+2. 进入 `/user/info`，确认 `active wallet`、`DevToken`、`Assigned Lockup`
+3. 切到 `committee member 1`，确认 Header 出现 `committee`
+4. 再切回 `viewer`，确认 `committee` 标记消失
+5. 打开带交易入口的页面，确认未连接或错误身份时的拦截提示符合预期
