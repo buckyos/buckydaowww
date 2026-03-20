@@ -52,6 +52,24 @@
 - `31337 / Hardhat Local`：允许跳过 GitHub 登录，直接测钱包和链
 - 其他网络：仍然按原本的登录流程，需要 GitHub 登录 + 后端用户态
 
+后续“连接钱包”和“签名绑定”拆分的详细交互方案见：
+
+- [WalletConnectBindSeparationProposal.md](./WalletConnectBindSeparationProposal.md)
+
+目标是让本地链模式真正只需要：
+
+- 连接钱包
+- 切换地址
+- 发链上交易
+
+而不再被绑定签名流程打断。
+
+当前实现已经完成第一版拆分：
+
+- `Connect Wallet` 只连接浏览器钱包
+- 本地链模式下不要求 `Bind Wallet`
+- 用户页会明确提示 `Local test mode skips wallet binding`
+
 ---
 
 ## 1. 启动本地 Hardhat 节点

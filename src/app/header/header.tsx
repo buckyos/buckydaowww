@@ -8,13 +8,16 @@ export default function Header() {
   return (
     <header className='max-w-[90%] mx-auto h-24 flex'>
       <div className='w-full flex items-center gap-10'>
-        <Link className='flex-center gap-2 no-underline text-black' href='/'>
+        <Link className='flex-center gap-2 no-underline text-black shrink-0' href='/'>
           <Image src={images.iconDan} width={36} height={36} alt='' />
           <div className='text-xl'>BuckyDAO</div>
         </Link>
-        <Nav />
-        <div className='flex-1'></div>
-        <HeaderRight />
+        <div className='flex-1 min-w-0 relative z-10'>
+          <Nav />
+        </div>
+        <div className='shrink-0 relative z-20'>
+          <HeaderRight />
+        </div>
       </div>
     </header>
   )

@@ -304,6 +304,49 @@
 
 ---
 
+### P1-04 连接钱包与绑定钱包的交互边界仍然耦合
+
+**状态**：已完成
+
+**位置**
+
+- `app/hooks/index.ts`
+- `app/components/header/ConnectWalletButton.tsx`
+- `app/(pages)/user/info/page.tsx`
+
+**问题**
+
+原先 `Connect Wallet` 直接走：
+
+1. 连接浏览器钱包
+2. `signMessage(jwt)`
+3. 调 `/api/user/bind`
+
+这会导致：
+
+- 用户第一次 connect 就被要求签名
+- “钱包连接”和“账号绑定”边界不清晰
+- 本地链联调虽然已经允许跳过 GitHub 登录，但仍容易被绑定流程影响
+
+**建议**
+
+1. `Connect Wallet` 只负责连接钱包
+2. `Bind Wallet` 作为用户页中的独立显式动作
+3. Header 只显示活动钱包和轻量状态，不承担主绑定入口
+4. `31337` 本地链模式下允许完全跳过绑定流程
+
+详细方案见：
+
+- [WalletConnectBindSeparationProposal.md](./WalletConnectBindSeparationProposal.md)
+
+当前状态：
+
+- `Connect Wallet` 与 `Bind Wallet` 已拆分
+- 用户页已增加独立 bind/rebind 入口
+- 本地链模式下未绑定地址不再阻塞链交互
+
+---
+
 ### P2-01 环境配置和部署配置组织较弱
 
 **状态**：待处理
@@ -507,6 +550,26 @@
   - 当前仍保留一个既有 warning：`user/info/page.tsx` 使用 `<img>`
   - `P0-02` 部分完成，仍缺更完善的切链错误处理和 OKX 实机验证
   - `P0-03` 部分完成，committee 身份和用户状态尚未完全跟随钱包事件刷新
+
+### 2026-03-20 P1-04 连接与绑定动作拆分
+
+- 处理项：`P1-04`
+- 改动文件：
+  - `app/hooks/index.ts`
+  - `app/components/header/ConnectWalletButton.tsx`
+  - `app/header/HeaderUserAvatar.tsx`
+  - `app/(pages)/user/info/page.tsx`
+- 修改内容：
+  - `handleConnect()` 拆为 `handleConnectWallet()` 和 `handleBindWallet()`
+  - `Connect Wallet` 不再触发签名绑定
+  - 用户页新增独立的 `Bind wallet / Rebind wallet` 入口
+  - 本地链模式下为未绑定钱包增加明确的跳过绑定提示
+  - 用户页无 GitHub 资料时增加基础占位显示，避免本地链空白状态
+- 是否影响用户行为：是
+- 是否与链上合约语义对齐：是，这次主要收的是前端登录态与钱包会话边界
+- 验证方式：
+  - `npm run build`
+- 当前状态：已完成
 
 ---
 

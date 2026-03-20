@@ -48,6 +48,11 @@
    - Header 直接进入钱包/链交互模式
    - 目的仅是支持本地 `Hardhat Local` 联调
 
+8. “连接钱包”和“签名绑定”已完成第一版拆分
+   - `Connect Wallet` 只建立钱包会话
+   - `Bind Wallet` 改为用户页中的显式动作
+   - 详细方案见 [WalletConnectBindSeparationProposal.md](./WalletConnectBindSeparationProposal.md)
+
 因此，本文档下面的“当前实现概览”和“当前设计的主要问题”部分，既包含历史基线，也包含仍然值得继续优化的剩余问题。
 
 ---
@@ -242,22 +247,30 @@
 - `app/hooks/useUserStore.ts`
 - `app/services/index.ts`
 
-当前钱包绑定流程是：
+当前钱包绑定流程已经拆成两步：
 
-1. 用户登录后拿到后端发的 `jwt`
-2. 前端在 `useBindWalletAddress().handleConnect()` 中调用：
-   - `getProvider()`
-   - `provider.getSigner()`
-   - `signer.address`
+1. `handleConnectWallet()`
+   - 获取 provider
+   - 获取 signer
+   - 获取 `activeAddress`
+   - 更新前端钱包会话状态
+2. `handleBindWallet()`
+   - 仅在已登录且需要绑定时触发
    - `signer.signMessage(jwt)`
-3. 将签名发到 `/api/user/bind`
-4. 调 `updateUser()`，刷新后端保存的用户信息
+   - 调 `/api/user/bind`
+   - `updateUser()` 刷新后端保存的用户信息
 
 也就是说：
 
 - 用户身份主键仍然在后端登录体系
-- 钱包地址是被“绑定”到用户资料上
-- 当前签名消息就是原始 `jwt`
+- 钱包地址仍然是被“绑定”到用户资料上
+- 当前签名消息仍然是原始 `jwt`
+- 但“连接钱包”和“绑定钱包”已经不再由同一个按钮同时触发
+
+本地链模式下：
+
+- 允许只连接钱包
+- 不要求执行绑定流程
 
 ---
 
@@ -376,7 +389,7 @@ Header 启动时会：
 
 ---
 
-### D. 用户身份和钱包地址是“绑定关系”，但前端状态管理没有体现这个边界
+### D. 用户身份和钱包地址是“绑定关系”，前端虽然已开始分层，但仍有剩余清理空间
 
 现在前端容易把两件事混淆：
 
@@ -389,7 +402,13 @@ Header 启动时会：
 - 用户绑定过一个地址后又在钱包里切到了另一个地址
 - 后端 `user.address` 和当前 `signer.address` 不一致
 
-当前状态流对这些分叉没有单独表达。
+第一版拆分后，Header 和用户页已经开始区分：
+
+- `boundAddress`
+- `activeAddress`
+- mismatch 状态
+
+但仍有一些页面继续把两类地址混合作为展示地址或治理地址，这部分还需要后续继续收口。
 
 ---
 

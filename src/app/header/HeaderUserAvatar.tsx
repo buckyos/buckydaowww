@@ -95,9 +95,7 @@ const HeaderUserAvatar = () => {
             <div
               className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-6 px-4 rounded-lg cursor-pointer text-sm'
               onClick={() => {
-                // setShowModal(true)
-                // 先不用弹窗
-                userBind.handleConnect()
+                userBind.handleConnectWallet()
               }}
             >
               <span className='ml-1'>Connect</span>
