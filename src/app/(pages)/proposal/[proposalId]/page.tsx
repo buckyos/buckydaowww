@@ -6,13 +6,21 @@ import {
   fetchProposalId,
   fetchMembers,
 } from '@services/index'
-import { message, Tag } from 'antd'
+import { Alert, message, Tag } from 'antd'
 import { CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ProposalExtraContent from '@components/ProposalExtraContent'
 import ProposalHeaderContent from './ProposalHeaderContent'
-import { extractUpgradeCalldataFromExtra } from '@utils/index'
+import {
+  extractUpgradeCalldataFromExtra,
+  getProposalSyncState,
+  hasTrustedProposalMetadata,
+  getProposalMissingMetadataMessage,
+  getProposalMetadataConflictMessage,
+  isProposalMetadataMissing,
+  isProposalMetadataConflict,
+} from '@utils/index'
 
 dayjs.extend(relativeTime)
 
@@ -46,11 +54,38 @@ export default function ProposalDetailPage() {
   const { content: proposalExtraContent } = extractUpgradeCalldataFromExtra(
     proposal.extra || '',
   )
+  const syncState = getProposalSyncState(proposal)
+  const trustedMetadata = hasTrustedProposalMetadata(proposal)
+  const metadataMissing = isProposalMetadataMissing(proposal)
+  const metadataConflict = isProposalMetadataConflict(proposal)
+  const displayTitle = proposal.title?.trim()
+    || (metadataMissing
+      ? `Proposal #${proposal.id} (Chain Only)`
+      : metadataConflict
+        ? `Proposal #${proposal.id} (Metadata Conflict)`
+        : `Proposal #${proposal.id}`)
 
   return (
     <>
       <div className='w-[1000px] mx-auto'>
-        <h2 className='text-4xl font-medium'>{proposal.title}</h2>
+        <h2 className='text-4xl font-medium'>{displayTitle}</h2>
+        {(metadataMissing || metadataConflict) && (
+          <Alert
+            className='mt-6'
+            type={metadataConflict ? 'error' : 'warning'}
+            showIcon
+            message={
+              metadataConflict
+                ? 'Proposal metadata conflict'
+                : 'Proposal metadata missing'
+            }
+            description={
+              metadataConflict
+                ? getProposalMetadataConflictMessage()
+                : getProposalMissingMetadataMessage()
+            }
+          />
+        )}
         <ProposalHeaderContent
           proposal={proposal}
           members={members}
@@ -64,23 +99,28 @@ export default function ProposalDetailPage() {
           <div className='flex relative'>
             <label className='font-bold w-28'>params:</label>
             <div className='text-cyfs-gray'>
-              {/* 防止params为空或undefined导致页面报错 */}
-              {Array.isArray(proposal.params) ? 
+              {trustedMetadata && Array.isArray(proposal.params) ? 
                 proposal.params.map((item, index) => (
                   <div key={index}>{JSON.stringify(item, null, 2)}</div>
-                )) : 
-                <Tag color='red'>Empty params</Tag>
+                )) : syncState === 'chain_only' ? (
+                  <Tag color='orange'>Chain-only proposal</Tag>
+                ) : syncState === 'conflict' ? (
+                  <Tag color='red'>Conflicting metadata</Tag>
+                ) : (
+                  <Tag color='red'>Empty params</Tag>
+                )
               }
             </div>
-            <CopyOutlined
-              className='absolute right-2 top-2 cursor-pointer hover:text-blue-500'
-              onClick={() => {
-                // 复制params到剪贴板
-                navigator.clipboard.writeText(JSON.stringify(proposal.params, null, 2))
-                  .then(() => message.success('Params Copied to clipboard'))
-                  .catch(() => message.error('Failed to copy'))
-              }}
-            />
+            {trustedMetadata && Array.isArray(proposal.params) && (
+              <CopyOutlined
+                className='absolute right-2 top-2 cursor-pointer hover:text-blue-500'
+                onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(proposal.params, null, 2))
+                    .then(() => message.success('Params Copied to clipboard'))
+                    .catch(() => message.error('Failed to copy'))
+                }}
+              />
+            )}
           </div>
           <div className='flex'>
             <label className='font-bold w-28'>paramroot:</label>

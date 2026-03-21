@@ -83,8 +83,39 @@ enum proposalTypeMap {
   unknown = '',
 }
 
+const getProposalSyncState = (
+  proposal: ProposalResponseData,
+): ProposalSyncState => {
+  return proposal.syncState ?? 'legacy'
+}
+
+const isProposalMetadataMissing = (proposal: ProposalResponseData) => {
+  return getProposalSyncState(proposal) === 'chain_only'
+}
+
+const isProposalMetadataConflict = (proposal: ProposalResponseData) => {
+  return getProposalSyncState(proposal) === 'conflict'
+}
+
+const getProposalMissingMetadataMessage = () => {
+  return 'This proposal exists on chain, but backend metadata has not been submitted or accepted yet.'
+}
+
+const getProposalMetadataConflictMessage = () => {
+  return 'Backend received proposal metadata that does not match the on-chain creator. Only chain data is trusted right now.'
+}
+
+const hasTrustedProposalMetadata = (proposal: ProposalResponseData) => {
+  const syncState = getProposalSyncState(proposal)
+  return syncState === 'legacy' || syncState === 'ready'
+}
+
 // 获取提案类型
 const getProposalType = (proposal: ProposalResponseData) => {
+  if (!hasTrustedProposalMetadata(proposal)) {
+    return proposalTypeMap.unknown
+  }
+
   const proposalType = decodeIfEncoded(_.last(proposal.params))
   if (proposalType === 'releaseTokens') {
     return proposalTypeMap.releaseTokens
@@ -209,6 +240,12 @@ export {
   proposalTypeMap,
   checkProposalVote,
   getProposalType,
+  getProposalSyncState,
+  isProposalMetadataMissing,
+  isProposalMetadataConflict,
+  getProposalMissingMetadataMessage,
+  getProposalMetadataConflictMessage,
+  hasTrustedProposalMetadata,
   proposalExpiredTimeDisplay,
   zeroPadLeft,
   extractMessage,

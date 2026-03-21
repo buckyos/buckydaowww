@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Button, message, Tooltip } from 'antd'
 import { useBindWalletAddress, useCommittee } from '@hooks/index'
-import useUserStore from '@hooks/useUserStore'
-import _ from 'lodash'
 import {
   extractMessage,
   getProposalType,
+  getProposalMissingMetadataMessage,
+  getProposalMetadataConflictMessage,
+  hasTrustedProposalMetadata,
   proposalTypeMap,
   transactionWait,
   decodePaddedAddress,
+  isProposalMetadataConflict,
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import {
@@ -26,14 +28,25 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   proposal,
   disabled,
 }) => {
-  const user = useUserStore()
   const { governanceAddress, hasActiveWallet } = useBindWalletAddress()
   // const contract = useContractStore()
   const { isCommittee } = useCommittee(governanceAddress)
   const [loading, setLoading] = useState(false)
+  const metadataConflict = isProposalMetadataConflict(proposal)
+  const trustedMetadata = hasTrustedProposalMetadata(proposal)
 
   const executeProposal = async () => {
     setLoading(true)
+    if (!trustedMetadata) {
+      message.error(
+        metadataConflict
+          ? getProposalMetadataConflictMessage()
+          : getProposalMissingMetadataMessage(),
+      )
+      setLoading(false)
+      return
+    }
+
     if (!hasActiveWallet) {
       message.error('Please connect your browser wallet first')
       setLoading(false)
@@ -135,7 +148,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
     <div className='flex-center gap-1'>
       <Button
         loading={loading}
-        disabled={disabled}
+        disabled={disabled || !trustedMetadata}
         type='primary'
         onClick={executeProposal}
         className=''
@@ -145,7 +158,11 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
 
       <Tooltip
         placement='top'
-        title={'Can only be implemented after voting'}
+        title={!trustedMetadata
+          ? metadataConflict
+            ? getProposalMetadataConflictMessage()
+            : getProposalMissingMetadataMessage()
+          : 'Can only be implemented after voting'}
       >
         <ExclamationCircleOutlined />
       </Tooltip>

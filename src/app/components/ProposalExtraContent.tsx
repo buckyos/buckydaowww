@@ -8,6 +8,7 @@ import {
   proposalTypeMap,
   decodePaddedAddress,
   extractUpgradeCalldataFromExtra,
+  hasTrustedProposalMetadata,
 } from '@utils/index'
 import useContractStore from '@hooks/useContract'
 import Link from 'next/link'
@@ -71,8 +72,13 @@ const ProposalSettlementContent: React.FC<{ versionID: string }> = ({ versionID 
 const ProposalExtraContent: React.FC<{ proposal: ProposalResponseData }> = ({
   proposal,
 }) => {
-  const proposalType = getProposalType(proposal)
   const contract = useContractStore()
+
+  if (!hasTrustedProposalMetadata(proposal)) {
+    return null
+  }
+
+  const proposalType = getProposalType(proposal)
   const { calldata } = extractUpgradeCalldataFromExtra(proposal.extra || '')
 
   return (

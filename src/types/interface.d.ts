@@ -63,6 +63,8 @@ interface CommitteeMember extends User {
   homepage?: string
 }
 
+type ProposalSyncState = 'legacy' | 'chain_only' | 'ready' | 'conflict'
+
 interface ProposalResponseData {
   id: string
   title: string
@@ -82,6 +84,7 @@ interface ProposalResponseData {
   project?: ProjectVersionProps
   paramroot?: string
   full: boolean // 投票类型，是否全员投票
+  syncState?: ProposalSyncState
   params: any[]
 }
 
