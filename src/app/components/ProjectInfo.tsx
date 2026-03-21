@@ -7,6 +7,37 @@ import { Breadcrumb, Spin, Tag } from 'antd'
 import Link from 'next/link'
 import _ from 'lodash'
 import Loading from '@components/Loading'
+import dayjs from 'dayjs'
+
+function ellipsisAddress(address?: string) {
+  if (!address) {
+    return ''
+  }
+  if (address.length <= 15) {
+    return address
+  }
+  return `${address.slice(0, 6)}...${address.slice(-5)}`
+}
+
+function formatUserLabel(user?: User) {
+  if (!user) {
+    return '-'
+  }
+
+  if (user.nickname?.trim()) {
+    return user.nickname.trim()
+  }
+
+  if (user.github_account?.trim()) {
+    return user.github_account.trim()
+  }
+
+  if (user.address?.trim()) {
+    return ellipsisAddress(user.address)
+  }
+
+  return '-'
+}
 
 const ProjectBreadcrumb: React.FC<{
   project?: ProjectItem
@@ -86,13 +117,46 @@ const ProjectInfo: React.FC<{
           <div className='grid grid-cols-2 mt-6 gap-y-2'>
             <div>
               <label className='mr-6 text-lg'>State</label>
-              <div className='py-1 px-2 text-sm bg-cyfs-green2 inline-block text-white rounded-full'>
-                {project?.state}
+              <div className='inline-flex items-center gap-2'>
+                <div className='py-1 px-2 text-sm bg-cyfs-green2 inline-block text-white rounded-full'>
+                  {project?.state}
+                </div>
+                {project?.legacy ? (
+                  <div className='py-1 px-2 text-xs bg-amber-50 text-amber-700 rounded-full border border-amber-200'>
+                    legacy profile
+                  </div>
+                ) : null}
               </div>
             </div>
             <div>
               <label className='mr-6 text-lg'>Created</label>
-              {project?.date}
+              {project?.createdAt
+                ? dayjs(project.createdAt * 1000).format('YYYY-MM-DD HH:mm')
+                : project?.date}
+            </div>
+            <div>
+              <label className='mr-6 text-lg'>Owner</label>
+              <span>{formatUserLabel(project?.owner)}</span>
+              {!!project?.owner?.address && (
+                <span className='ml-3 font-mono text-sm text-cyfs-green'>
+                  {ellipsisAddress(project.owner.address)}
+                </span>
+              )}
+            </div>
+            <div>
+              <label className='mr-6 text-lg'>Updated</label>
+              {project?.updatedAt
+                ? dayjs(project.updatedAt * 1000).format('YYYY-MM-DD HH:mm')
+                : '-'}
+            </div>
+            <div className='col-span-2'>
+              <label className='mr-6 text-lg'>Updated by</label>
+              <span>{formatUserLabel(project?.updatedBy)}</span>
+              {!!project?.updatedBy?.address && (
+                <span className='ml-3 font-mono text-sm text-cyfs-green'>
+                  {ellipsisAddress(project.updatedBy.address)}
+                </span>
+              )}
             </div>
             {/* <div> */}
             {/*   <label className='mr-6 text-lg'>Version</label> */}

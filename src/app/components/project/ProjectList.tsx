@@ -4,7 +4,7 @@ import { useAsyncEffect } from 'ahooks'
 import { useState } from 'react'
 import Tag from '@components/Tag'
 import { GithubOutlined } from '@ant-design/icons'
-import { fetchRepositoryList } from '@services/index'
+import { decodeProjectProfile, fetchRepositoryList } from '@services/index'
 import { message } from 'antd'
 
 export default function ProjectList() {
@@ -13,9 +13,7 @@ export default function ProjectList() {
   useAsyncEffect(async () => {
     const result = await fetchRepositoryList()
     if (result.code == 0) {
-      const data = result.data.map((item) => {
-        return JSON.parse(item.detail) as ProjectItem
-      })
+      const data = result.data.map((item) => decodeProjectProfile(item))
       console.log('ProjectList result', result, data)
       setProjects(data)
     } else {

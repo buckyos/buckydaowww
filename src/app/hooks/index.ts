@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
-import { bindAddress, devLogin, fetchRepositoryList } from '@services/index'
+import { bindAddress, decodeProjectProfile, devLogin, fetchRepositoryList } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
 import { abis } from '@contracts/abis'
 import { CommitteeType } from './useCommittee'
@@ -452,9 +452,7 @@ function useGetProjectQuery(id: string) {
     if (result.code == 0) {
       const decodedId = decodeURIComponent(String(id))
       const project = result.data
-        .map((item) => {
-          return JSON.parse(item.detail) as ProjectItem
-        })
+        .map((item) => decodeProjectProfile(item))
         .find(
           (item) =>
             String(item.id) === decodedId || item.project_name === decodedId,

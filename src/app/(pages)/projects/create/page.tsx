@@ -3,7 +3,11 @@ import { Breadcrumb, Button, Form, Input, message } from 'antd'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
-import { fetchRepositoryList, upsertProjectDetail } from '@services/index'
+import {
+  decodeProjectProfile,
+  fetchRepositoryList,
+  upsertProjectDetail,
+} from '@services/index'
 import { useBindWalletAddress, useUserStore } from '@hooks/index'
 
 function buildProjectSlug(projectName: string) {
@@ -42,7 +46,7 @@ export default function CreateProjectPage() {
     }
 
     const duplicated = existing.data
-      .map((item) => JSON.parse(item.detail) as ProjectItem)
+      .map((item) => decodeProjectProfile(item))
       .find((item) => {
         return (
           item.project_name.trim().toLowerCase() === projectName.toLowerCase()

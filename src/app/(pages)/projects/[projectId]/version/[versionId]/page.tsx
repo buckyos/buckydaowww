@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useAsyncEffect } from 'ahooks'
 import {
+  decodeProjectProfile,
   getProjectVersionDetail,
   fetchProposalId,
   fetchRepositoryList,
@@ -31,9 +32,7 @@ const ProjectVersionPage = () => {
     const version = versionResult.data as ProjectVersionProps
     setVersion(version)
     const project = projectResult.data
-      .map((item) => {
-        return JSON.parse(item.detail) as ProjectItem
-      })
+      .map((item) => decodeProjectProfile(item))
       .find((item) => item.id == projectId)
     if (project) {
       setProject(project)

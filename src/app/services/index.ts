@@ -102,6 +102,33 @@ export async function fetchRepositoryList(): Promise<
   return data
 }
 
+export function decodeProjectProfile(item: RepositoryItem): ProjectItem {
+  const detail = JSON.parse(item.detail) as Partial<ProjectItem>
+  const projectId =
+    detail.project_id
+    || detail.id
+    || item.projectId
+    || item.name
+
+  return {
+    id: projectId,
+    project_id: projectId,
+    project_name: detail.project_name || item.name,
+    state: detail.state || 'unknown',
+    date: detail.date || '',
+    current_version: detail.current_version || '-',
+    stage: detail.stage || '-',
+    github_url: detail.github_url || '',
+    description: detail.description || '',
+    project_logs: detail.project_logs || [],
+    owner: item.owner,
+    updatedBy: item.updatedBy,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+    legacy: item.legacy,
+  }
+}
+
 export async function upsertProjectDetail(
   jwt: string,
   payload: {

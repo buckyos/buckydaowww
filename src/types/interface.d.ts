@@ -153,6 +153,12 @@ interface CreateVersionDefine {
 interface RepositoryItem {
   name: string
   detail: string
+  projectId?: string
+  owner?: User
+  updatedBy?: User
+  createdAt?: number
+  updatedAt?: number
+  legacy?: boolean
 }
 
 interface ResponseTokenInfo {
@@ -178,6 +184,11 @@ interface ProjectItem {
   github_url: string
   description: string
   project_logs?: ProjectLogsDefine[]
+  owner?: User
+  updatedBy?: User
+  createdAt?: number
+  updatedAt?: number
+  legacy?: boolean
 }
 
 interface ProjectLogsDefine {

@@ -3,7 +3,11 @@ import { Modal, Form, Input, message } from 'antd'
 import { create } from 'zustand'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
-import { fetchRepositoryList, upsertProjectDetail } from '@services/index'
+import {
+  decodeProjectProfile,
+  fetchRepositoryList,
+  upsertProjectDetail,
+} from '@services/index'
 import { useBindWalletAddress, useUserStore } from '@hooks/index'
 
 interface CreateProjectModalStore {
@@ -54,7 +58,7 @@ const CreateProjectModal = () => {
     }
 
     const duplicated = existing.data
-      .map((item) => JSON.parse(item.detail) as ProjectItem)
+      .map((item) => decodeProjectProfile(item))
       .find(
         (item) =>
           item.project_name.trim().toLowerCase() === projectName.toLowerCase()
