@@ -14,7 +14,7 @@ import { useUserinfo } from './useUserInfo'
 
 
 const UserInfoButton = () => {
-  const { isEdit, setIsEdit, job, desc } = useUserinfo()
+  const { isEdit, setIsEdit, nickname, job, desc } = useUserinfo()
   const { jwt, updateUser } = useUserStore((state) => ({
     jwt: state.jwt,
     updateUser: state.updateUser,
@@ -23,7 +23,7 @@ const UserInfoButton = () => {
 
   const onSubmitChange = async () => {
     setLoading(true)
-    const result = await PostUserExtraInfo(jwt, job, desc)
+    const result = await PostUserExtraInfo(jwt, nickname.trim(), job, desc)
     console.log('onSubmitChange', result)
     if (result.code === 0) {
       message.success('update user info success')

@@ -50,7 +50,7 @@ const MemberCard = ({ item }: MemberCardProps) => {
           </div>
           {!!item.job && (
             <div className='mt-1 text-sm text-black-secondary'>
-              <Tag color='green'>Position: {item.job}</Tag>
+              <Tag color='green'>Job: {item.job}</Tag>
             </div>
           )}
 

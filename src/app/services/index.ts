@@ -172,12 +172,13 @@ export async function fetchContractTokenInfo(): Promise<
 // 修改用户信息
 export async function PostUserExtraInfo(
   jwt: string,
+  nickname: string,
   job: string,
   desc: string,
 ) {
   const resp = await fetch('/api/user/edit', {
     method: 'POST',
-    body: JSON.stringify({ job, desc }),
+    body: JSON.stringify({ nickname, job, desc }),
     headers: {
       'DAO-TOKEN': jwt,
     },

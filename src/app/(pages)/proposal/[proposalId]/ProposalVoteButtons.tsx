@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Modal, Tag, Tooltip, message } from 'antd'
 import { useBindWalletAddress, useCommittee } from '@hooks/index'
-import { voteProposal, supportsProposalVotingOnWeb } from '@contracts/index'
+import { contractService, newProviderContract, voteProposal, supportsProposalVotingOnWeb } from '@contracts/index'
+import { abis } from '@contracts/abis'
 import {
   decodePaddedAddress,
   extractMessage,
@@ -62,10 +63,67 @@ const ProposalVoteButtons: React.FC<{
     hasActiveWallet,
     handleConnectWallet,
   } = useBindWalletAddress()
-  const { isCommittee } = useCommittee(activeAddress)
+  const { isCommittee, isUnknown } = useCommittee(activeAddress)
   const [loadingAction, setLoadingAction] = useState<'support' | 'reject' | ''>(
     '',
   )
+  const [checkingFullVoteEligibility, setCheckingFullVoteEligibility] = useState(false)
+  const [hasFullVotingPower, setHasFullVotingPower] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const checkFullVoteEligibility = async () => {
+      if (!proposal.full || !hasActiveWallet || !activeAddress) {
+        setCheckingFullVoteEligibility(false)
+        setHasFullVotingPower(null)
+        return
+      }
+
+      setCheckingFullVoteEligibility(true)
+      try {
+        const committee = await contractService.getReadonlyCommitteeContract()
+        const devToken = await newProviderContract(
+          contractService.getAddressOfDevToken(),
+          abis,
+        )
+        const normalToken = await newProviderContract(
+          contractService.getAddressOfNormalToken(),
+          abis,
+        )
+        const [devRatioRaw, devBalanceRaw, normalBalanceRaw] = await Promise.all([
+          committee.devRatio(),
+          devToken.balanceOf(activeAddress),
+          normalToken.balanceOf(activeAddress),
+        ])
+
+        if (cancelled) {
+          return
+        }
+
+        const devRatio = BigInt(devRatioRaw.toString())
+        const devBalance = BigInt(devBalanceRaw.toString())
+        const normalBalance = BigInt(normalBalanceRaw.toString())
+        const votingPower = normalBalance + (devBalance * devRatio) / 100n
+        setHasFullVotingPower(votingPower > 0n)
+      } catch (error) {
+        console.warn('check full vote eligibility failed', error)
+        if (!cancelled) {
+          setHasFullVotingPower(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setCheckingFullVoteEligibility(false)
+        }
+      }
+    }
+
+    void checkFullVoteEligibility()
+
+    return () => {
+      cancelled = true
+    }
+  }, [activeAddress, hasActiveWallet, proposal.full])
 
   const normalizedActiveAddress = activeAddress.trim().toLowerCase()
   const currentVote = normalizedActiveAddress
@@ -97,6 +155,14 @@ const ProposalVoteButtons: React.FC<{
       : getProposalMissingMetadataMessage()
     : !supportsWebVoting
       ? 'Web voting for this proposal type is not supported yet.'
+      : hasActiveWallet && proposal.full && checkingFullVoteEligibility
+        ? 'Checking token-holder voting eligibility...'
+        : hasActiveWallet && proposal.full && hasFullVotingPower === false
+          ? 'Only token holders can vote on this full proposal.'
+          : hasActiveWallet && !proposal.full && isUnknown
+            ? 'Checking committee voting eligibility...'
+            : hasActiveWallet && !proposal.full && !isCommittee
+              ? 'Only committee members can vote on this proposal.'
       : voteClosed
         ? 'Voting is closed for this proposal.'
         : currentVote

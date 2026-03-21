@@ -1,6 +1,7 @@
 'use client'
 import { Button, Tag } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
+import { useAsyncEffect } from 'ahooks'
 import {
   useCommittee,
   useContractStore,
@@ -28,10 +29,22 @@ export default function UserInfoPage() {
     shouldShowBindWalletAction,
     isLocalChainMode,
   } = useBindWalletAddress()
+  const updateUser = useUserStore((state) => state.updateUser)
   const { token } = useLockToken(governanceAddress)
   const { isCommittee } = useCommittee(governanceAddress)
-  const hasProfile = !!user.user.avatar && !!user.user.nickname
-  const displayName = user.user.nickname || 'Wallet'
+  const hasProfile = !!user.user.avatar
+  const displayName =
+    user.user.nickname
+    || user.user.github_account
+    || boundAddress
+    || activeAddress
+    || 'Wallet'
+
+  useAsyncEffect(async () => {
+    if (user.isLogin()) {
+      await updateUser()
+    }
+  }, [])
 
   return (
     <div className='flex flex-col px-40 mt-20 pb-80'>
