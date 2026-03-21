@@ -249,10 +249,16 @@ export async function devLogin(
 
 export async function beginGithubLogin(
   redirect?: string,
+  options?: {
+    forceAccountSelection?: boolean
+  },
 ): Promise<CommonResponse<string>> {
   const query = new URLSearchParams()
   if (redirect) {
     query.set('redirect', redirect)
+  }
+  if (options?.forceAccountSelection) {
+    query.set('prompt', 'select_account')
   }
 
   const suffix = query.toString() ? `?${query.toString()}` : ''

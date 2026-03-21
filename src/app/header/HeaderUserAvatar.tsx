@@ -1,11 +1,12 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Dropdown, MenuProps, Tag, Tooltip } from 'antd'
+import { Dropdown, MenuProps, Tag, Tooltip, message } from 'antd'
 import { LogoutOutlined, ContactsOutlined, UserOutlined } from '@ant-design/icons'
 import ConnectWalletButton from '@components/header/ConnectWalletButton'
 import useUserStore from '@hooks/useUserStore'
 import { useCommittee, useBindWalletAddress } from '@hooks/index'
+import { beginGithubLogin } from '@services/index'
 
 const HeaderUserAvatar = () => {
   const user = useUserStore()
@@ -33,7 +34,19 @@ const HeaderUserAvatar = () => {
       : ''
   const mismatchMessage = userBind.isLocalChainMode
     ? 'Logged-in local account and active wallet are different. Logout and login again if you want to switch accounts.'
-    : 'Logged-in account and active wallet are different. Switch back to the bound wallet or rebind this account.'
+    : 'Logged-in account and active wallet are different. Switch back to the bound wallet, rebind this account, or switch GitHub account.'
+  const canSwitchGithubAccount = isLoggedIn && !userBind.useLocalDevLogin
+
+  const handleSwitchGithubAccount = async () => {
+    const result = await beginGithubLogin(window.location.href, {
+      forceAccountSelection: true,
+    })
+    if (result.code !== 0 || !result.data) {
+      message.error(result.msg || 'Failed to switch GitHub account')
+      return
+    }
+    window.location.href = result.data
+  }
 
   const items: MenuProps['items'] = [
     {
@@ -54,6 +67,20 @@ const HeaderUserAvatar = () => {
       ),
       key: 'wallet',
     },
+    canSwitchGithubAccount ? {
+      label: (
+        <div
+          className='flex items-center py-2'
+          onClick={() => {
+            void handleSwitchGithubAccount()
+          }}
+        >
+          <UserOutlined className='mr-2' />
+          Switch GitHub account
+        </div>
+      ),
+      key: 'switch-github-account',
+    } : null,
     isLoggedIn && userBind.shouldShowBindWalletAction ? {
       label: (
         <div
@@ -154,7 +181,33 @@ const HeaderUserAvatar = () => {
 
           {userBind.isAddressMismatch && (
             <div className='max-w-[280px] 2xl:max-w-[340px] rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-700 cursor-default'>
-              {mismatchMessage}
+              <div>{mismatchMessage}</div>
+              <div className='mt-2 flex flex-wrap gap-2'>
+                {userBind.shouldShowBindWalletAction && (
+                  <button
+                    className='rounded border border-amber-300 bg-white px-2 py-1 text-xs text-amber-700 hover:bg-amber-100'
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      void userBind.handleBindWallet()
+                    }}
+                    type='button'
+                  >
+                    {userBind.bindWalletLabel}
+                  </button>
+                )}
+                {canSwitchGithubAccount && (
+                  <button
+                    className='rounded border border-blue-200 bg-white px-2 py-1 text-xs text-blue-600 hover:bg-blue-50'
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      void handleSwitchGithubAccount()
+                    }}
+                    type='button'
+                  >
+                    Switch GitHub account
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
