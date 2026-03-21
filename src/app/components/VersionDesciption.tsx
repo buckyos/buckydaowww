@@ -11,8 +11,7 @@ import {
 } from '@ant-design/icons'
 import Loading from '@components/Loading'
 import { useVersionSettlementModalStore } from '@hooks/modal'
-import useUserStore from '@hooks/useUserStore'
-import { message } from 'antd'
+import { useBindWalletAddress } from '@hooks/index'
 import { transformVersionStateWord } from '@utils/index'
 
 interface VersionDescriptionProps {
@@ -25,15 +24,14 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
   inProposalPage = false,
 }) => {
   const { show } = useVersionSettlementModalStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
   const { decimals, symbol } = useContractStore((state) => ({
     decimals: state.decimals,
     symbol: state.symbol,
   }))
-  const { isLogin } = useUserStore((state) => ({ isLogin: state.isLogin }))
 
-  const onCreateSettlementProposal = () => {
-    if (!isLogin()) {
-      message.error('error: please login first')
+  const onCreateSettlementProposal = async () => {
+    if (!(await ensureAuthenticated({ requireWallet: true }))) {
       return
     }
 

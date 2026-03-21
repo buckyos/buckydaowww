@@ -13,6 +13,7 @@ const HeaderUserAvatar = () => {
   const { isCommittee } = useCommittee(userBind.governanceAddress)
   const hasProfile = !!user.user.avatar && !!user.user.nickname
   const displayName = user.user.nickname || 'Wallet'
+  const isLoggedIn = user.isLogin()
 
   const items: MenuProps['items'] = [
     {
@@ -33,7 +34,7 @@ const HeaderUserAvatar = () => {
       ),
       key: 'wallet',
     },
-    {
+    isLoggedIn ? {
       label: (
         <div
           className='flex items-center py-2'
@@ -46,8 +47,8 @@ const HeaderUserAvatar = () => {
         </div>
       ),
       key: 'logout',
-    },
-  ]
+    } : null,
+  ].filter(Boolean)
 
   return (
     <Dropdown menu={{ items }} placement='bottomRight' arrow>

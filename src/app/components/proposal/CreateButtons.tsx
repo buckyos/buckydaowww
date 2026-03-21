@@ -8,16 +8,16 @@ import ChangeCommitteeModal from '@components/modal/ChangeCommitteeModal'
 
 const CreateButtons = () => {
   const user = useUserStore()
-  const { governanceAddress, hasActiveWallet } = useBindWalletAddress()
+  const { governanceAddress, hasActiveWallet, ensureAuthenticated } =
+    useBindWalletAddress()
   const [showUpgradeContractModal, setShowUpgradeContractModal] =
     useState(false)
   const [showChangeCommitteeModal, setChangeCommitteeModal] = useState(false)
   const { isCommittee } = useCommittee(governanceAddress)
 
   const generateCheck = (fn: any) => {
-    return () => {
-      if (!user.isLogin()) {
-        message.error('error: please login first')
+    return async () => {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
         return
       }
 

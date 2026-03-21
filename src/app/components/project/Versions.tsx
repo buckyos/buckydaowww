@@ -17,7 +17,7 @@ import {
   NodeIndexOutlined,
   CalendarOutlined,
 } from '@ant-design/icons'
-import useUserStore from '@hooks/useUserStore'
+import { useBindWalletAddress } from '@hooks/index'
 import { transformVersionStateWord, formatNumberWithCommas } from '@utils/index'
 
 interface VersionsProps {
@@ -29,11 +29,11 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
   const { show } = useCreateVersionModalStore()
   const [data, setData] = useState<ProjectVersionProps[]>([])
   const [loading, setLoading] = useState(false)
+  const { ensureAuthenticated } = useBindWalletAddress()
   const { decimals, symbol } = useContractStore((state) => ({
     decimals: state.decimals,
     symbol: state.symbol,
   }))
-  const isLogin = useUserStore((state) => state.isLogin)
 
   useAsyncEffect(async () => {
     if (project_name) {
@@ -45,9 +45,8 @@ const Versions: React.FC<VersionsProps> = ({ project_name }) => {
     }
   }, [project_name])
 
-  const onCreateVersion = () => {
-    if (!isLogin()) {
-      message.error('error: please login first')
+  const onCreateVersion = async () => {
+    if (!(await ensureAuthenticated({ requireWallet: true }))) {
       return
     }
 

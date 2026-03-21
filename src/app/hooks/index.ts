@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
-import { bindAddress, fetchRepositoryList } from '@services/index'
+import { bindAddress, devLogin, fetchRepositoryList } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
 import { abis } from '@contracts/abis'
 import { CommitteeType } from './useCommittee'
@@ -22,6 +22,70 @@ import {
   getInjectedWalletState,
   subscribeWalletChanges,
 } from '@contracts/index'
+
+let localDevLoginPromise: Promise<boolean> | null = null
+
+function normalizeAddress(address?: string) {
+  return address?.trim().toLowerCase() || ''
+}
+
+async function loginWithLocalDevSession(): Promise<boolean> {
+  if (localDevLoginPromise) {
+    return localDevLoginPromise
+  }
+
+  localDevLoginPromise = (async () => {
+    const provider = await getProvider()
+    if (!provider) {
+      message.error('Please connect your browser wallet first')
+      return false
+    }
+
+    try {
+      const signer = await provider.getSigner()
+      const address = await signer.getAddress()
+      const network = await provider.getNetwork()
+
+      useWalletStore.getState().updateWalletState({
+        activeAddress: address,
+        chainId: network.chainId.toString(),
+        hasWallet: true,
+        initialized: true,
+      })
+
+      const result = await devLogin(address)
+      if (result.code !== 0 || !result.data) {
+        message.error(result.msg || 'Local dev login failed')
+        return false
+      }
+
+      const signature = await signer.signMessage(result.data)
+      const bindStatus = await bindAddress(signature, result.data)
+      if (bindStatus !== 200) {
+        message.error('Local wallet bind failed')
+        return false
+      }
+
+      const store = useUserStore.getState()
+      store.updateJwt(result.data)
+      const code = await useUserStore.getState().updateUser()
+      if (code !== 0 || !useUserStore.getState().isLogin()) {
+        message.error('Local dev login failed')
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.warn('local dev login failed', error)
+      message.error('Local dev login failed')
+      return false
+    }
+  })().finally(() => {
+    localDevLoginPromise = null
+  })
+
+  return localDevLoginPromise
+}
 
 function ellipsisAddress(address: string) {
   if (!address) {
@@ -151,13 +215,46 @@ function useBindWalletAddress() {
   const boundAddress = user.address
   const displayAddress = activeAddress || boundAddress
   const governanceAddress = activeAddress || boundAddress
+  const normalizedActiveAddress = normalizeAddress(activeAddress)
+  const normalizedBoundAddress = normalizeAddress(boundAddress)
   const isAddressMismatch =
-    !!activeAddress &&
-    !!boundAddress &&
-    activeAddress.toLowerCase() !== boundAddress.toLowerCase()
+    !!normalizedActiveAddress &&
+    !!normalizedBoundAddress &&
+    normalizedActiveAddress !== normalizedBoundAddress
   const canBindWallet = !isLocalChainMode && !!jwt && hasActiveWallet
   const shouldShowBindWalletAction = canBindWallet && (!boundAddress || isAddressMismatch)
   const bindWalletLabel = boundAddress ? 'Rebind wallet' : 'Bind wallet'
+
+  const ensureAuthenticated = async ({
+    requireWallet = false,
+  }: {
+    requireWallet?: boolean
+  } = {}) => {
+    if (requireWallet && !hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      return false
+    }
+
+    const isLoggedIn = useUserStore.getState().isLogin()
+    const shouldRefreshLocalWalletSession =
+      isLocalChainMode &&
+      hasActiveWallet &&
+      (!isLoggedIn ||
+        (normalizedActiveAddress &&
+          normalizedBoundAddress &&
+          normalizedActiveAddress !== normalizedBoundAddress))
+
+    if (!shouldRefreshLocalWalletSession) {
+      if (isLoggedIn) {
+        return true
+      }
+
+      message.error('error: please login first')
+      return false
+    }
+
+    return loginWithLocalDevSession()
+  }
 
   return {
     isConnect: () => hasActiveWallet || isConnect(),
@@ -176,6 +273,7 @@ function useBindWalletAddress() {
     canBindWallet,
     shouldShowBindWalletAction,
     bindWalletLabel,
+    ensureAuthenticated,
     handleConnectWallet,
     handleBindWallet,
     handleConnect: handleConnectWallet,

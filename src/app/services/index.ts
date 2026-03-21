@@ -121,6 +121,32 @@ export async function bindAddress(sign: string, jwt: string): Promise<number> {
   // return data
 }
 
+export async function devLogin(
+  address: string,
+): Promise<CommonResponse<string>> {
+  const query = new URLSearchParams({ address })
+  const resp = await fetch(`/api/user/devlogin?${query.toString()}`)
+
+  const text = await resp.text()
+  if (!text) {
+    return {
+      code: resp.ok ? 0 : resp.status,
+      msg: resp.ok ? '' : `dev login failed [${resp.status}]`,
+      data: '',
+    }
+  }
+
+  try {
+    return JSON.parse(text) as CommonResponse<string>
+  } catch (_error) {
+    return {
+      code: resp.ok ? 0 : resp.status,
+      msg: text,
+      data: '',
+    }
+  }
+}
+
 // 更新提案信息
 export async function updateProposalInfomation(
   proposalId: string,

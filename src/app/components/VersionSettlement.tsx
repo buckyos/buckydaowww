@@ -10,6 +10,7 @@ import {
 } from '@services/index'
 import { getVersionSettlementInfo } from '@contracts/index'
 import useUserStore from '@hooks/useUserStore'
+import { useBindWalletAddress } from '@hooks/index'
 import { wrapUnits, calculateProportion } from '@utils/numberConverter'
 import { contractService } from '@contracts/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
@@ -23,13 +24,13 @@ const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
     jwt: state.jwt,
     isLogin: state.isLogin,
   }))
+  const { ensureAuthenticated } = useBindWalletAddress()
   const [loading, setLoading] = useState(false)
 
   const onWithdraw = async () => {
     setLoading(true)
     const fn = async () => {
-      if (!isLogin()) {
-        message.error('error: please login first')
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
         return
       }
 

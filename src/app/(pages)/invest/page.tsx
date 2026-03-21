@@ -133,7 +133,7 @@ const WhitelistInvestments: React.FC<{ data: TwoStepInvestmentData[] }> = ({
 // main page
 export default function InvestmentPage() {
   const user = useUserStore()
-  const { governanceAddress } = useBindWalletAddress()
+  const { governanceAddress, ensureAuthenticated } = useBindWalletAddress()
   const { isCommittee, isUnknown } = useCommittee(governanceAddress)
   const [showModal, setShowModal] = useState(false)
   const [data, setData] = useState<TwoStepInvestmentData[]>([])
@@ -149,8 +149,7 @@ export default function InvestmentPage() {
   }, [])
 
   const onShowCreateInvestmentModal = async () => {
-    if (!user.isLogin()) {
-      message.error('error: please login first')
+    if (!(await ensureAuthenticated({ requireWallet: true }))) {
       return
     }
 
