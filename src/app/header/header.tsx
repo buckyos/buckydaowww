@@ -7,16 +7,18 @@ import HeaderRight from '@components/header/HeaderRight'
 export default function Header() {
   return (
     <header className='max-w-[90%] mx-auto min-h-24 py-3 flex'>
-      <div className='w-full flex items-start gap-10'>
+      <div className='w-full flex flex-col gap-4 2xl:flex-row 2xl:items-start 2xl:gap-10'>
         <Link className='flex-center gap-2 no-underline text-black shrink-0' href='/'>
           <Image src={images.iconDan} width={36} height={36} alt='' />
           <div className='text-xl'>BuckyDAO</div>
         </Link>
-        <div className='flex-1 min-w-0 relative z-10 pt-3'>
+        <div className='w-full min-w-0 relative z-10 2xl:flex-1 2xl:w-auto 2xl:pt-3'>
           <Nav />
         </div>
-        <div className='shrink-0 relative z-20'>
-          <HeaderRight />
+        <div className='w-full min-w-0 relative z-20 2xl:w-auto 2xl:shrink-0'>
+          <div className='flex justify-end'>
+            <HeaderRight />
+          </div>
         </div>
       </div>
     </header>

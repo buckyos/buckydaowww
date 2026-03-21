@@ -34,7 +34,7 @@ const HeaderRight = () => {
   }
 
   return (
-    <>
+    <div className='flex flex-wrap items-center justify-end gap-3'>
       {userBind.sessionState === 'anonymous' ? (
         <Tooltip title={userBind.displayAddress}>
           <div className='flex-center border border-cyfs-green text-cyfs-green h-9 px-4 rounded-lg cursor-default text-sm'>
@@ -42,7 +42,7 @@ const HeaderRight = () => {
           </div>
         </Tooltip>
       ) : (
-        <div></div>
+        <div />
       )}
       <div
         className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-9 px-4 rounded-lg cursor-pointer text-sm'
@@ -52,8 +52,7 @@ const HeaderRight = () => {
       >
         Login
       </div>
-      <div></div>
-    </>
+    </div>
   )
 }
 

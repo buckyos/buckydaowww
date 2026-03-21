@@ -352,7 +352,11 @@ const ProposalHeaderContent: React.FC<{
                 </div>
             }
             <div className='flex-center gap-6 mt-10'>
-                <Link className='text-cyfs-blue' href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
+                <Link
+                    className='text-cyfs-blue'
+                    href={"https://github.com/buckyos/SourceDAO/blob/main/docs/VoteGuide.md"}
+                    target='_blank'
+                >
                     How to vote?
                 </Link>
                 <ProposalVoteButtons

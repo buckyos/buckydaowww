@@ -86,7 +86,7 @@ const HeaderUserAvatar = () => {
 
   return (
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
-      <div className='flex items-start gap-2 py-1'>
+      <div className='flex items-start gap-2 py-1 max-w-full'>
         {hasProfile ? (
           <Image
             width={60}
@@ -100,7 +100,7 @@ const HeaderUserAvatar = () => {
             <UserOutlined className='text-xl' />
           </div>
         )}
-        <div className='flex min-w-0 max-w-[340px] flex-col gap-1.5'>
+        <div className='flex min-w-0 max-w-[280px] 2xl:max-w-[340px] flex-col gap-1.5'>
           <div className='flex min-w-0 items-center gap-2'>
             <Tooltip
               title={
@@ -153,7 +153,7 @@ const HeaderUserAvatar = () => {
           )}
 
           {userBind.isAddressMismatch && (
-            <div className='max-w-[340px] rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-700 cursor-default'>
+            <div className='max-w-[280px] 2xl:max-w-[340px] rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-700 cursor-default'>
               {mismatchMessage}
             </div>
           )}

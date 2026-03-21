@@ -41,8 +41,8 @@ const HeaderInfo = () => {
   
   return (
     <>
-      <div className='flex items-start gap-3'>
-        <div className='flex items-center pt-2' >
+      <div className='flex w-full flex-col items-end gap-2 2xl:w-auto 2xl:flex-row 2xl:items-start 2xl:gap-3'>
+        <div className='flex items-center justify-end pt-1 2xl:pt-2' >
           {loading && <Spin className='mr-4' size='small' />}
           {!loading && <HeaderTokenInfo devTokenAmount={devTokenAmount} normalTokenAmount={normalTokenAmount} reload={reload}/>}
         </div>
