@@ -102,6 +102,26 @@ export async function fetchRepositoryList(): Promise<
   return data
 }
 
+export async function upsertProjectDetail(
+  jwt: string,
+  payload: {
+    name: string
+    detail: string
+  },
+): Promise<CommonResponse<any>> {
+  const resp = await fetch('/api/repo/detail', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'DAO-TOKEN': jwt,
+    },
+  })
+  return parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to save project profile',
+  )
+}
+
 // 获取合约代币信息
 export async function fetchContractTokenInfo(): Promise<
   CommonResponse<ContractTokenInfo>

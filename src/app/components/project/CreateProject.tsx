@@ -1,15 +1,12 @@
 'use client'
-import { useRouter } from 'next/navigation'
+import { useCreateProjectModalStore } from './CreateProjectModal'
 
 export default function CreateProject() {
-  const router = useRouter()
-  const onCreateProject = () => {
-    router.push('/projects/create')
-  }
+  const { show } = useCreateProjectModalStore()
 
-  // const onCreateVersion = () => {
-  //   router.push('/projects/version/create')
-  // }
+  const onCreateProject = () => {
+    show()
+  }
 
   return (
     <div className='flex-center gap-5'>

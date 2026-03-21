@@ -91,7 +91,10 @@ export default function ProposalDetailPage() {
           members={members}
           fetchData={fetchData}
         />
-        <ProposalExtraContent proposal={proposal} />
+        <ProposalExtraContent
+          proposal={proposal}
+          committeeMembers={members}
+        />
 
         <div className='mt-20 pt-20'>{proposalExtraContent}</div>
         <div className='my-20 border-b border-solid border-[#F0F0F0]'></div>

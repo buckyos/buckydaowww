@@ -1,10 +1,22 @@
 'use client'
-import { Breadcrumb, Button, Form, Input, message } from 'antd'
-import Link from 'next/link'
+import { Modal, Form, Input, message } from 'antd'
+import { create } from 'zustand'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
 import { fetchRepositoryList, upsertProjectDetail } from '@services/index'
 import { useBindWalletAddress, useUserStore } from '@hooks/index'
+
+interface CreateProjectModalStore {
+  visible: boolean
+  show: () => void
+  close: () => void
+}
+
+const useCreateProjectModalStore = create<CreateProjectModalStore>((set) => ({
+  visible: false,
+  show: () => set({ visible: true }),
+  close: () => set({ visible: false }),
+}))
 
 function buildProjectSlug(projectName: string) {
   const slug = projectName
@@ -16,9 +28,9 @@ function buildProjectSlug(projectName: string) {
   return slug || encodeURIComponent(projectName.trim())
 }
 
-// render
-export default function CreateProjectPage() {
+const CreateProjectModal = () => {
   const router = useRouter()
+  const { visible, close } = useCreateProjectModalStore()
   const { ensureAuthenticated } = useBindWalletAddress()
 
   const onCreateProject = async (values: {
@@ -43,12 +55,11 @@ export default function CreateProjectPage() {
 
     const duplicated = existing.data
       .map((item) => JSON.parse(item.detail) as ProjectItem)
-      .find((item) => {
-        return (
+      .find(
+        (item) =>
           item.project_name.trim().toLowerCase() === projectName.toLowerCase()
-          || String(item.id).trim().toLowerCase() === projectId.toLowerCase()
-        )
-      })
+          || String(item.id).trim().toLowerCase() === projectId.toLowerCase(),
+      )
 
     if (duplicated) {
       message.error('A project profile with the same name already exists')
@@ -80,55 +91,57 @@ export default function CreateProjectPage() {
     }
 
     message.success('Project profile created')
+    close()
     router.push(`/projects/${encodeURIComponent(projectId)}`)
   }
 
   return (
-    <main className='max-w-[90%] mx-auto my-6 md:max-w-[70%]'>
-      <Breadcrumb
-        items={[
-          { title: <Link href='/projects'>Projects</Link> },
-          { title: <div>Create</div> },
-        ]}
-      />
-      <h2 className='mt-10 text-2xl font-bold text-center'>create project</h2>
-      <div className='flex-center mt-20'>
-        <Form
-          name='basic'
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
-          initialValues={{ remember: true }}
-          autoComplete='off'
-          onFinish={onCreateProject}
-        >
-          <Form.Item
-            label='project name'
-            name='project_name'
-            rules={[{ required: true, message: 'Please input project name' }]}
-          >
-            <Input className='ml-2' />
-          </Form.Item>
-
-          <Form.Item
-            label='github url'
-            name='github_url'
-            rules={[{ required: true, message: 'Please input github url' }]}
-          >
-            <Input className='ml-2' />
-          </Form.Item>
-
-          <Form.Item label='description' name='description'>
-            <Input.TextArea className='ml-2' rows={5} />
-          </Form.Item>
-
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type='primary' htmlType='submit'>
-              Create project
-            </Button>
-          </Form.Item>
-        </Form>
+    <Modal
+      title='Create project'
+      open={visible}
+      onCancel={close}
+      footer={null}
+    >
+      <div className='text-sm text-gray-500'>
+        <p>
+          This step creates an empty project profile. Versions are still created
+          inside the project detail page.
+        </p>
       </div>
-    </main>
+      <Form
+        onFinish={onCreateProject}
+        className='mt-6'
+        name='create-project'
+        style={{ width: '100%' }}
+        autoComplete='off'
+      >
+        <Form.Item
+          name='project_name'
+          rules={[{ required: true, message: 'project name is required' }]}
+        >
+          <Input placeholder='project name' />
+        </Form.Item>
+
+        <Form.Item
+          name='github_url'
+          rules={[{ required: true, message: 'github url is required' }]}
+        >
+          <Input placeholder='github url' />
+        </Form.Item>
+
+        <Form.Item name='description'>
+          <Input.TextArea placeholder='project description' rows={5} />
+        </Form.Item>
+
+        <div className='flex justify-center'>
+          <button className='btn-dan w-32 h-9' type='submit'>
+            Create project
+          </button>
+        </div>
+      </Form>
+    </Modal>
   )
 }
+
+export { useCreateProjectModalStore }
+export default CreateProjectModal

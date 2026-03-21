@@ -447,11 +447,15 @@ function useGetProjectQuery(id: string) {
     // 需要先获取项目列表,然后再找到对应的项目
     const result = await fetchRepositoryList()
     if (result.code == 0) {
+      const decodedId = decodeURIComponent(String(id))
       const project = result.data
         .map((item) => {
           return JSON.parse(item.detail) as ProjectItem
         })
-        .find((item) => item.id == id)
+        .find(
+          (item) =>
+            String(item.id) === decodedId || item.project_name === decodedId,
+        )
       if (project) {
         setData(project)
       }
