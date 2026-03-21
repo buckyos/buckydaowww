@@ -1,4 +1,11 @@
 import { transformNumber, bigTransformPercentNumber } from '@utils/index'
+import {
+  buildPendingMetadataKey,
+  getPendingMetadataSubmissions,
+  hasPendingMetadataSubmissions,
+  removePendingMetadataSubmission,
+  upsertPendingMetadataSubmission,
+} from './metadataOutbox'
 
 async function parseJsonResponse<T>(
   resp: Response,
@@ -31,6 +38,45 @@ async function parseJsonResponse<T>(
 
     throw new Error(`${fallbackMessage}: invalid JSON response`)
   }
+}
+
+function persistPendingMetadataSubmission(payload: {
+  kind:
+    | 'proposal_extra_and_params'
+    | 'proposal_params_only'
+    | 'project_extra'
+    | 'investment_extra'
+    | 'token_release'
+  txHash: string
+  title?: string
+  extra?: string
+  params?: any[]
+  pname?: string
+  version?: string
+  issueLink?: string
+  addresses?: string[]
+  amounts?: string[]
+}) {
+  const { kind, txHash, ...rest } = payload
+  upsertPendingMetadataSubmission({
+    key: buildPendingMetadataKey(kind, txHash),
+    kind,
+    txHash,
+    createdAt: Date.now(),
+    ...rest,
+  })
+}
+
+function clearPendingMetadataSubmission(
+  kind:
+    | 'proposal_extra_and_params'
+    | 'proposal_params_only'
+    | 'project_extra'
+    | 'investment_extra'
+    | 'token_release',
+  txHash: string,
+) {
+  removePendingMetadataSubmission(buildPendingMetadataKey(kind, txHash))
 }
 
 // 获取DAO成员列表
@@ -211,6 +257,13 @@ export async function createInvestmentExtra(
   extra: string,
   txHash: string,
 ) {
+  persistPendingMetadataSubmission({
+    kind: 'investment_extra',
+    txHash,
+    title,
+    extra,
+  })
+
   const resp = await fetch('/api/investment/extra', {
     method: 'POST',
     body: JSON.stringify({
@@ -226,6 +279,9 @@ export async function createInvestmentExtra(
     resp,
     'Failed to create investment metadata',
   )
+  if (data.code === 0) {
+    clearPendingMetadataSubmission('investment_extra', txHash)
+  }
   return data
 }
 
@@ -234,6 +290,12 @@ export async function proposalSetparams(
   params: any[],
   txHash: string,
 ) {
+  persistPendingMetadataSubmission({
+    kind: 'proposal_params_only',
+    txHash,
+    params,
+  })
+
   const resp = await fetch('/api/proposal/setparams', {
     method: 'POST',
     body: JSON.stringify(
@@ -253,6 +315,9 @@ export async function proposalSetparams(
     resp,
     'Failed to submit proposal params',
   )
+  if (data.code === 0) {
+    clearPendingMetadataSubmission('proposal_params_only', txHash)
+  }
   return data
 }
 
@@ -263,6 +328,14 @@ export async function proposalSetExtraAndParams(
   content: string,
   txHash: string,
 ) {
+  persistPendingMetadataSubmission({
+    kind: 'proposal_extra_and_params',
+    txHash,
+    title,
+    extra: content,
+    params,
+  })
+
   const resp = await fetch('/api/proposal/extra', {
     method: 'POST',
     body: JSON.stringify(
@@ -284,6 +357,9 @@ export async function proposalSetExtraAndParams(
     resp,
     'Failed to submit proposal metadata',
   )
+  if (data.code === 0) {
+    clearPendingMetadataSubmission('proposal_extra_and_params', txHash)
+  }
   return data
 }
 
@@ -296,6 +372,15 @@ export async function createReleaseToken(
   amounts: string[],
   txHash: string,
 ) {
+  persistPendingMetadataSubmission({
+    kind: 'token_release',
+    txHash,
+    title,
+    extra,
+    addresses,
+    amounts,
+  })
+
   const resp = await fetch('/api/token/release', {
     method: 'POST',
     body: JSON.stringify({
@@ -313,6 +398,9 @@ export async function createReleaseToken(
     resp,
     'Failed to create token release metadata',
   )
+  if (data.code === 0) {
+    clearPendingMetadataSubmission('token_release', txHash)
+  }
   return data
 }
 
@@ -391,6 +479,16 @@ export async function createProjectVersionExtra(
   issueLink: string,
   txHash: string,
 ) {
+  persistPendingMetadataSubmission({
+    kind: 'project_extra',
+    txHash,
+    title,
+    extra,
+    pname,
+    version,
+    issueLink,
+  })
+
   const resp = await fetch('/api/project/extra', {
     method: 'POST',
     body: JSON.stringify({
@@ -409,6 +507,9 @@ export async function createProjectVersionExtra(
     resp,
     'Failed to submit project metadata',
   )
+  if (data.code === 0) {
+    clearPendingMetadataSubmission('project_extra', txHash)
+  }
   return data
 }
 
@@ -438,4 +539,82 @@ export async function postContributionWithdraw(
     'Failed to withdraw contribution',
   )
   return data
+}
+
+export { hasPendingMetadataSubmissions }
+
+export async function retryPendingMetadataSubmissions(
+  txHash: string,
+  jwt: string,
+) {
+  const items = getPendingMetadataSubmissions(txHash)
+
+  for (const item of items) {
+    if (item.kind === 'proposal_extra_and_params') {
+      const result = await proposalSetExtraAndParams(
+        jwt,
+        item.params || [],
+        item.title || '',
+        item.extra || '',
+        item.txHash,
+      )
+      if (result.code !== 0) {
+        throw new Error(result.msg || 'Failed to submit proposal metadata')
+      }
+      continue
+    }
+
+    if (item.kind === 'proposal_params_only') {
+      const result = await proposalSetparams(jwt, item.params || [], item.txHash)
+      if (result.code !== 0) {
+        throw new Error(result.msg || 'Failed to submit proposal params')
+      }
+      continue
+    }
+
+    if (item.kind === 'project_extra') {
+      const result = await createProjectVersionExtra(
+        jwt,
+        item.title || '',
+        item.extra || '',
+        item.pname || '',
+        item.version || '',
+        item.issueLink || '',
+        item.txHash,
+      )
+      if (result.code !== 0) {
+        throw new Error(result.msg || 'Failed to submit project metadata')
+      }
+      continue
+    }
+
+    if (item.kind === 'investment_extra') {
+      const result = await createInvestmentExtra(
+        jwt,
+        item.title || '',
+        item.extra || '',
+        item.txHash,
+      )
+      if (result.code !== 0) {
+        throw new Error(result.msg || 'Failed to submit investment metadata')
+      }
+      continue
+    }
+
+    if (item.kind === 'token_release') {
+      const result = await createReleaseToken(
+        jwt,
+        item.title || '',
+        item.extra || '',
+        item.addresses || [],
+        item.amounts || [],
+        item.txHash,
+      )
+      if (result.code !== 0) {
+        throw new Error(result.msg || 'Failed to submit token release metadata')
+      }
+    }
+  }
+
+  return items.length
 }

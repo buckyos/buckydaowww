@@ -1,17 +1,22 @@
 
 'use client'
 import { useState } from 'react'
-import { Button, Progress, Tag, message } from 'antd'
+import { Button } from 'antd'
 import UpdateProposalModal from '@components/proposal/UpdateProposalModal'
+import RetryMetadataButton from './RetryMetadataButton'
 
 const ProposalEdition: React.FC<{
+    proposal: ProposalResponseData,
     isEdit: boolean,
     fetchData: () => Promise<ProposalResponseData>
-}> = ({ isEdit, fetchData }) => {
+}> = ({ proposal, isEdit, fetchData }) => {
     const [showEditModal, setShowEditModal] = useState(false)
     return (
         <>
-            {isEdit && <Button onClick={() => setShowEditModal(true)}>Edit</Button>}
+            <div className='flex gap-2'>
+                <RetryMetadataButton proposal={proposal} fetchData={fetchData} />
+                {isEdit && <Button onClick={() => setShowEditModal(true)}>Edit</Button>}
+            </div>
             <UpdateProposalModal
                 visible={showEditModal}
                 setVisible={setShowEditModal}

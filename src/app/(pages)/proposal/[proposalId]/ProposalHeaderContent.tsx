@@ -296,6 +296,7 @@ const ProposalHeaderContent: React.FC<{
                 />
 
                 <ProposalEdition
+                    proposal={proposal}
                     isEdit={
                         // 当前用户是提案创建人，且提案没有设置过标题
                         proposal.creator!.address === user.address && proposal.title == ''}

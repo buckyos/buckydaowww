@@ -67,6 +67,7 @@ type ProposalSyncState = 'legacy' | 'chain_only' | 'ready' | 'conflict'
 
 interface ProposalResponseData {
   id: string
+  txHash: string
   title: string
   extra: string
   proposalId: string
