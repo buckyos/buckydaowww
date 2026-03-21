@@ -68,12 +68,13 @@ async function changeCommitteeProposal(
     return false
   }
   const content = values.content || ''
+  const isFullProposal = values.isFullProposal === true
 
   // create proposal
   const comitteeContract = await contractService.getCommitteeContract()
   const tx = await comitteeContract.prepareSetCommittees(
     addresses,
-    values.isFullProposal // 是否开启全员投票
+    isFullProposal,
   )
   const receipt = await transactionWait(tx)
   if (receipt?.status !== 1) {

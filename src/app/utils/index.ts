@@ -27,6 +27,14 @@ const zeroPadLeft = (value: number | string | undefined) => {
 function extractMessage(error: unknown) {
   const errorInfo = (error as any).message
   try {
+    if (
+      typeof errorInfo === 'string' &&
+      errorInfo.includes('eth_sendTransaction') &&
+      errorInfo.includes('Failed to fetch')
+    ) {
+      return 'MetaMask could not reach the local Hardhat RPC while sending the transaction. Re-select or re-add the Hardhat Local network (RPC http://127.0.0.1:8545, chainId 31337) and try again.'
+    }
+
     // 先正则匹配
     const regex = /execution reverted: "([^"]+)"/
     const match = errorInfo.match(regex)
@@ -52,6 +60,10 @@ function showErrorMessage(e: any, msg: string) {
 }
 
 async function transactionWait(tx: any) {
+  if (!tx || typeof tx.wait !== 'function') {
+    throw new Error('No transaction response was returned from the contract call')
+  }
+
   message.info(
     'The contract has been called, tx is being confirmed, please wait...',
   )

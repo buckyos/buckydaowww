@@ -4,6 +4,7 @@ import { abis, ISourceProject, ProjectManagement, SourceDaoCommittee } from '@co
 
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL
+const CHAIN_NAME = process.env.NEXT_PUBLIC_CHAIN
 
 /**
  * 检查浏览器是否安装了以太坊钱包插件
@@ -45,6 +46,49 @@ function getDefaultRpcUrl(networkId: string) {
   }
 }
 
+function getExpectedChainConfig() {
+  const networkId = getExpectedNetworkId()
+  const rpcUrl = RPC_URL || getDefaultRpcUrl(networkId)
+  if (!rpcUrl) {
+    return undefined
+  }
+
+  return {
+    chainId: getExpectedChainIdHex(),
+    chainName: CHAIN_NAME || `Chain ${networkId}`,
+    rpcUrls: [rpcUrl],
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+  }
+}
+
+async function ensureExpectedChainConfigured(injectedProvider: any) {
+  if (expectedChainConfigured) {
+    return
+  }
+
+  const chainConfig = getExpectedChainConfig()
+  if (!chainConfig) {
+    return
+  }
+
+  try {
+    await injectedProvider.request({
+      method: 'wallet_addEthereumChain',
+      params: [chainConfig],
+    })
+  } catch (error: any) {
+    if (error?.code !== 4001) {
+      console.warn('wallet_addEthereumChain failed', error)
+    }
+  } finally {
+    expectedChainConfigured = true
+  }
+}
+
 export function isBrowserHasWallet(): boolean {
   try {
     return !!getInjectedProvider()
@@ -57,6 +101,7 @@ export function isBrowserHasWallet(): boolean {
 let readOnlyProvider: ethers.JsonRpcProvider | undefined
 let browserProvider: ethers.BrowserProvider | undefined
 let walletListenersBound = false
+let expectedChainConfigured = false
 const walletChangeListeners = new Set<() => void>()
 
 function clearWalletDerivedState() {
@@ -162,6 +207,9 @@ export async function getProvider() {
   }
 
   bindWalletEvents()
+  if (getExpectedNetworkId() === '31337') {
+    await ensureExpectedChainConfigured(injectedProvider)
+  }
 
   if (!browserProvider) {
     browserProvider = new ethers.BrowserProvider(injectedProvider)

@@ -87,6 +87,9 @@ const ChangeCommitteeModal: React.FC<{
           name=''
           style={{ width: '100%' }}
           autoComplete='off'
+          initialValues={{
+            isFullProposal: false,
+          }}
         >
           <Form.Item
             name='title'
@@ -173,7 +176,6 @@ const ChangeCommitteeModal: React.FC<{
             <Switch
               checkedChildren="Enable"
               unCheckedChildren="Disable"
-              defaultChecked={false}
             />
           </Form.Item>
 
