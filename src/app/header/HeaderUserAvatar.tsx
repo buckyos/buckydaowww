@@ -10,10 +10,30 @@ import { useCommittee, useBindWalletAddress } from '@hooks/index'
 const HeaderUserAvatar = () => {
   const user = useUserStore()
   const userBind = useBindWalletAddress()
-  const { isCommittee } = useCommittee(userBind.governanceAddress)
+  const { isCommittee: isBoundCommittee } = useCommittee(userBind.boundAddress)
+  const { isCommittee: isActiveCommittee } = useCommittee(userBind.activeAddress)
   const hasProfile = !!user.user.avatar && !!user.user.nickname
-  const displayName = user.user.nickname || 'Wallet'
   const isLoggedIn = user.isLogin()
+  const identityAddress = isLoggedIn
+    ? userBind.boundAddress || userBind.activeAddress
+    : userBind.activeAddress
+  const hasGithubIdentity = !!user.user.github_account && !userBind.isLocalChainMode
+  const displayName =
+    user.user.nickname
+    || (hasGithubIdentity ? user.user.github_account : '')
+    || (identityAddress ? userBind.addressEllipsis(identityAddress) : 'Wallet')
+  const identityHint = isLoggedIn
+    ? userBind.isLocalChainMode
+      ? 'Local session'
+      : user.user.github_account
+        ? `GitHub @${user.user.github_account}`
+        : 'Authenticated account'
+    : userBind.hasActiveWallet
+      ? 'Connected wallet'
+      : ''
+  const mismatchMessage = userBind.isLocalChainMode
+    ? 'Logged-in local account and active wallet are different. Logout and login again if you want to switch accounts.'
+    : 'Logged-in account and active wallet are different. Switch back to the bound wallet or rebind this account.'
 
   const items: MenuProps['items'] = [
     {
@@ -34,6 +54,20 @@ const HeaderUserAvatar = () => {
       ),
       key: 'wallet',
     },
+    isLoggedIn && userBind.shouldShowBindWalletAction ? {
+      label: (
+        <div
+          className='flex items-center py-2'
+          onClick={() => {
+            void userBind.handleBindWallet()
+          }}
+        >
+          <ContactsOutlined className='mr-2' />
+          {userBind.bindWalletLabel}
+        </div>
+      ),
+      key: 'bind-wallet',
+    } : null,
     isLoggedIn ? {
       label: (
         <div
@@ -52,7 +86,7 @@ const HeaderUserAvatar = () => {
 
   return (
     <Dropdown menu={{ items }} placement='bottomRight' arrow>
-      <div className='flex-center gap-2'>
+      <div className='flex items-start gap-2 py-1'>
         {hasProfile ? (
           <Image
             width={60}
@@ -66,29 +100,61 @@ const HeaderUserAvatar = () => {
             <UserOutlined className='text-xl' />
           </div>
         )}
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-center'>
-            <span className='text-lg cursor-default'>
-              {displayName}
-            </span>
-            {isCommittee && (
-              <div className='ml-2'>
-                <Tag color='green'>committee</Tag>
-              </div>
+        <div className='flex min-w-0 max-w-[340px] flex-col gap-1.5'>
+          <div className='flex min-w-0 items-center gap-2'>
+            <Tooltip
+              title={
+                !user.user.nickname && !user.user.github_account && identityAddress
+                  ? identityAddress
+                  : undefined
+              }
+            >
+              <span className='min-w-0 truncate text-base font-medium cursor-default'>
+                {displayName}
+              </span>
+            </Tooltip>
+            {!userBind.isAddressMismatch && (isLoggedIn ? isBoundCommittee : isActiveCommittee) && (
+              <Tag color='green'>committee</Tag>
             )}
           </div>
 
-          {userBind.displayAddress && (
-            <Tooltip title={userBind.displayAddress}>
-              <div className='text-cyfs-green text-sm'>
-                {userBind.addressEllipsis()}
-              </div>
-            </Tooltip>
+          {!!identityHint && (
+            <div className='min-w-0 text-xs text-cyfs-gray truncate cursor-default'>
+              {identityHint}
+            </div>
+          )}
+
+          {isLoggedIn && userBind.boundAddress && (
+            <div className='flex min-w-0 items-center gap-2 text-xs'>
+              <span className='w-10 shrink-0 text-cyfs-gray'>Bound</span>
+              <Tooltip title={userBind.boundAddress}>
+                <div className='min-w-0 truncate font-mono text-cyfs-green'>
+                  {userBind.addressEllipsis(userBind.boundAddress)}
+                </div>
+              </Tooltip>
+              {isBoundCommittee && <Tag color='green'>committee</Tag>}
+            </div>
+          )}
+
+          {userBind.hasActiveWallet && (!isLoggedIn || userBind.isAddressMismatch) && (
+            <div className='flex min-w-0 items-center gap-2 text-xs'>
+              <span className='w-10 shrink-0 text-cyfs-gray'>
+                {isLoggedIn ? 'Active' : 'Wallet'}
+              </span>
+              <Tooltip title={userBind.activeAddress}>
+                <div className={`min-w-0 truncate font-mono ${isLoggedIn ? 'text-blue-500' : 'text-cyfs-green'}`}>
+                  {userBind.addressEllipsis(userBind.activeAddress)}
+                </div>
+              </Tooltip>
+              {isLoggedIn && userBind.isAddressMismatch && isActiveCommittee && (
+                <Tag color='blue'>active committee</Tag>
+              )}
+            </div>
           )}
 
           {userBind.isAddressMismatch && (
-            <div className='text-amber-500 text-xs cursor-default'>
-              Active wallet differs from bound address
+            <div className='max-w-[340px] rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-700 cursor-default'>
+              {mismatchMessage}
             </div>
           )}
 
