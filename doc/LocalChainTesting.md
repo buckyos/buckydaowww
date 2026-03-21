@@ -26,6 +26,27 @@
 - `/api/user/bind`
 - proposal / repo / investment 列表和 metadata
 
+如果你想直接把：
+
+- Hardhat 本地链
+- backend
+- frontend
+
+一起拉起，现在也可以直接使用：
+
+- [local_dev_stack.sh](/home/bucky/work/SourceDAO/scripts/local_dev_stack.sh)
+
+对应说明见：
+
+- [LocalFullStackDev.md](/home/bucky/work/SourceDAO/docs/LocalFullStackDev.md)
+
+如果你的本机 `3000` 已经被别的前端占用，也可以临时切到：
+
+```bash
+cd /home/bucky/work/SourceDAO
+SOURCE_DAO_FRONTEND_PORT=3001 npm run stack:local
+```
+
 ---
 
 ## 本地测试模式说明
