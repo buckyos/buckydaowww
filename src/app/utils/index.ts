@@ -2,6 +2,7 @@ import { nowTimestamp, timeago } from '@utils/time'
 import { ethers } from 'ethers'
 import _ from 'lodash'
 import { message } from 'antd'
+import { createElement } from 'react'
 import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import { decodeIfEncoded, decodePaddedAddress } from '@utils/encode'
 
@@ -29,6 +30,14 @@ function extractMessage(error: unknown) {
   try {
     if (
       typeof errorInfo === 'string' &&
+      errorInfo.includes('missing revert data') &&
+      errorInfo.includes('estimateGas')
+    ) {
+      return 'Transaction simulation failed before the wallet could send it on chain.\n\nCommon causes:\n- budget exceeds the current 2.5% token supply limit\n- version is not greater than the latest version\n- token/amount array lengths do not match'
+    }
+
+    if (
+      typeof errorInfo === 'string' &&
       errorInfo.includes('eth_sendTransaction') &&
       errorInfo.includes('Failed to fetch')
     ) {
@@ -54,9 +63,36 @@ function extractMessage(error: unknown) {
   }
 }
 
+function formatLongErrorMessage(messageText: string) {
+  return messageText
+    .replace(/\]\[/g, ']\n[')
+    .replace(/, transaction=\{/g, ',\ntransaction={')
+    .replace(/, invocation=/g, ',\ninvocation=')
+    .replace(/, revert=/g, ',\nrevert=')
+    .replace(/, code=/g, ',\ncode=')
+}
+
 function showErrorMessage(e: any, msg: string) {
-    let result = extractMessage(e)
-    message.error(`${msg}[${result}]`, 10)
+    const result = extractMessage(e)
+    const formatted = formatLongErrorMessage(`${msg}\n${result}`)
+    message.open({
+      type: 'error',
+      duration: 10,
+      style: { marginTop: '20vh' },
+      content: createElement(
+        'div',
+        {
+          style: {
+            whiteSpace: 'pre-wrap',
+            textAlign: 'left',
+            maxWidth: '720px',
+            wordBreak: 'break-word',
+            lineHeight: 1.5,
+          },
+        },
+        formatted,
+      ),
+    })
 }
 
 async function transactionWait(tx: any) {
