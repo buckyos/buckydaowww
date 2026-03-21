@@ -11,6 +11,7 @@ import ProposalStateLine from '@components/ProposalStateLine'
 import { useUserStore } from '@hooks/index'
 import ProposalEdition from './ProposalEdition'
 import FullVoteExecuteButton from './FullVoteExecuteButton'
+import ProposalVoteButtons from './ProposalVoteButtons'
 import _ from 'lodash'
 import { useAsyncEffect } from 'ahooks'
 import {
@@ -354,6 +355,10 @@ const ProposalHeaderContent: React.FC<{
                 <Link className='text-cyfs-blue' href={"https://github.com/buckyos/SourceDAO"} target='_blank'>
                     How to vote?
                 </Link>
+                <ProposalVoteButtons
+                    proposal={proposal}
+                    fetchData={fetchData}
+                />
                 {currentVoteType == VoteType.FullMember &&
                     <FullVoteExecuteButton
                         proposal={proposal}
