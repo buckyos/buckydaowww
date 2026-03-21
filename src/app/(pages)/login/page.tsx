@@ -1,5 +1,5 @@
 'use client'
-import { Suspense } from 'react'
+import { Suspense, useRef } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import { useSearchParams, useRouter } from 'next/navigation'
 import useUserStore from '@hooks/useUserStore'
@@ -12,9 +12,16 @@ function LoginPageInner() {
   const code = params.get('code')
   const state = params.get('state')
   const user = useUserStore()
+  const handledLoginKeyRef = useRef<string | null>(null)
 
   useAsyncEffect(async () => {
     if (code) {
+      const loginKey = `${code}:${state || ''}`
+      if (handledLoginKeyRef.current === loginKey) {
+        return
+      }
+      handledLoginKeyRef.current = loginKey
+
       if (!state) {
         message.error('Missing GitHub OAuth state')
         return

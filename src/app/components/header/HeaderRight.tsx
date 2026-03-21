@@ -9,6 +9,7 @@ const HeaderRight = () => {
   const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
   const useLocalDevLogin =
     isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
+  const loginLabel = useLocalDevLogin ? 'Login with Wallet' : 'Login with GitHub'
 
   const handleLogin = async () => {
     if (useLocalDevLogin) {
@@ -46,7 +47,7 @@ const HeaderRight = () => {
           void handleLogin()
         }}
       >
-        Login
+        {loginLabel}
       </div>
     </div>
   )
