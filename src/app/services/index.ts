@@ -1,5 +1,38 @@
 import { transformNumber, bigTransformPercentNumber } from '@utils/index'
 
+async function parseJsonResponse<T>(
+  resp: Response,
+  fallbackMessage: string,
+): Promise<T> {
+  const text = await resp.text()
+
+  if (!text) {
+    if (resp.status === 401 || resp.status === 403) {
+      throw new Error('Please login first')
+    }
+
+    throw new Error(
+      resp.ok
+        ? `${fallbackMessage}: empty response body`
+        : `${fallbackMessage} [${resp.status}]`,
+    )
+  }
+
+  try {
+    return JSON.parse(text) as T
+  } catch (_error) {
+    if (resp.status === 401 || resp.status === 403) {
+      throw new Error('Please login first')
+    }
+
+    if (!resp.ok) {
+      throw new Error(text)
+    }
+
+    throw new Error(`${fallbackMessage}: invalid JSON response`)
+  }
+}
+
 // 获取DAO成员列表
 export async function fetchMembers() {
   const resp = await fetch('/api/committee/members')
@@ -164,7 +197,10 @@ export async function updateProposalInfomation(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to update proposal information',
+  )
   return data
 }
 
@@ -186,7 +222,10 @@ export async function createInvestmentExtra(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to create investment metadata',
+  )
   return data
 }
 
@@ -210,7 +249,10 @@ export async function proposalSetparams(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to submit proposal params',
+  )
   return data
 }
 
@@ -238,7 +280,10 @@ export async function proposalSetExtraAndParams(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to submit proposal metadata',
+  )
   return data
 }
 
@@ -264,7 +309,10 @@ export async function createReleaseToken(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to create token release metadata',
+  )
   return data
 }
 
@@ -357,7 +405,10 @@ export async function createProjectVersionExtra(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to submit project metadata',
+  )
   return data
 }
 
@@ -382,6 +433,9 @@ export async function postContributionWithdraw(
       'DAO-TOKEN': jwt,
     },
   })
-  const data = await resp.json()
+  const data = await parseJsonResponse<CommonResponse<any>>(
+    resp,
+    'Failed to withdraw contribution',
+  )
   return data
 }

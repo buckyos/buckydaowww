@@ -59,6 +59,10 @@ async function changeCommitteeProposal(
   values: StoreValue,
   jwt: string,
 ) {
+  if (!jwt) {
+    throw new Error('Please login first')
+  }
+
   const addresses = (values.committee as CommitteeMember[]).map(
     (item) => item.address,
   )

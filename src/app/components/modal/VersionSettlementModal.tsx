@@ -1,5 +1,6 @@
 import { Button, Modal, message, Form, Input, InputNumber, Radio } from 'antd'
 import { useState } from 'react'
+import { useBindWalletAddress } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
 import { useVersionSettlementModalStore } from '@hooks/modal'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
@@ -12,15 +13,17 @@ import { contractService } from '@contracts/index'
 // 项目结算 提案
 const VersionSettlementModal = () => {
   const { visible, version, close } = useVersionSettlementModalStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { jwt } = useUserStore((state) => {
-    return { jwt: state.jwt }
-  })
 
   const onFinish = async (values: any) => {
     setIsSubmitting(true)
     const postContract = async () => {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        return
+      }
+
       if (version === undefined) {
         message.error('error: missing project version')
         return
@@ -55,6 +58,7 @@ const VersionSettlementModal = () => {
 
       // 提案的参数设置
       // set params
+      const jwt = useUserStore.getState().jwt
       const setparamResult = await proposalSetparams(
         jwt,
         [

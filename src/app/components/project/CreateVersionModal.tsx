@@ -8,6 +8,7 @@ import {
   DatePicker,
 } from 'antd'
 import { useState } from 'react'
+import { useBindWalletAddress } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
 import dayjs from 'dayjs'
@@ -63,15 +64,17 @@ function parseReceiptLog(receipt: any): number {
 const CreateVersionModal = () => {
   const { visible, project_name, close, project_id } = useCreateVersionModalStore()
   const contract = useContractStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { jwt } = useUserStore((state) => {
-    return { jwt: state.jwt }
-  })
 
   const onFinish = async (values: any) => {
     setIsSubmitting(true)
     const fn = async () => {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        return
+      }
+
       if (!project_name) {
         message.error('error: missing project name')
         return
@@ -104,6 +107,7 @@ const CreateVersionModal = () => {
       }
 
       // service
+      const jwt = useUserStore.getState().jwt
       const result = await createProjectVersionExtra(
         jwt,
         values.title,

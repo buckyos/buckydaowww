@@ -3,6 +3,7 @@ import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { ethers } from 'ethers'
+import { useBindWalletAddress } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
 import {
   appendUpgradeCalldataToExtra,
@@ -19,12 +20,16 @@ const UpgradeContractModal: React.FC<{
   setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const user = useUserStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
     const fn = async () => {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        return
+      }
+
       const migrationCalldata = normalizeUpgradeCalldata(values.migrationCalldata)
       const calldataHash = ethers.keccak256(migrationCalldata)
       const proposalExtra = appendUpgradeCalldataToExtra(
@@ -49,7 +54,7 @@ const UpgradeContractModal: React.FC<{
         return
       }
       const result = await proposalSetExtraAndParams(
-        user.jwt,
+        useUserStore.getState().jwt,
         [
           values.contractProxyAddress,
           values.implAddress,

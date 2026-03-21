@@ -281,7 +281,33 @@ function useBindWalletAddress() {
     }
 
     if (sessionState === 'authenticated') {
-      if (isAddressMismatch) {
+      const refreshCode = await updateUser().catch((error) => {
+        console.warn('refresh authenticated session failed', error)
+        return -1
+      })
+
+      if (refreshCode !== 0) {
+        if (isLocalChainMode && hasActiveWallet) {
+          return handleLocalLogin()
+        }
+
+        useUserStore.getState().logout()
+        message.error('Please login first')
+        return false
+      }
+
+      const refreshedActiveAddress = normalizeAddress(
+        useWalletStore.getState().activeAddress,
+      )
+      const refreshedBoundAddress = normalizeAddress(
+        useUserStore.getState().user.address,
+      )
+
+      if (
+        refreshedActiveAddress &&
+        refreshedBoundAddress &&
+        refreshedActiveAddress !== refreshedBoundAddress
+      ) {
         message.error('Active wallet differs from the authenticated address')
         return false
       }

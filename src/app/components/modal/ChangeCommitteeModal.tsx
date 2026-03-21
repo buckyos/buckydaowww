@@ -5,7 +5,7 @@ import { useAsyncEffect } from 'ahooks'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin, Switch } from 'antd'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
-import { useUserStore } from '@hooks/index'
+import { useBindWalletAddress, useUserStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { fetchMembers } from '@services/index'
 import { changeCommitteeProposal } from '@contracts/index'
@@ -18,8 +18,7 @@ const ChangeCommitteeModal: React.FC<{
   const [committee, setCommittee] = useState<CommitteeMember[]>([])
   const [loading, setLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const user = useUserStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   useAsyncEffect(async () => {
     if (!showModal) {
@@ -53,8 +52,16 @@ const ChangeCommitteeModal: React.FC<{
     setIsSubmitting(true)
 
     try {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        setIsSubmitting(false)
+        return
+      }
+
       // 提交委员会变更提案
-      const isOk = await changeCommitteeProposal(values, user.jwt)
+      const isOk = await changeCommitteeProposal(
+        values,
+        useUserStore.getState().jwt,
+      )
       if (isOk) {
         message.success(
           'Change committee proposal submitted successfully, reloading...',
