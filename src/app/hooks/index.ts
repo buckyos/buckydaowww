@@ -184,6 +184,8 @@ function useBindWalletAddress() {
     useWalletAddress()
   const updateWalletState = useWalletStore((state) => state.updateWalletState)
   const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
+  const useLocalDevLogin =
+    isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
 
   const handleConnectWallet = async () => {
     const provider = await getProvider()
@@ -204,7 +206,7 @@ function useBindWalletAddress() {
   }
 
   const handleLocalLogin = async () => {
-    if (!isLocalChainMode) {
+    if (!useLocalDevLogin) {
       return false
     }
 
@@ -219,7 +221,7 @@ function useBindWalletAddress() {
   }
 
   const handleBindWallet = async () => {
-    if (isLocalChainMode) {
+    if (useLocalDevLogin) {
       message.info('Local chain mode does not require wallet binding')
       return
     }
@@ -266,7 +268,7 @@ function useBindWalletAddress() {
     : hasActiveWallet
       ? 'anonymous'
       : 'disconnected'
-  const canBindWallet = !isLocalChainMode && !!jwt && hasActiveWallet
+  const canBindWallet = !useLocalDevLogin && !!jwt && hasActiveWallet
   const shouldShowBindWalletAction = canBindWallet && (!boundAddress || isAddressMismatch)
   const bindWalletLabel = boundAddress ? 'Rebind wallet' : 'Bind wallet'
 
@@ -287,7 +289,7 @@ function useBindWalletAddress() {
       })
 
       if (refreshCode !== 0) {
-        if (isLocalChainMode && hasActiveWallet) {
+        if (useLocalDevLogin && hasActiveWallet) {
           return handleLocalLogin()
         }
 
@@ -320,7 +322,7 @@ function useBindWalletAddress() {
       return false
     }
 
-    if (isLocalChainMode) {
+    if (useLocalDevLogin) {
       message.error('Please connect your browser wallet and login first')
       return false
     }
@@ -343,6 +345,7 @@ function useBindWalletAddress() {
     hasBoundAddress: !!boundAddress,
     isAddressMismatch,
     isLocalChainMode,
+    useLocalDevLogin,
     isAuthenticated,
     sessionState,
     canBindWallet,

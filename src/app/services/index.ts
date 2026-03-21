@@ -247,6 +247,40 @@ export async function devLogin(
   }
 }
 
+export async function beginGithubLogin(
+  redirect?: string,
+): Promise<CommonResponse<string>> {
+  const query = new URLSearchParams()
+  if (redirect) {
+    query.set('redirect', redirect)
+  }
+
+  const suffix = query.toString() ? `?${query.toString()}` : ''
+  const resp = await fetch(`/api/user/githubauthorize${suffix}`, {
+    credentials: 'same-origin',
+  })
+
+  return parseJsonResponse<CommonResponse<string>>(
+    resp,
+    'Failed to initialize GitHub login',
+  )
+}
+
+export async function completeGithubLogin(
+  code: string,
+  state: string,
+): Promise<CommonResponse<string>> {
+  const query = new URLSearchParams({ code, state })
+  const resp = await fetch(`/api/user/githublogin?${query.toString()}`, {
+    credentials: 'same-origin',
+  })
+
+  return parseJsonResponse<CommonResponse<string>>(
+    resp,
+    'Failed to complete GitHub login',
+  )
+}
+
 // 更新提案信息
 export async function updateProposalInfomation(
   proposalId: string,

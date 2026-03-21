@@ -2,31 +2,27 @@
 import { useBindWalletAddress } from '@hooks/index'
 import HeaderInfo from '@components/header/HeaderInfo'
 import { message, Tooltip } from 'antd'
+import { beginGithubLogin } from '@services/index'
 
 const HeaderRight = () => {
   const userBind = useBindWalletAddress()
   const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
+  const useLocalDevLogin =
+    isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
 
   const handleLogin = async () => {
-    if (isLocalChainMode) {
+    if (useLocalDevLogin) {
       await userBind.handleLocalLogin()
       return
     }
 
-    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
-    const callbackUrl = process.env.NEXT_PUBLIC_GITHUB_CALLBACK_URL
-
-    if (!clientId || !callbackUrl) {
-      message.error('Missing GitHub OAuth configuration')
+    const result = await beginGithubLogin(window.location.href)
+    if (result.code !== 0 || !result.data) {
+      message.error(result.msg || 'Failed to initialize GitHub login')
       return
     }
 
-    const redirectUrl = new URL(callbackUrl)
-    redirectUrl.searchParams.set('redirect', window.location.href)
-
-    const redirectUri = redirectUrl.toString()
-    const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`
-    window.location.href = url
+    window.location.href = result.data
   }
 
   if (userBind.sessionState === 'authenticated') {

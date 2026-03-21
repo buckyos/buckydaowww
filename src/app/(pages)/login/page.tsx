@@ -4,20 +4,25 @@ import { useAsyncEffect } from 'ahooks'
 import { useSearchParams, useRouter } from 'next/navigation'
 import useUserStore from '@hooks/useUserStore'
 import { message } from 'antd'
+import { completeGithubLogin } from '@services/index'
 
 function LoginPageInner() {
   const params = useSearchParams()
   const router = useRouter()
   const code = params.get('code')
+  const state = params.get('state')
   const user = useUserStore()
 
   useAsyncEffect(async () => {
     if (code) {
-      // fetch token
-      const resp = await fetch(`/api/user/githublogin?code=${code}`)
-      const result = await resp.json()
+      if (!state) {
+        message.error('Missing GitHub OAuth state')
+        return
+      }
+
+      const result = await completeGithubLogin(code, state)
       if (result.code != 0) {
-        message.error(result.msg)
+        message.error(result.msg || 'GitHub login failed')
         return
       }
       const jwt = result.data
@@ -38,7 +43,7 @@ function LoginPageInner() {
         }
       }
     }
-  }, [code])
+  }, [code, state])
 
   return (
     <div className='flex-center'>
