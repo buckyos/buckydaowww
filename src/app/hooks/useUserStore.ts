@@ -88,6 +88,7 @@ const useUserStore = create<UserStoreDefine>()(
             desc: '',
           },
           jwt: '',
+          expiration: 0,
         })
       },
     }),

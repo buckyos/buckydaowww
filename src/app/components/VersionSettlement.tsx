@@ -20,10 +20,6 @@ import _ from 'lodash'
 const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
   proposal,
 }) => {
-  const { jwt, isLogin } = useUserStore((state) => ({
-    jwt: state.jwt,
-    isLogin: state.isLogin,
-  }))
   const { ensureAuthenticated } = useBindWalletAddress()
   const [loading, setLoading] = useState(false)
 
@@ -55,6 +51,7 @@ const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
         return false
       }
 
+      const jwt = useUserStore.getState().jwt
       const result = await postContributionWithdraw(jwt, [proposal.project.id])
       console.log('result', result)
     }
