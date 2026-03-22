@@ -42,6 +42,13 @@ const Nav = () => {
         Project
       </Link>
 
+      <Link
+        href="/token"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Token
+      </Link>
+
       <div className='block md:hidden'>{/* <WalletConnector /> */}</div>
     </nav>
   )

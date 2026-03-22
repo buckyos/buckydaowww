@@ -321,6 +321,11 @@ class ContractService {
     return this.LOCKUP
   }
 
+  public getAddressOfDividend() {
+    if (!this.DIVIDEND) throw new Error('DIVIDEND is undefined')
+    return this.DIVIDEND
+  }
+
   public getAddressOfAquired() {
     if (!this.ACQUIRED) throw new Error('ACQUIRED is undefined')
     return this.ACQUIRED
