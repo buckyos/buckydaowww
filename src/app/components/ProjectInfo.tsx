@@ -116,15 +116,24 @@ const ProjectInfo: React.FC<{
               <ProjectOutlined className='text-3xl mr-3 items-center flex' />
               <h1 className='text-3xl font-bold'>{project?.project_name}</h1>
             </div>
-            {canEditProfile && onEditProfile ? (
-              <button
-                className='btn-dan h-9 px-5'
-                type='button'
-                onClick={onEditProfile}
+            <div className='flex items-center gap-3 flex-wrap'>
+              <a
+                className='text-sm text-cyfs-green underline underline-offset-2'
+                href='https://github.com/buckyos/SourceDAO/blob/main/docs/ProjectVersionGuide.md'
+                target='_blank'
               >
-                Edit profile
-              </button>
-            ) : null}
+                Project / Version guide
+              </a>
+              {canEditProfile && onEditProfile ? (
+                <button
+                  className='btn-dan h-9 px-5'
+                  type='button'
+                  onClick={onEditProfile}
+                >
+                  Edit profile
+                </button>
+              ) : null}
+            </div>
           </div>
 
           <div className='grid grid-cols-2 mt-6 gap-y-2'>

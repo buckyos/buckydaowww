@@ -6,14 +6,87 @@ import { useVersionSettlementModalStore } from '@hooks/modal'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { getAddress } from 'ethers'
 import { proposalSetparams } from '@services/index'
-import { extractMessage, transactionWait } from '@utils/index'
+import { extractMessage, showErrorMessage, transactionWait } from '@utils/index'
 import { contractService } from '@contracts/index'
 
+function normalizeAddress(address?: string) {
+  return address?.trim().toLowerCase() || ''
+}
+
+function buildSettlementPrecheckErrors(
+  version: ProjectVersionProps,
+  activeAddress: string,
+  contributions: ContributionInfo[],
+) {
+  const errors: string[] = []
+
+  if (version.state !== 1) {
+    errors.push(
+      'Settlement proposal can only be created when the version state is Developing.',
+    )
+  }
+
+  if (!activeAddress) {
+    errors.push('Connect the manager wallet first.')
+  } else if (
+    normalizeAddress(activeAddress) !== normalizeAddress(version.manager)
+  ) {
+    errors.push('Only the version manager wallet can create the settlement proposal.')
+  }
+
+  if (contributions.length === 0) {
+    errors.push('At least one contributor is required.')
+  }
+
+  const seenAddresses = new Set<string>()
+  contributions.forEach((item) => {
+    const normalized = normalizeAddress(item.contributor)
+    if (!normalized) {
+      errors.push('Contributor address is required.')
+      return
+    }
+
+    if (seenAddresses.has(normalized)) {
+      errors.push(`Duplicate contributor address: ${item.contributor}`)
+      return
+    }
+
+    seenAddresses.add(normalized)
+
+    if (item.value <= 0) {
+      errors.push(`Contribution value must be greater than 0 for ${item.contributor}.`)
+    }
+  })
+
+  return errors
+}
+
+function showSettlementPrecheckErrors(errors: string[]) {
+  message.open({
+    type: 'error',
+    duration: 10,
+    style: { marginTop: '20vh' },
+    content: (
+      <div style={{ whiteSpace: 'pre-wrap', textAlign: 'left', maxWidth: '720px', lineHeight: 1.5 }}>
+        {'Failed settlement\n' + errors.map((item) => `- ${item}`).join('\n')}
+      </div>
+    ),
+  })
+}
+
+function isSettlementSimulationFailure(error: unknown) {
+  const errorInfo = (error as any)?.message
+  return (
+    typeof errorInfo === 'string' &&
+    errorInfo.includes('missing revert data') &&
+    errorInfo.includes('estimateGas')
+  )
+}
 
 // 项目结算 提案
 const VersionSettlementModal = () => {
   const { visible, version, close } = useVersionSettlementModalStore()
-  const { ensureAuthenticated } = useBindWalletAddress()
+  const { ensureAuthenticated, activeAddress } = useBindWalletAddress()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -39,6 +112,16 @@ const VersionSettlementModal = () => {
         },
       )
       console.log('onFinish', values, contributions)
+      const precheckErrors = buildSettlementPrecheckErrors(
+        version,
+        activeAddress,
+        contributions,
+      )
+      if (precheckErrors.length > 0) {
+        showSettlementPrecheckErrors(precheckErrors)
+        return
+      }
+
       // 合约
       const projectContractCaller = await contractService.getProjectContract()
       const tx = await projectContractCaller.acceptProject(
@@ -84,8 +167,20 @@ const VersionSettlementModal = () => {
     try {
       await postContract()
     } catch (e) {
-      const msg = extractMessage(e)
-      message.error('Failed settlement:  ' + msg, 5)
+      if (isSettlementSimulationFailure(e) && version) {
+        showSettlementPrecheckErrors(
+          buildSettlementPrecheckErrors(version, activeAddress, [] as ContributionInfo[]).concat([
+            'Contributor addresses must be unique and contribution values must be greater than 0.',
+          ]),
+        )
+      } else {
+        const msg = extractMessage(e)
+        if (typeof msg === 'string' && msg.trim()) {
+          showErrorMessage(e, 'Failed settlement')
+        } else {
+          message.error('Failed settlement', 5)
+        }
+      }
     }
     setIsSubmitting(false)
   }

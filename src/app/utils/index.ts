@@ -216,10 +216,16 @@ function transformVersionStateWord(state: number | string) {
     return 'Waiting vote'
   }
   if (state == 1) {
-    return 'Proposal passed'
+    return 'Developing'
+  }
+  if (state == 2) {
+    return 'Waiting settlement vote'
   }
   if (state == 3) {
     return 'Version settled'
+  }
+  if (state == 4) {
+    return 'Rejected'
   }
   return 'Unknown'
 }

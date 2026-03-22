@@ -47,7 +47,16 @@ export default function ProjectsPage() {
     <>
       {/* <ProjectRoadmap /> */}
       <div className='my-6 flex items-center justify-between gap-4'>
-        <div className='text-2xl font-medium'>Project Dashboard</div>
+        <div>
+          <div className='text-2xl font-medium'>Project Dashboard</div>
+          <a
+            className='text-sm text-cyfs-green underline underline-offset-2'
+            href='https://github.com/buckyos/SourceDAO/blob/main/docs/ProjectVersionGuide.md'
+            target='_blank'
+          >
+            Project / Version guide
+          </a>
+        </div>
         <CreateProject />
       </div>
       <ProjectList />

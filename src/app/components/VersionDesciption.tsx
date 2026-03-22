@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Descriptions, Tooltip } from 'antd'
+import { Button, Descriptions, Tooltip } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import useContractStore from '@hooks/useContract'
@@ -29,12 +29,16 @@ function ellipsisAddress(address?: string) {
   return `${address.slice(0, 6)}...${address.slice(-5)}`
 }
 
+function normalizeAddress(address?: string) {
+  return address?.trim().toLowerCase() || ''
+}
+
 const VersionDescription: React.FC<VersionDescriptionProps> = ({
   version,
   inProposalPage = false,
 }) => {
   const { show } = useVersionSettlementModalStore()
-  const { ensureAuthenticated } = useBindWalletAddress()
+  const { ensureAuthenticated, activeAddress } = useBindWalletAddress()
   const { decimals, symbol } = useContractStore((state) => ({
     decimals: state.decimals,
     symbol: state.symbol,
@@ -52,6 +56,23 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
 
   if (version === undefined) {
     return <Loading className='mt-20' />
+  }
+
+  const isManagerWallet =
+    !!activeAddress &&
+    normalizeAddress(activeAddress) === normalizeAddress(version.manager)
+  const settlementBlockers: string[] = []
+
+  if (version.state !== 1) {
+    settlementBlockers.push(
+      'Settlement proposal can only be created after the version proposal passes and the version enters Developing state.',
+    )
+  }
+
+  if (!activeAddress) {
+    settlementBlockers.push('Connect the manager wallet before creating a settlement proposal.')
+  } else if (!isManagerWallet) {
+    settlementBlockers.push('Only the version manager wallet can create the settlement proposal.')
   }
 
   const items: DescriptionsProps['items'] = [
@@ -146,19 +167,33 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
       items.push({
         label: 'settlement status',
         children: (
-          <>
-            <div>
-              <div className='flex-center gap-4'>
-                <div>No settlement proposal</div>
-                <a
-                  className='btn-dan w-60 h-9'
-                  onClick={onCreateSettlementProposal}
-                >
-                  Create settlement proposal
-                </a>
-              </div>
+          <div className='space-y-3'>
+            <div className='flex items-center gap-4 flex-wrap'>
+              <div>No settlement proposal</div>
+              <Button
+                className='btn-dan w-60 h-9'
+                type='primary'
+                disabled={settlementBlockers.length > 0}
+                onClick={onCreateSettlementProposal}
+              >
+                Create settlement proposal
+              </Button>
             </div>
-          </>
+            {settlementBlockers.length > 0 ? (
+              <div className='rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>
+                <div className='font-medium mb-2'>Settlement proposal is not available yet.</div>
+                <ul className='list-disc pl-5 space-y-1'>
+                  {settlementBlockers.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className='text-sm text-gray-500'>
+                Create the settlement proposal after development is complete, then submit contributor points for committee review.
+              </div>
+            )}
+          </div>
         ),
       })
     }
