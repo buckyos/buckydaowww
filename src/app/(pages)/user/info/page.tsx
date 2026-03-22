@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { Button, Tag } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { useAsyncEffect } from 'ahooks'
@@ -50,10 +51,12 @@ export default function UserInfoPage() {
     <div className='flex flex-col px-40 mt-20 pb-80'>
       <div className='flex items-center'>
         {hasProfile ? (
-          <img
-            className='w-16 h-16 rounded-full overflow-hidden'
+          <Image
+            className='h-16 w-16 rounded-full overflow-hidden'
             src={user.user.avatar}
-            alt=''
+            alt='user avatar'
+            width={64}
+            height={64}
           />
         ) : (
           <div className='w-16 h-16 rounded-full overflow-hidden bg-gray-100 text-gray-500 flex items-center justify-center'>
