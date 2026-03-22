@@ -444,10 +444,10 @@ function useGetProjectQuery(id: string) {
   // state
   const [data, setData] = useState<ProjectItem>()
   const [isLoading, setIsLoading] = useState(true)
-  //  const [error, setError] = useState<Error>()
-  useAsyncEffect(async () => {
+  const loadProject = async () => {
     // 没有单独的项目详情接口,
     // 需要先获取项目列表,然后再找到对应的项目
+    setIsLoading(true)
     const result = await fetchRepositoryList()
     if (result.code == 0) {
       const decodedId = decodeURIComponent(String(id))
@@ -462,9 +462,14 @@ function useGetProjectQuery(id: string) {
       }
     }
     setIsLoading(false)
+  }
+
+  //  const [error, setError] = useState<Error>()
+  useAsyncEffect(async () => {
+    await loadProject()
   }, [])
 
-  return { data, isLoading }
+  return { data, isLoading, refetch: loadProject }
 }
 
 export {

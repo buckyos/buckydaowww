@@ -19,6 +19,16 @@ interface VersionDescriptionProps {
   inProposalPage?: boolean
 }
 
+function ellipsisAddress(address?: string) {
+  if (!address) {
+    return '-'
+  }
+  if (address.length <= 15) {
+    return address
+  }
+  return `${address.slice(0, 6)}...${address.slice(-5)}`
+}
+
 const VersionDescription: React.FC<VersionDescriptionProps> = ({
   version,
   inProposalPage = false,
@@ -109,7 +119,13 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
         </Tooltip>
       </>
     ),
-    children: version?.manager,
+    children: (
+      <Tooltip title={version?.manager}>
+        <span className='font-mono text-sm text-cyfs-green'>
+          {ellipsisAddress(version?.manager)}
+        </span>
+      </Tooltip>
+    ),
   })
 
   if (!inProposalPage) {

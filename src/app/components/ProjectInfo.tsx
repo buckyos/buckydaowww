@@ -102,16 +102,29 @@ const ProjectInfo: React.FC<{
   project?: ProjectItem
   loading: boolean
   version?: ProjectVersionProps
-}> = ({ project, loading, version }) => {
+  canEditProfile?: boolean
+  onEditProfile?: () => void
+}> = ({ project, loading, version, canEditProfile = false, onEditProfile }) => {
   return (
     <>
       <ProjectBreadcrumb project={project} version={version} />
       {loading && <Loading className='mt-10' />}
       {!loading && (
         <>
-          <div className='flex items-center mt-10'>
-            <ProjectOutlined className='text-3xl mr-3 items-center flex' />
-            <h1 className='text-3xl font-bold'>{project?.project_name}</h1>
+          <div className='flex items-center justify-between gap-4 mt-10 flex-wrap'>
+            <div className='flex items-center'>
+              <ProjectOutlined className='text-3xl mr-3 items-center flex' />
+              <h1 className='text-3xl font-bold'>{project?.project_name}</h1>
+            </div>
+            {canEditProfile && onEditProfile ? (
+              <button
+                className='btn-dan h-9 px-5'
+                type='button'
+                onClick={onEditProfile}
+              >
+                Edit profile
+              </button>
+            ) : null}
           </div>
 
           <div className='grid grid-cols-2 mt-6 gap-y-2'>
