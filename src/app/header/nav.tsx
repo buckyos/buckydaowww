@@ -29,6 +29,13 @@ const Nav = () => {
       </Link>
 
       <Link
+        href="/funding"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Funding
+      </Link>
+
+      <Link
         href="/invest"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
       >

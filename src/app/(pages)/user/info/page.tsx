@@ -53,7 +53,7 @@ export default function UserInfoPage() {
         {hasProfile ? (
           <Image
             className='h-16 w-16 rounded-full overflow-hidden'
-            src={user.user.avatar}
+            src={user.user.avatar || ''}
             alt='user avatar'
             width={64}
             height={64}
