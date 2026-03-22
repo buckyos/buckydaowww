@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { decodeBytes32String } from 'ethers'
-import { Tag, Tooltip, Spin } from 'antd'
+import { Button, Modal, Tag, Tooltip, Spin, message } from 'antd'
 import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useAsyncEffect } from 'ahooks'
 import { fetchTokenInfo, getDevRatio, newProviderContract, contractService } from '@contracts/index'
 import { abis, erc20, ISourceProject, ProjectManagement } from '@contracts/abis'
 import { useBindWalletAddress, useLockToken } from '@hooks/index'
+import { showErrorMessage, transactionWait } from '@utils/index'
 import { formatAmount, wrapUnits } from '@utils/numberConverter'
 
 function ellipsisAddress(address?: string) {
@@ -65,10 +66,19 @@ type RewardAmount = {
 }
 
 export default function TokenCenterPage() {
-  const { governanceAddress, activeAddress, boundAddress, hasActiveWallet } =
+  const {
+    governanceAddress,
+    activeAddress,
+    boundAddress,
+    hasActiveWallet,
+    handleConnectWallet,
+  } =
     useBindWalletAddress()
   const { token: lockupToken } = useLockToken(governanceAddress)
   const [loading, setLoading] = useState(true)
+  const [submittingAction, setSubmittingAction] = useState<
+    '' | 'claim-lockup' | 'withdraw-dividend'
+  >('')
   const [tokenInfo, setTokenInfo] = useState<ContractTokenInfo>()
   const [devRatio, setDevRatio] = useState<bigint>(0n)
   const [walletBalances, setWalletBalances] = useState<{
@@ -317,6 +327,139 @@ export default function TokenCenterPage() {
 
   const devDecimals = tokenInfo?.dev.decimals ?? 18
   const normalDecimals = tokenInfo?.normal.decimals ?? 18
+  const withdrawableRewards = dividendOverview.estimatedPreviousRewards.filter(
+    (reward) => !reward.withdrawed && reward.amount > 0n,
+  )
+
+  const claimLockup = async () => {
+    if (!hasActiveWallet) {
+      const connected = await handleConnectWallet()
+      if (!connected) {
+        return
+      }
+    }
+
+    if (lockupDetails.canClaim <= 0n || !tokenInfo) {
+      message.info('No claimable lockup tokens are available right now')
+      return
+    }
+
+    Modal.confirm({
+      centered: true,
+      title: 'Claim lockup tokens',
+      okText: 'Claim now',
+      cancelText: 'Cancel',
+      content: (
+        <div className='mt-4 flex flex-col gap-3 text-sm'>
+          <div>
+            You are about to claim your currently unlocked lockup allocation.
+          </div>
+          <div>
+            <b>Claimable now:</b>{' '}
+            {formatTokenBigInt(lockupDetails.canClaim, normalDecimals, 4)}{' '}
+            {tokenInfo.normal.symbol}
+          </div>
+          <div>
+            <b>Unlock target:</b>{' '}
+            {lockupDetails.unlockProjectName
+              ? `${lockupDetails.unlockProjectName} v${lockupDetails.unlockProjectVersion.toString()}`
+              : 'Unknown'}
+          </div>
+          <div className='text-cyfs-gray'>
+            Your wallet will open for the on-chain claim transaction after you confirm.
+          </div>
+        </div>
+      ),
+      onOk: async () => {
+        try {
+          setSubmittingAction('claim-lockup')
+          const lockupContract = await contractService.getLockupContract()
+          const tx = await lockupContract.claimTokens(lockupDetails.canClaim)
+          const receipt = await transactionWait(tx)
+          if (receipt?.status !== 1) {
+            message.error(`Claim lockup failed [${receipt?.status}]`)
+            return
+          }
+          message.success('Lockup tokens claimed successfully')
+          await load()
+        } catch (error) {
+          showErrorMessage(error, 'Failed to claim lockup tokens')
+        } finally {
+          setSubmittingAction('')
+        }
+      },
+    })
+  }
+
+  const withdrawDividends = async () => {
+    if (!hasActiveWallet) {
+      const connected = await handleConnectWallet()
+      if (!connected) {
+        return
+      }
+    }
+
+    if (withdrawableRewards.length === 0 || dividendOverview.currentCycleIndex === 0n) {
+      message.info('No withdrawable dividend rewards are available right now')
+      return
+    }
+
+    const tokens = withdrawableRewards.map((reward) => reward.token)
+
+    Modal.confirm({
+      centered: true,
+      title: 'Withdraw dividend rewards',
+      okText: 'Withdraw rewards',
+      cancelText: 'Cancel',
+      content: (
+        <div className='mt-4 flex flex-col gap-3 text-sm'>
+          <div>
+            You are about to withdraw all currently available dividend rewards for cycle #
+            {dividendOverview.previousCycleIndex.toString()}.
+          </div>
+          <div>
+            <b>Reward tokens:</b>
+            <div className='mt-2 flex flex-wrap gap-2'>
+              {withdrawableRewards.map((reward) => (
+                <Tag key={`withdraw-${reward.token}`}>
+                  {(rewardTokenMeta[reward.token]?.symbol ?? ellipsisAddress(reward.token))}:{' '}
+                  {formatTokenBigInt(
+                    reward.amount,
+                    rewardTokenMeta[reward.token]?.decimals ?? 18,
+                    4,
+                  )}
+                </Tag>
+              ))}
+            </div>
+          </div>
+          <div className='text-cyfs-gray'>
+            Your wallet will open for the on-chain withdrawal transaction after you confirm.
+          </div>
+        </div>
+      ),
+      onOk: async () => {
+        try {
+          setSubmittingAction('withdraw-dividend')
+          const dividendContract = await contractService.getDividendContract()
+          const tx = await dividendContract.withdrawDividends(
+            [dividendOverview.previousCycleIndex],
+            tokens,
+          )
+          const receipt = await transactionWait(tx)
+          if (receipt?.status !== 1) {
+            message.error(`Withdraw dividends failed [${receipt?.status}]`)
+            return
+          }
+          message.success('Dividend rewards withdrawn successfully')
+          await load()
+        } catch (error) {
+          showErrorMessage(error, 'Failed to withdraw dividends')
+        } finally {
+          setSubmittingAction('')
+        }
+      },
+    })
+  }
 
   return (
     <div className='space-y-8 py-8'>
@@ -562,6 +705,21 @@ export default function TokenCenterPage() {
                 </div>
               </div>
             ) : null}
+            <div className='flex flex-wrap items-center gap-3'>
+              <Button
+                type='primary'
+                disabled={lockupDetails.canClaim <= 0n}
+                loading={submittingAction === 'claim-lockup'}
+                onClick={() => void claimLockup()}
+              >
+                Claim Lockup
+              </Button>
+              <span className='text-sm text-gray-500'>
+                {lockupDetails.canClaim > 0n
+                  ? `Claimable now: ${formatTokenBigInt(lockupDetails.canClaim, normalDecimals, 4)} ${tokenInfo?.normal.symbol || ''}`
+                  : 'No lockup tokens are claimable at the moment.'}
+              </span>
+            </div>
             {!governanceAddress ? (
               <p>Connect a wallet to see your lockup status.</p>
             ) : loading || !tokenInfo ? (
@@ -615,6 +773,21 @@ export default function TokenCenterPage() {
               Dividend stake and unstake activity updates cycle checkpoints. Rewards for a closed cycle are based on
               historical effective stake, not just your live wallet balance.
             </p>
+            <div className='flex flex-wrap items-center gap-3'>
+              <Button
+                type='primary'
+                disabled={withdrawableRewards.length === 0}
+                loading={submittingAction === 'withdraw-dividend'}
+                onClick={() => void withdrawDividends()}
+              >
+                Withdraw Dividends
+              </Button>
+              <span className='text-sm text-gray-500'>
+                {withdrawableRewards.length > 0
+                  ? `Withdraw ${withdrawableRewards.length} reward token(s) from cycle #${dividendOverview.previousCycleIndex.toString()}`
+                  : 'No withdrawable dividend rewards are available right now.'}
+              </span>
+            </div>
             {loading ? (
               <div className='flex justify-center py-8'>
                 <Spin />
