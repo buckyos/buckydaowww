@@ -103,6 +103,11 @@ interface ProposalDetailResponseData {
   data: ProposalResponseData
 }
 
+interface ProposalVoteRecord {
+  proposal: ProposalResponseData
+  support: boolean
+}
+
 interface ProposalCardProps {
   item: ProposalResponseData
   memberCount: number
@@ -307,6 +312,13 @@ interface ContributionItem {
   amount: string
   isClaim: boolean
   projectId: number
+}
+
+interface WithdrawableContributionItem {
+  address: string
+  amount: string
+  projectId: number
+  project: ProjectVersionProps
 }
 
 interface SettlementVersionProposalParams {

@@ -31,9 +31,14 @@ const ProjectVersionPage = () => {
     console.log(projectResult, versionResult)
     const version = versionResult.data as ProjectVersionProps
     setVersion(version)
+    const decodedProjectId = decodeURIComponent(String(projectId))
     const project = projectResult.data
       .map((item) => decodeProjectProfile(item))
-      .find((item) => item.id == projectId)
+      .find(
+        (item) =>
+          String(item.id) === decodedProjectId
+          || item.project_name === decodedProjectId,
+      )
     if (project) {
       setProject(project)
     }

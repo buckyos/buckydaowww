@@ -7,9 +7,11 @@ import { Button, Spin, Tag, message } from 'antd'
 import { UserOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import ProposalStateTag from '@components/ProposalStateTag'
 import {
-  fetchRepositoryList,
-  getProjectVersions,
+  fetchOwnedRepositoryList,
+  getManagedProjectVersions,
   getProposals,
+  getRecentProposalVotes,
+  getWithdrawableContributions,
   beginGithubLogin,
   decodeProjectProfile,
 } from '@services/index'
@@ -45,11 +47,6 @@ type AssetSummary = {
   withdrawableDividendCycle: bigint
 }
 
-type ManagedVersionItem = ProjectVersionProps & {
-  projectId: string
-  projectName: string
-}
-
 function normalizeAddress(address?: string) {
   return address?.trim().toLowerCase() || ''
 }
@@ -72,31 +69,6 @@ function formatTokenBigInt(
   fractionDigits = 4,
 ) {
   return Number.parseFloat(wrapUnits(rawValue, decimals)).toFixed(fractionDigits)
-}
-
-function matchesCurrentIdentity(
-  candidate: User | undefined,
-  addresses: string[],
-  githubAccount: string,
-) {
-  if (!candidate) {
-    return false
-  }
-
-  const candidateAddress = normalizeAddress(candidate.address)
-  if (candidateAddress && addresses.includes(candidateAddress)) {
-    return true
-  }
-
-  if (
-    githubAccount &&
-    candidate.github_account &&
-    candidate.github_account === githubAccount
-  ) {
-    return true
-  }
-
-  return false
 }
 
 function getLoginLabel(useLocalDevLogin: boolean) {
@@ -137,9 +109,21 @@ export default function MePage() {
     normalSymbol: 'BDT',
     devSymbol: 'BDDT',
   })
-  const [allProposals, setAllProposals] = useState<ProposalResponseData[]>([])
-  const [allProjects, setAllProjects] = useState<ProjectItem[]>([])
-  const [managedVersions, setManagedVersions] = useState<ManagedVersionItem[]>([])
+  const [myProposals, setMyProposals] = useState<ProposalResponseData[]>([])
+  const [myProjects, setMyProjects] = useState<ProjectItem[]>([])
+  const [recentVotes, setRecentVotes] = useState<ProposalVoteRecord[]>([])
+  const [inProgressProposals, setInProgressProposals] = useState<
+    ProposalResponseData[]
+  >([])
+  const [acceptedProposals, setAcceptedProposals] = useState<
+    ProposalResponseData[]
+  >([])
+  const [myManagedVersions, setMyManagedVersions] = useState<ProjectVersionProps[]>(
+    [],
+  )
+  const [withdrawableContributions, setWithdrawableContributions] = useState<
+    WithdrawableContributionItem[]
+  >([])
 
   useEffect(() => {
     let cancelled = false
@@ -257,16 +241,17 @@ export default function MePage() {
 
   useEffect(() => {
     let cancelled = false
-    const addresses = [
-      normalizeAddress(governanceAddress),
-      normalizeAddress(boundAddress),
-      normalizeAddress(activeAddress),
-    ].filter(Boolean)
+    const walletAddress = governanceAddress || ''
+    const sessionAddress = boundAddress || ''
 
-    if (addresses.length === 0 && !user.github_account) {
-      setAllProposals([])
-      setAllProjects([])
-      setManagedVersions([])
+    if (!walletAddress && !sessionAddress && !user.github_account) {
+      setMyProposals([])
+      setMyProjects([])
+      setRecentVotes([])
+      setInProgressProposals([])
+      setAcceptedProposals([])
+      setMyManagedVersions([])
+      setWithdrawableContributions([])
       setDashboardLoading(false)
       return () => {
         cancelled = true
@@ -276,37 +261,50 @@ export default function MePage() {
     setDashboardLoading(true)
     const loadDashboard = async () => {
       try {
-        const [proposalResult, projectResult] = await Promise.all([
-          getProposals(1, 100),
-          fetchRepositoryList(),
+        const [
+          createdProposalResult,
+          ownedProjectResult,
+          recentVoteResult,
+          inProgressProposalResult,
+          acceptedProposalResult,
+          managedVersionsResult,
+          withdrawableContributionResult,
+        ] = await Promise.all([
+          sessionAddress
+            ? getProposals(1, 20, { creator: sessionAddress })
+            : Promise.resolve(undefined),
+          sessionAddress || user.github_account
+            ? fetchOwnedRepositoryList(sessionAddress || user.github_account)
+            : Promise.resolve(undefined),
+          walletAddress
+            ? getRecentProposalVotes(walletAddress, 1, 10)
+            : Promise.resolve(undefined),
+          walletAddress
+            ? getProposals(1, 50, { state: ProposalState.InProgress })
+            : Promise.resolve(undefined),
+          walletAddress
+            ? getProposals(1, 50, { state: ProposalState.Accepted })
+            : Promise.resolve(undefined),
+          walletAddress
+            ? getManagedProjectVersions(walletAddress, 1, 20)
+            : Promise.resolve(undefined),
+          walletAddress
+            ? getWithdrawableContributions(walletAddress)
+            : Promise.resolve(undefined),
         ])
 
-        const proposals = proposalResult?.data?.items || []
-        const projects = (projectResult?.data || []).map((item) =>
-          decodeProjectProfile(item),
-        )
-
-        const versionLists = await Promise.all(
-          projects.map(async (project) => {
-            try {
-              const result = await getProjectVersions(project.project_name)
-              const items = result?.data?.items || []
-              return items.map((version: ProjectVersionProps) => ({
-                ...version,
-                projectId: project.project_id,
-                projectName: project.project_name,
-              }))
-            } catch (error) {
-              console.warn('load project versions failed', project.project_name, error)
-              return []
-            }
-          }),
-        )
-
         if (!cancelled) {
-          setAllProposals(proposals)
-          setAllProjects(projects)
-          setManagedVersions(versionLists.flat())
+          setMyProposals(createdProposalResult?.data?.items || [])
+          setMyProjects(
+            (ownedProjectResult?.data || []).map((item) => decodeProjectProfile(item)),
+          )
+          setRecentVotes(recentVoteResult?.data?.items || [])
+          setInProgressProposals(inProgressProposalResult?.data?.items || [])
+          setAcceptedProposals(acceptedProposalResult?.data?.items || [])
+          setMyManagedVersions(managedVersionsResult?.data?.items || [])
+          setWithdrawableContributions(
+            withdrawableContributionResult?.data || [],
+          )
         }
       } catch (error) {
         console.warn('load /me dashboard failed', error)
@@ -322,25 +320,9 @@ export default function MePage() {
     return () => {
       cancelled = true
     }
-  }, [governanceAddress, boundAddress, activeAddress, user.github_account])
+  }, [governanceAddress, boundAddress, user.github_account])
 
-  const identityAddresses = [
-    normalizeAddress(governanceAddress),
-    normalizeAddress(boundAddress),
-    normalizeAddress(activeAddress),
-  ].filter(Boolean)
-
-  const myProjects = allProjects.filter((project) =>
-    matchesCurrentIdentity(project.owner, identityAddresses, user.github_account),
-  )
-
-  const myProposals = allProposals
-    .filter((proposal) =>
-      matchesCurrentIdentity(proposal.creator, identityAddresses, user.github_account),
-    )
-    .sort((a, b) => Number(b.id) - Number(a.id))
-
-  const awaitingMyVote = allProposals
+  const awaitingMyVote = inProgressProposals
     .filter((proposal) => {
       if (!hasTrustedProposalMetadata(proposal)) {
         return false
@@ -374,25 +356,31 @@ export default function MePage() {
     })
     .sort((a, b) => a.expired - b.expired)
 
-  const executableProposals = allProposals
-    .filter((proposal) => {
+  const executableProposals = [
+    ...acceptedProposals.filter((proposal) => {
       if (!hasTrustedProposalMetadata(proposal)) {
         return false
       }
-
-      if (proposal.full) {
-        return proposal.state === ProposalState.InProgress && proposal.expired * 1000 < Date.now()
+      return isCommittee && !proposal.full
+    }),
+    ...inProgressProposals.filter((proposal) => {
+      if (!hasTrustedProposalMetadata(proposal)) {
+        return false
       }
-
-      return isCommittee && proposal.state === ProposalState.Accepted
-    })
+      return proposal.full && proposal.expired * 1000 < Date.now()
+    }),
+  ]
     .sort((a, b) => Number(b.id) - Number(a.id))
-
-  const myManagedVersions = managedVersions
-    .filter((version) =>
-      identityAddresses.includes(normalizeAddress(version.manager)),
-    )
-    .sort((a, b) => b.id - a.id)
+  const sortedManagedVersions = [...myManagedVersions].sort((a, b) => b.id - a.id)
+  const sortedRecentVotes = [...recentVotes].sort(
+    (a, b) => Number(b.proposal.id) - Number(a.proposal.id),
+  )
+  const sortedMyProposals = [...myProposals].sort((a, b) => Number(b.id) - Number(a.id))
+  const sortedMyProjects = [...myProjects].sort((a, b) => {
+    const left = a.updatedAt || a.createdAt || 0
+    const right = b.updatedAt || b.createdAt || 0
+    return right - left
+  })
 
   const displayName =
     user.nickname
@@ -586,7 +574,7 @@ export default function MePage() {
             <Spin />
           </div>
         ) : (
-          <div className='mt-6 grid gap-4 xl:grid-cols-3'>
+          <div className='mt-6 grid gap-4 2xl:grid-cols-4 xl:grid-cols-2'>
             <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
               <div className='flex items-center justify-between gap-3'>
                 <div className='text-base font-medium'>Awaiting My Vote</div>
@@ -657,18 +645,18 @@ export default function MePage() {
                 <Tag>{myManagedVersions.length}</Tag>
               </div>
               <div className='mt-4 space-y-3'>
-                {myManagedVersions.length === 0 ? (
+                {sortedManagedVersions.length === 0 ? (
                   <div className='text-sm text-gray-500'>No project version currently points to your address as manager.</div>
                 ) : (
-                  myManagedVersions.slice(0, 5).map((version) => (
+                  sortedManagedVersions.slice(0, 5).map((version) => (
                     <Link
                       key={`version-${version.id}`}
-                      href={`/projects/${version.projectId}/version/${version.id}`}
+                      href={`/projects/${encodeURIComponent(version.pname)}/version/${version.id}`}
                       className='block rounded-lg border border-white bg-white px-4 py-3 hover:border-[#D9D9D9]'
                     >
                       <div className='flex items-center justify-between gap-3'>
                         <div className='font-medium text-black'>
-                          {version.projectName} {version.version}
+                          {version.pname} {version.version}
                         </div>
                         <Tag color={version.state === 1 ? 'processing' : 'default'}>
                           {transformVersionStateWord(version.state)}
@@ -682,11 +670,48 @@ export default function MePage() {
                 )}
               </div>
             </div>
+
+            <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+              <div className='flex items-center justify-between gap-3'>
+                <div className='text-base font-medium'>Withdrawable Contributions</div>
+                <Tag>{withdrawableContributions.length}</Tag>
+              </div>
+              <div className='mt-4 space-y-3'>
+                {withdrawableContributions.length === 0 ? (
+                  <div className='text-sm text-gray-500'>
+                    No finished version currently exposes unclaimed contribution rewards for this wallet.
+                  </div>
+                ) : (
+                  withdrawableContributions.slice(0, 5).map((item) => (
+                    <Link
+                      key={`withdraw-${item.projectId}`}
+                      href={`/projects/${encodeURIComponent(item.project.pname)}/version/${item.projectId}`}
+                      className='block rounded-lg border border-white bg-white px-4 py-3 hover:border-[#D9D9D9]'
+                    >
+                      <div className='flex items-center justify-between gap-3'>
+                        <div className='font-medium text-black'>
+                          {item.project.pname} {item.project.version}
+                        </div>
+                        <Tag color='green'>Withdrawable</Tag>
+                      </div>
+                      <div className='mt-1 text-sm text-gray-500'>
+                        {formatAmount(
+                          Number(wrapUnits(item.amount, tokenDecimals.dev)),
+                          4,
+                          false,
+                        )}{' '}
+                        {tokenDecimals.devSymbol}
+                      </div>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         )}
       </section>
 
-      <div className='grid gap-6 xl:grid-cols-2'>
+      <div className='grid gap-6 xl:grid-cols-3'>
         <section className={cardClassName}>
           <div className='flex items-center justify-between gap-3'>
             <div>
@@ -703,10 +728,10 @@ export default function MePage() {
               <div className='flex justify-center py-8'>
                 <Spin />
               </div>
-            ) : myProposals.length === 0 ? (
+            ) : sortedMyProposals.length === 0 ? (
               <div className='text-sm text-gray-500'>No proposal currently matches your logged-in identity or wallet.</div>
             ) : (
-              myProposals.slice(0, 5).map((proposal) => (
+              sortedMyProposals.slice(0, 5).map((proposal) => (
                 <Link
                   key={`my-proposal-${proposal.id}`}
                   href={`/proposal/${proposal.id}`}
@@ -743,10 +768,10 @@ export default function MePage() {
               <div className='flex justify-center py-8'>
                 <Spin />
               </div>
-            ) : myProjects.length === 0 ? (
+            ) : sortedMyProjects.length === 0 ? (
               <div className='text-sm text-gray-500'>No project profile currently matches your identity.</div>
             ) : (
-              myProjects.slice(0, 5).map((project) => (
+              sortedMyProjects.slice(0, 5).map((project) => (
                 <Link
                   key={`my-project-${project.project_id}`}
                   href={`/projects/${project.project_id}`}
@@ -764,6 +789,52 @@ export default function MePage() {
                       {project.github_url}
                     </div>
                   )}
+                </Link>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className={cardClassName}>
+          <div className='flex items-center justify-between gap-3'>
+            <div>
+              <h2 className='text-xl font-medium'>Recent Votes</h2>
+              <p className='mt-1 text-sm text-gray-500'>
+                Your most recent recorded proposal votes for the current wallet.
+              </p>
+            </div>
+            <Link className='text-cyfs-green' href='/proposals'>
+              View proposals <ArrowRightOutlined />
+            </Link>
+          </div>
+
+          <div className='mt-6 space-y-3'>
+            {dashboardLoading ? (
+              <div className='flex justify-center py-8'>
+                <Spin />
+              </div>
+            ) : sortedRecentVotes.length === 0 ? (
+              <div className='text-sm text-gray-500'>
+                No recorded vote currently matches the active governance wallet.
+              </div>
+            ) : (
+              sortedRecentVotes.slice(0, 5).map((record) => (
+                <Link
+                  key={`recent-vote-${record.proposal.id}`}
+                  href={`/proposal/${record.proposal.id}`}
+                  className='block rounded-lg border border-[#F3F4F6] px-4 py-3 hover:border-[#D9D9D9]'
+                >
+                  <div className='flex items-center justify-between gap-3'>
+                    <div className='font-medium text-black'>
+                      {record.proposal.title?.trim() || `Proposal #${record.proposal.id}`}
+                    </div>
+                    <Tag color={record.support ? 'blue' : 'red'}>
+                      {record.support ? 'Supported' : 'Rejected'}
+                    </Tag>
+                  </div>
+                  <div className='mt-1 text-sm text-gray-500'>
+                    #{record.proposal.id} · {String(getProposalType(record.proposal))}
+                  </div>
                 </Link>
               ))
             )}

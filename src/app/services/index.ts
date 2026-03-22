@@ -102,6 +102,15 @@ export async function fetchRepositoryList(): Promise<
   return data
 }
 
+export async function fetchOwnedRepositoryList(
+  owner: string,
+): Promise<CommonResponse<RepositoryItem[]>> {
+  const query = new URLSearchParams({ owner })
+  const resp = await fetch(`/api/repo/detail?${query.toString()}`)
+  const data = await resp.json()
+  return data
+}
+
 export function decodeProjectProfile(item: RepositoryItem): ProjectItem {
   const detail = JSON.parse(item.detail) as Partial<ProjectItem>
   const projectId =
@@ -514,8 +523,38 @@ export async function getContractInfo(): Promise<ContractInfomationResponse> {
 export async function getProposals(
   page: number,
   size: number,
+  filters?: {
+    creator?: string
+    state?: number
+  },
 ): Promise<CommonListResponse<ProposalResponseData>> {
-  const resp = await fetch(`/api/proposal?pageNo=${page}&pageSize=${size}`)
+  const query = new URLSearchParams({
+    pageNo: page.toString(),
+    pageSize: size.toString(),
+  })
+  if (filters?.creator) {
+    query.set('creator', filters.creator)
+  }
+  if (filters?.state !== undefined) {
+    query.set('state', filters.state.toString())
+  }
+  const resp = await fetch(`/api/proposal?${query.toString()}`)
+  const data = await resp.json()
+  return data
+}
+
+export async function getRecentProposalVotes(
+  address: string,
+  page = 1,
+  size = 10,
+): Promise<CommonListResponse<ProposalVoteRecord>> {
+  const query = new URLSearchParams({
+    pageNo: page.toString(),
+    pageSize: size.toString(),
+  })
+  const resp = await fetch(
+    `/api/proposal/votes/${encodeURIComponent(address)}?${query.toString()}`,
+  )
   const data = await resp.json()
   return data
 }
@@ -542,6 +581,23 @@ export async function getTwoStepInvestmentDetail(
 export async function getProjectVersions(project_name: string) {
   //  `/project/${params.pname}`
   const resp = await fetch('/api/project/' + project_name, {
+    method: 'GET',
+  })
+  const data = await resp.json()
+  return data
+}
+
+export async function getManagedProjectVersions(
+  manager: string,
+  page = 1,
+  size = 20,
+): Promise<CommonListResponse<ProjectVersionProps>> {
+  const query = new URLSearchParams({
+    pageNo: page.toString(),
+    pageSize: size.toString(),
+    manager,
+  })
+  const resp = await fetch(`/api/project?${query.toString()}`, {
     method: 'GET',
   })
   const data = await resp.json()
@@ -605,6 +661,16 @@ export async function getVersionContributionInfo(
   versionId: string,
 ): Promise<CommonResponse<ContributionItem[]>> {
   const resp = await fetch('/api/contribution/' + versionId)
+  const data = await resp.json()
+  return data
+}
+
+export async function getWithdrawableContributions(
+  address: string,
+): Promise<CommonResponse<WithdrawableContributionItem[]>> {
+  const resp = await fetch(
+    `/api/contribution/withdrawable/${encodeURIComponent(address)}`,
+  )
   const data = await resp.json()
   return data
 }
