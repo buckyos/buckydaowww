@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { decodeBytes32String } from 'ethers'
 import { Tag, Tooltip, Spin } from 'antd'
 import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useAsyncEffect } from 'ahooks'
 import { fetchTokenInfo, getDevRatio, newProviderContract, contractService } from '@contracts/index'
-import { abis } from '@contracts/abis'
+import { abis, erc20, ISourceProject, ProjectManagement } from '@contracts/abis'
 import { useBindWalletAddress, useLockToken } from '@hooks/index'
 import { formatAmount, wrapUnits } from '@utils/numberConverter'
 
@@ -41,8 +42,27 @@ function formatTokenBigInt(
   return Number.parseFloat(wrapUnits(rawValue, decimals)).toFixed(fractionDigits)
 }
 
+function decodeProjectName(bytes32Name: string) {
+  try {
+    return decodeBytes32String(bytes32Name)
+  } catch {
+    return bytes32Name
+  }
+}
+
 const cardClassName =
   'rounded-2xl border border-[#F0F0F0] bg-white p-6 shadow-sm'
+
+type RewardTokenMetadata = {
+  symbol: string
+  decimals: number
+}
+
+type RewardAmount = {
+  token: string
+  amount: bigint
+  withdrawed?: boolean
+}
 
 export default function TokenCenterPage() {
   const { governanceAddress, activeAddress, boundAddress, hasActiveWallet } =
@@ -60,6 +80,77 @@ export default function TokenCenterPage() {
     normal: 0n,
     votingPower: 0n,
   })
+  const [lockupDetails, setLockupDetails] = useState<{
+    canClaim: bigint
+    unlockProjectName: string
+    unlockProjectVersion: bigint
+    releasedAt: bigint
+  }>({
+    canClaim: 0n,
+    unlockProjectName: '',
+    unlockProjectVersion: 0n,
+    releasedAt: 0n,
+  })
+  const [dividendOverview, setDividendOverview] = useState<{
+    currentCycleIndex: bigint
+    startBlocktime: bigint
+    totalStaked: bigint
+    currentUserStake: bigint
+    previousUserStake: bigint
+    rewardCount: number
+    rewards: RewardAmount[]
+    previousCycleIndex: bigint
+    estimatedPreviousRewards: RewardAmount[]
+  }>({
+    currentCycleIndex: 0n,
+    startBlocktime: 0n,
+    totalStaked: 0n,
+    currentUserStake: 0n,
+    previousUserStake: 0n,
+    rewardCount: 0,
+    rewards: [],
+    previousCycleIndex: 0n,
+    estimatedPreviousRewards: [],
+  })
+  const [rewardTokenMeta, setRewardTokenMeta] = useState<Record<string, RewardTokenMetadata>>({})
+
+  const resolveRewardTokenMetadata = async (
+    tokens: string[],
+    info: ContractTokenInfo,
+  ) => {
+    const uniqueTokens = [...new Set(tokens)]
+    const entries = await Promise.all(
+      uniqueTokens.map(async (tokenAddress) => {
+        if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+          return [tokenAddress, { symbol: 'Native', decimals: 18 }] as const
+        }
+
+        if (tokenAddress.toLowerCase() === contractService.getAddressOfNormalToken().toLowerCase()) {
+          return [tokenAddress, { symbol: info.normal.symbol, decimals: info.normal.decimals }] as const
+        }
+
+        if (tokenAddress.toLowerCase() === contractService.getAddressOfDevToken().toLowerCase()) {
+          return [tokenAddress, { symbol: info.dev.symbol, decimals: info.dev.decimals }] as const
+        }
+
+        try {
+          const token = await newProviderContract(tokenAddress, erc20)
+          const [symbolRaw, decimalsRaw] = await Promise.all([
+            token.symbol(),
+            token.decimals(),
+          ])
+          return [
+            tokenAddress,
+            { symbol: String(symbolRaw), decimals: Number(decimalsRaw) },
+          ] as const
+        } catch {
+          return [tokenAddress, { symbol: ellipsisAddress(tokenAddress), decimals: 18 }] as const
+        }
+      }),
+    )
+
+    return Object.fromEntries(entries)
+  }
 
   const load = async () => {
     setLoading(true)
@@ -70,6 +161,25 @@ export default function TokenCenterPage() {
       setDevRatio(normalizedRatio)
 
       if (governanceAddress) {
+        const lockupContract = await newProviderContract(
+          contractService.getAddressOfLockup(),
+          abis,
+        )
+        const lockupInfoContract = await newProviderContract(
+          contractService.getAddressOfLockup(),
+          [
+            'function unlockProjectName() view returns (bytes32)',
+            'function unlockProjectVersion() view returns (uint64)',
+          ],
+        )
+        const dividendContract = await newProviderContract(
+          contractService.getAddressOfDividend(),
+          abis,
+        )
+        const projectContract = await newProviderContract(
+          contractService.getAddressOfProject(),
+          [...ISourceProject, ...ProjectManagement],
+        )
         const devToken = await newProviderContract(
           contractService.getAddressOfDevToken(),
           abis,
@@ -82,20 +192,119 @@ export default function TokenCenterPage() {
           devToken.balanceOf(governanceAddress),
           normalToken.balanceOf(governanceAddress),
         ])
+        const [
+          canClaimRaw,
+          unlockProjectNameRaw,
+          unlockProjectVersionRaw,
+          currentCycleIndexRaw,
+          currentCycle,
+        ] = await Promise.all([
+          lockupContract.getCanClaimTokens.staticCall({ from: governanceAddress }),
+          lockupInfoContract.unlockProjectName(),
+          lockupInfoContract.unlockProjectVersion(),
+          dividendContract.getCurrentCycleIndex(),
+          dividendContract.getCurrentCycle(),
+        ])
         const dev = BigInt(devRaw.toString())
         const normal = BigInt(normalRaw.toString())
         const votingPower = normal + (dev * normalizedRatio) / 100n
+        const currentCycleIndex = BigInt(currentCycleIndexRaw.toString())
+        const previousCycleIndex = currentCycleIndex > 0n ? currentCycleIndex - 1n : 0n
+        const [
+          currentUserStakeRaw,
+          previousUserStakeRaw,
+          previousCycleInfos,
+          releasedAtRaw,
+        ] = await Promise.all([
+          dividendContract.getStakeAmount.staticCall(currentCycleIndex, {
+            from: governanceAddress,
+          }),
+          dividendContract.getStakeAmount.staticCall(previousCycleIndex, {
+            from: governanceAddress,
+          }),
+          currentCycleIndex > 0n
+            ? dividendContract.getCycleInfos(previousCycleIndex, previousCycleIndex)
+            : Promise.resolve([]),
+          projectContract.versionReleasedTime(
+            unlockProjectNameRaw,
+            unlockProjectVersionRaw,
+          ),
+        ])
+        const previousCycle = previousCycleInfos[0]
+        const previousCycleRewardTokens = previousCycle
+          ? previousCycle.rewards.map((reward: any) => reward.token)
+          : []
+        const estimatedPreviousRewardsRaw =
+          currentCycleIndex > 0n && previousCycleRewardTokens.length > 0
+            ? await dividendContract.estimateDividends.staticCall(
+                [previousCycleIndex],
+                previousCycleRewardTokens,
+                { from: governanceAddress },
+              )
+            : []
+        const rewardTokens = [
+          ...currentCycle.rewards.map((reward: any) => reward.token),
+          ...estimatedPreviousRewardsRaw.map((reward: any) => reward.token),
+        ]
+        const rewardTokenMetadata = await resolveRewardTokenMetadata(
+          rewardTokens,
+          info,
+        )
+
         setWalletBalances({
           dev,
           normal,
           votingPower,
         })
+        setLockupDetails({
+          canClaim: BigInt(canClaimRaw.toString()),
+          unlockProjectName: decodeProjectName(String(unlockProjectNameRaw)),
+          unlockProjectVersion: BigInt(unlockProjectVersionRaw.toString()),
+          releasedAt: BigInt(releasedAtRaw.toString()),
+        })
+        setDividendOverview({
+          currentCycleIndex,
+          startBlocktime: BigInt(currentCycle.startBlocktime.toString()),
+          totalStaked: BigInt(currentCycle.totalStaked.toString()),
+          currentUserStake: BigInt(currentUserStakeRaw.toString()),
+          previousUserStake: BigInt(previousUserStakeRaw.toString()),
+          rewardCount: currentCycle.rewards.length,
+          rewards: currentCycle.rewards.map((reward: any) => ({
+            token: reward.token,
+            amount: BigInt(reward.amount.toString()),
+          })),
+          previousCycleIndex,
+          estimatedPreviousRewards: estimatedPreviousRewardsRaw.map((reward: any) => ({
+            token: reward.token,
+            amount: BigInt(reward.amount.toString()),
+            withdrawed: Boolean(reward.withdrawed),
+          })),
+        })
+        setRewardTokenMeta(rewardTokenMetadata)
       } else {
         setWalletBalances({
           dev: 0n,
           normal: 0n,
           votingPower: 0n,
         })
+        setLockupDetails({
+          canClaim: 0n,
+          unlockProjectName: '',
+          unlockProjectVersion: 0n,
+          releasedAt: 0n,
+        })
+        setDividendOverview({
+          currentCycleIndex: 0n,
+          startBlocktime: 0n,
+          totalStaked: 0n,
+          currentUserStake: 0n,
+          previousUserStake: 0n,
+          rewardCount: 0,
+          rewards: [],
+          previousCycleIndex: 0n,
+          estimatedPreviousRewards: [],
+        })
+        setRewardTokenMeta({})
       }
     } finally {
       setLoading(false)
@@ -317,15 +526,236 @@ export default function TokenCenterPage() {
             <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
               <div className='text-sm text-gray-500'>Lockup Assigned / Claimed</div>
               <div className='mt-2 text-2xl font-semibold'>
-                {formatTokenBigInt(lockupToken.assigned, devDecimals, 2)}
+                {formatTokenBigInt(lockupToken.assigned, normalDecimals, 2)}
               </div>
               <div className='mt-1 text-sm text-gray-500'>
-                Claimed {formatTokenBigInt(lockupToken.claimed, devDecimals, 2)} / Locked {formatTokenBigInt(lockupToken.locked, devDecimals, 2)}
+                Claimed {formatTokenBigInt(lockupToken.claimed, normalDecimals, 2)} / Locked {formatTokenBigInt(lockupToken.locked, normalDecimals, 2)}
               </div>
             </div>
           </div>
         )}
       </section>
+
+      <div className='grid gap-6 xl:grid-cols-2'>
+        <section className={cardClassName}>
+          <div className='flex items-center gap-2'>
+            <h2 className='text-xl font-medium'>Lockup Details</h2>
+            <Tooltip title='Lockup releases NormalToken linearly over 6 months after the configured unlock condition is met. The current UI shows the amounts that are already assigned, claimed, locked, and claimable now.'>
+              <InfoCircleOutlined />
+            </Tooltip>
+          </div>
+          <div className='mt-4 space-y-4 text-sm text-gray-500'>
+            <p>
+              Locked allocations do not become immediately withdrawable. Once the target release condition is met,
+              claimable amount increases linearly over 180 days.
+            </p>
+            {lockupDetails.unlockProjectName ? (
+              <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                <div className='text-sm text-gray-500'>Unlock Condition</div>
+                <div className='mt-2 text-base font-medium text-black'>
+                  Release of {lockupDetails.unlockProjectName} v{lockupDetails.unlockProjectVersion.toString()}
+                </div>
+                <div className='mt-2 text-sm text-gray-500'>
+                  {lockupDetails.releasedAt > 0n
+                    ? `Release detected at ${new Date(Number(lockupDetails.releasedAt) * 1000).toLocaleString()}`
+                    : 'The target version has not been released on chain yet, so claimable amount remains zero.'}
+                </div>
+              </div>
+            ) : null}
+            {!governanceAddress ? (
+              <p>Connect a wallet to see your lockup status.</p>
+            ) : loading || !tokenInfo ? (
+              <div className='flex justify-center py-8'>
+                <Spin />
+              </div>
+            ) : (
+              <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                  <div className='text-sm text-gray-500'>Assigned</div>
+                  <div className='mt-2 text-2xl font-semibold'>
+                    {formatTokenBigInt(lockupToken.assigned, normalDecimals, 2)}
+                  </div>
+                  <div className='mt-1 text-sm text-cyfs-green'>{tokenInfo.normal.symbol}</div>
+                </div>
+                <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                  <div className='text-sm text-gray-500'>Claimed</div>
+                  <div className='mt-2 text-2xl font-semibold'>
+                    {formatTokenBigInt(lockupToken.claimed, normalDecimals, 2)}
+                  </div>
+                  <div className='mt-1 text-sm text-cyfs-green'>{tokenInfo.normal.symbol}</div>
+                </div>
+                <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                  <div className='text-sm text-gray-500'>Still Locked</div>
+                  <div className='mt-2 text-2xl font-semibold'>
+                    {formatTokenBigInt(lockupToken.locked, normalDecimals, 2)}
+                  </div>
+                  <div className='mt-1 text-sm text-cyfs-green'>{tokenInfo.normal.symbol}</div>
+                </div>
+                <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                  <div className='text-sm text-gray-500'>Claimable Now</div>
+                  <div className='mt-2 text-2xl font-semibold'>
+                    {formatTokenBigInt(lockupDetails.canClaim, normalDecimals, 2)}
+                  </div>
+                  <div className='mt-1 text-sm text-cyfs-green'>{tokenInfo.normal.symbol}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className={cardClassName}>
+          <div className='flex items-center gap-2'>
+            <h2 className='text-xl font-medium'>Dividend Overview</h2>
+            <Tooltip title='Dividend cycles distribute reward assets to stakers. Current-cycle stake affects the next cycle, so your previous cycle effective stake is often the more relevant number for expected rewards.'>
+              <InfoCircleOutlined />
+            </Tooltip>
+          </div>
+          <div className='mt-4 space-y-4 text-sm text-gray-500'>
+            <p>
+              Dividend stake and unstake activity updates cycle checkpoints. Rewards for a closed cycle are based on
+              historical effective stake, not just your live wallet balance.
+            </p>
+            {loading ? (
+              <div className='flex justify-center py-8'>
+                <Spin />
+              </div>
+            ) : !tokenInfo ? null : (
+              <>
+                <div className='grid gap-4 sm:grid-cols-2'>
+                  <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                    <div className='text-sm text-gray-500'>Current Cycle</div>
+                    <div className='mt-2 text-2xl font-semibold'>
+                      #{dividendOverview.currentCycleIndex.toString()}
+                    </div>
+                    <div className='mt-1 text-sm text-gray-500'>
+                      Started{' '}
+                      {dividendOverview.startBlocktime > 0n
+                        ? new Date(Number(dividendOverview.startBlocktime) * 1000).toLocaleString()
+                        : '-'}
+                    </div>
+                  </div>
+                  <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                    <div className='text-sm text-gray-500'>Current Total Staked</div>
+                    <div className='mt-2 text-2xl font-semibold'>
+                      {formatTokenBigInt(dividendOverview.totalStaked, normalDecimals, 2)}
+                    </div>
+                    <div className='mt-1 text-sm text-cyfs-green'>{tokenInfo.normal.symbol}</div>
+                  </div>
+                </div>
+
+                {governanceAddress ? (
+                  <div className='grid gap-4 sm:grid-cols-2'>
+                    <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                      <div className='text-sm text-gray-500'>My Current-Cycle Stake</div>
+                      <div className='mt-2 text-2xl font-semibold'>
+                        {formatTokenBigInt(dividendOverview.currentUserStake, normalDecimals, 2)}
+                      </div>
+                      <div className='mt-1 text-sm text-gray-500'>
+                        Becomes effective for reward calculation in the next cycle.
+                      </div>
+                    </div>
+                    <div className='rounded-xl border border-[#F3F4F6] bg-[#FAFAFA] p-4'>
+                      <div className='text-sm text-gray-500'>My Previous-Cycle Effective Stake</div>
+                      <div className='mt-2 text-2xl font-semibold'>
+                        {formatTokenBigInt(dividendOverview.previousUserStake, normalDecimals, 2)}
+                      </div>
+                      <div className='mt-1 text-sm text-gray-500'>
+                        This is the stake base that matters for the current closed-cycle reward estimate.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='rounded-xl border border-dashed border-[#D1D5DB] bg-[#FAFAFA] px-6 py-8 text-sm text-gray-500'>
+                    Connect a wallet to see your cycle-by-cycle dividend stake view.
+                  </div>
+                )}
+
+                <div>
+                  <div className='text-sm font-medium text-black'>Current Cycle Reward Pool</div>
+                  {dividendOverview.rewardCount === 0 ? (
+                    <div className='mt-2 text-sm text-gray-500'>No reward deposits recorded in the current cycle yet.</div>
+                  ) : (
+                    <div className='mt-3 space-y-2'>
+                      {dividendOverview.rewards.map((reward) => (
+                        <div
+                          key={`${reward.token}-${reward.amount.toString()}`}
+                          className='flex items-center justify-between gap-4 rounded-lg border border-[#F3F4F6] bg-[#FAFAFA] px-4 py-3'
+                        >
+                          <div>
+                            <div className='text-sm font-medium text-black'>
+                              {rewardTokenMeta[reward.token]?.symbol ?? ellipsisAddress(reward.token)}
+                            </div>
+                            <div className='font-mono text-xs text-gray-500 break-all'>
+                              {reward.token === '0x0000000000000000000000000000000000000000'
+                                ? '0x0000000000000000000000000000000000000000'
+                                : reward.token}
+                            </div>
+                          </div>
+                          <div className='text-right'>
+                            <div className='text-sm font-medium'>
+                              {formatTokenBigInt(
+                                reward.amount,
+                                rewardTokenMeta[reward.token]?.decimals ?? 18,
+                                4,
+                              )}
+                            </div>
+                            <div className='text-xs text-gray-500'>Current cycle deposited total</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className='text-sm font-medium text-black'>Previous Closed-Cycle Reward Estimate</div>
+                  {dividendOverview.currentCycleIndex === 0n ? (
+                    <div className='mt-2 text-sm text-gray-500'>
+                      Cycle 0 has no full-cycle stake history, so there is no claimable dividend estimate yet.
+                    </div>
+                  ) : dividendOverview.estimatedPreviousRewards.length === 0 ? (
+                    <div className='mt-2 text-sm text-gray-500'>
+                      No withdrawable reward is currently estimated for cycle #{dividendOverview.previousCycleIndex.toString()}.
+                    </div>
+                  ) : (
+                    <div className='mt-3 space-y-2'>
+                      {dividendOverview.estimatedPreviousRewards.map((reward) => (
+                        <div
+                          key={`${dividendOverview.previousCycleIndex.toString()}-${reward.token}-${reward.amount.toString()}`}
+                          className='flex items-center justify-between gap-4 rounded-lg border border-[#F3F4F6] bg-[#FAFAFA] px-4 py-3'
+                        >
+                          <div>
+                            <div className='text-sm font-medium text-black'>
+                              {rewardTokenMeta[reward.token]?.symbol ?? ellipsisAddress(reward.token)}
+                            </div>
+                            <div className='font-mono text-xs text-gray-500 break-all'>
+                              {reward.token}
+                            </div>
+                          </div>
+                          <div className='text-right'>
+                            <div className='text-sm font-medium'>
+                              {formatTokenBigInt(
+                                reward.amount,
+                                rewardTokenMeta[reward.token]?.decimals ?? 18,
+                                4,
+                              )}
+                            </div>
+                            <div className='mt-1'>
+                              <Tag color={reward.withdrawed ? 'default' : 'green'}>
+                                {reward.withdrawed ? 'Withdrawn' : 'Withdrawable'}
+                              </Tag>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      </div>
 
       <section className={cardClassName}>
         <h2 className='text-xl font-medium'>Notes</h2>
@@ -336,6 +766,18 @@ export default function TokenCenterPage() {
           <p>
             For full-community votes, the current vote weight is computed from the live on-chain ratio:
             {' '}<span className='font-mono'>BDT + (BDDT * devRatio / 100)</span>.
+          </p>
+          <p>
+            Lockup does not release instantly. Once its configured unlock condition is satisfied, NormalToken becomes
+            claimable linearly over 6 months.
+          </p>
+          <p>
+            Dividend rewards are cycle-based. Stake changes made in the current cycle affect the next cycle, so
+            current-cycle stake and effective reward stake are intentionally not the same concept.
+          </p>
+          <p>
+            Token Center reads on-chain contracts directly. Reward estimates reflect chain state at refresh time and do
+            not depend on backend indexing.
           </p>
           <p>
             For proposal workflows and project/version governance, see{' '}

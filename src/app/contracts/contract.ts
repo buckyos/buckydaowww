@@ -336,6 +336,11 @@ class ContractService {
     return this.COMMITTEE
   }
 
+  public getAddressOfProject() {
+    if (!this.PROJECT) throw new Error('PROJECT is undefined')
+    return this.PROJECT
+  }
+
 
   public getNetworkId() {
     if (!this.NETWORK_ID) throw new Error('NETWORK_ID is undefined')
