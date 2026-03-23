@@ -393,3 +393,51 @@ interface ContractTokenInfo {
     unreleasePercent: number
   }
 }
+
+interface FundingOverviewResponseData {
+  tokenInfo: ResponseTokenInfo
+  treasury: {
+    bdtInDividend: string
+    bdtInAcquired: string
+    bdtInProject: string
+  }
+  rounds: {
+    activeCount: number
+    closedCount: number
+    totalCount: number
+    totalSubscribedDao: string
+    activeRounds: TwoStepInvestmentData[]
+    historyRounds: TwoStepInvestmentData[]
+  }
+  pipeline: {
+    waitingVote: ProjectVersionProps[]
+    developing: ProjectVersionProps[]
+    waitingSettlement: ProjectVersionProps[]
+    settled: ProjectVersionProps[]
+  }
+}
+
+interface FundingOverviewData {
+  tokenInfo: ContractTokenInfo
+  treasury: {
+    bddtReleased: number
+    bddtUnreleased: number
+    bdtInDividend: number
+    bdtInAcquired: number
+    bdtInProject: number
+  }
+  rounds: {
+    activeCount: number
+    closedCount: number
+    totalCount: number
+    totalSubscribedDao: number
+    activeRounds: TwoStepInvestmentData[]
+    historyRounds: TwoStepInvestmentData[]
+  }
+  pipeline: {
+    waitingVote: ProjectVersionProps[]
+    developing: ProjectVersionProps[]
+    waitingSettlement: ProjectVersionProps[]
+    settled: ProjectVersionProps[]
+  }
+}

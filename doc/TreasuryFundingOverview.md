@@ -167,19 +167,65 @@
 
 ## 6. 第二阶段候选增强
 
-后续可以继续补：
+第二阶段不再只是继续堆总览卡片，而是把 `/funding` 和 `/invest` 分别往“决策总览”和“round 工作台”推进。
+
+### 6.1 Funding 第二阶段
+
+目标：
+
+- 把前端 fan-out 聚合迁移到更稳定的 backend summary
+- 让 treasury 与 project release 的关系更可读
+
+建议优先级：
 
 1. backend 聚合接口
    - `/treasury/overview`
    - `/funding/overview`
+   - `/funding/release-pipeline`
 2. treasury 资产图表
    - 合约余额分布
    - 历史融资量趋势
 3. release 关联增强
    - 最近 release 版本时间线
    - release token proposal 摘要
-4. 投资页关系增强
-   - `/funding` 与 `/invest` 的更紧密联动
+   - lockup / contribution withdraw 的关联说明
+
+### 6.2 Invest 第二阶段
+
+目标：
+
+- 把 `/invest/[id]` 从“原始详情页”升级成真正的 round 工作台
+- 优先回答当前用户最关心的问题：
+  - 我能不能认购？
+  - 我现在处于哪个阶段？
+  - 我还能认购多少？
+  - investor 什么时候可以结束本轮？
+
+建议拆成这些区块：
+
+1. `Round Summary`
+   - round title / status
+   - human-readable ratio
+   - remaining inventory
+   - investor
+2. `My Subscription Status`
+   - 当前钱包是否在 whitelist
+   - step 1 配额
+   - 已认购数量
+   - 当前最大可认购数量
+3. `Timeline & Rules`
+   - step 1 / step 2 / end 时间
+   - 当前阶段说明
+   - investor end 条件说明
+4. `Whitelist Allocation`
+   - 当前 round whitelist 摘要
+   - 已认购进度
+
+### 6.3 当前建议的实施顺序
+
+1. 先做 `/invest/[id]` 工作台化改造
+2. 再补 backend treasury / funding summary
+3. 最后上图表和 release ledger
 
 ## 7. 当前取舍
 

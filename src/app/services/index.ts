@@ -158,16 +158,7 @@ export async function upsertProjectDetail(
   )
 }
 
-// 获取合约代币信息
-export async function fetchContractTokenInfo(): Promise<
-  CommonResponse<ContractTokenInfo>
-> {
-  const resp = await fetch('/api/contract/token')
-  if (resp.status != 200) {
-    throw Error("failed")
-  }
-  const result = await resp.json()
-  const data = result as ResponseTokenInfo
+function mapContractTokenInfo(data: ResponseTokenInfo): ContractTokenInfo {
   const devTotalSupply = transformNumber(data.devTokenTotalSupply, data.devTokenDecimals)
   const normalTotalSupply = transformNumber(data.normalTokenTotalSupply, data.normalTokenDecimals)
   const devTotalReleased = transformNumber(data.devTokenTotalReleased, data.devTokenDecimals)
@@ -180,13 +171,14 @@ export async function fetchContractTokenInfo(): Promise<
     BigInt(data.devTokenTotalUnreleased),
     BigInt(data.devTokenTotalSupply),
   )
-  const reponseData: ContractTokenInfo = {
-    normal: {  // BDT
+
+  return {
+    normal: {
       totalSupply: normalTotalSupply,
       symbol: data.normalTokenSymbol,
       decimals: data.normalTokenDecimals,
     },
-    dev: {  // BDDT
+    dev: {
       totalSupply: devTotalSupply,
       symbol: data.devTokenSymbol,
       decimals: data.devTokenDecimals,
@@ -194,14 +186,73 @@ export async function fetchContractTokenInfo(): Promise<
       totalReleasedPercent: devTotalReleasedPercent,
       unrelease: devTokenTotalUnreleased,
       unreleasePercent: devTokenBalancePercent,
-
-    }
+    },
   }
+}
+
+// 获取合约代币信息
+export async function fetchContractTokenInfo(): Promise<
+  CommonResponse<ContractTokenInfo>
+> {
+  const resp = await fetch('/api/contract/token')
+  if (resp.status != 200) {
+    throw Error("failed")
+  }
+  const result = await resp.json()
+  const data = result as ResponseTokenInfo
+  const reponseData = mapContractTokenInfo(data)
 
   return {
     code: 0,
     msg: "",
     data: reponseData
+  }
+}
+
+export async function fetchFundingOverview(): Promise<
+  CommonResponse<FundingOverviewData>
+> {
+  const resp = await fetch('/api/funding/overview')
+  const result = await parseJsonResponse<CommonResponse<FundingOverviewResponseData>>(
+    resp,
+    'Failed to fetch funding overview',
+  )
+  const data = result.data
+  const tokenInfo = mapContractTokenInfo(data.tokenInfo)
+
+  return {
+    ...result,
+    data: {
+      tokenInfo,
+      treasury: {
+        bddtReleased: tokenInfo.dev.totalReleased,
+        bddtUnreleased: tokenInfo.dev.unrelease,
+        bdtInDividend: transformNumber(
+          data.treasury.bdtInDividend,
+          data.tokenInfo.normalTokenDecimals,
+        ),
+        bdtInAcquired: transformNumber(
+          data.treasury.bdtInAcquired,
+          data.tokenInfo.normalTokenDecimals,
+        ),
+        bdtInProject: transformNumber(
+          data.treasury.bdtInProject,
+          data.tokenInfo.normalTokenDecimals,
+        ),
+      },
+      rounds: {
+        activeCount: data.rounds.activeCount,
+        closedCount: data.rounds.closedCount,
+        totalCount: data.rounds.totalCount,
+        totalSubscribedDao: transformNumber(
+          data.rounds.totalSubscribedDao,
+          data.tokenInfo.normalTokenDecimals,
+        ),
+        activeRounds: data.rounds.activeRounds,
+        historyRounds: data.rounds.historyRounds,
+      },
+      pipeline: data.pipeline,
+    },
   }
 }
 

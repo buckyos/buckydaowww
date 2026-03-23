@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
 import {
   Alert,
@@ -20,16 +20,7 @@ import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
 import InvestStatusTag from '@components/invest/InvestStatusTag'
 import {
-  contractService,
-  newProviderContract,
-} from '@contracts/index'
-import { erc20 } from '@contracts/abis'
-import {
-  decodeProjectProfile,
-  fetchContractTokenInfo,
-  fetchRepositoryList,
-  getProjectVersions,
-  getTwoStepInvestment,
+  fetchFundingOverview,
 } from '@services/index'
 import {
   formatAmount,
@@ -41,32 +32,8 @@ import { transformVersionStateWord } from '@utils/index'
 const OVERVIEW_DOC_URL =
   'https://github.com/buckyos/buckydaowww/blob/beta2/doc/TreasuryFundingOverview.md'
 
-type TreasurySnapshot = {
-  bddtReleased: number
-  bddtUnreleased: number
-  bdtInDividend: number
-  bdtInAcquired: number
-  bdtInProject: number
-}
-
-type PipelineGroups = {
-  waitingVote: ProjectVersionProps[]
-  developing: ProjectVersionProps[]
-  waitingSettlement: ProjectVersionProps[]
-  settled: ProjectVersionProps[]
-}
-
 function formatTokenAmount(value: number) {
   return formatNumberWithCommas(formatAmount(value, 3, true))
-}
-
-function safeDecodeProject(item: RepositoryItem): ProjectItem | null {
-  try {
-    return decodeProjectProfile(item)
-  } catch (error) {
-    console.warn('failed to decode project profile', item.name, error)
-    return null
-  }
 }
 
 function ellipsisAddress(address?: string) {
@@ -111,86 +78,15 @@ function SectionTitle(props: { title: string; caption?: string }) {
 export default function Funding() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [tokenInfo, setTokenInfo] = useState<ContractTokenInfo | null>(null)
-  const [treasury, setTreasury] = useState<TreasurySnapshot | null>(null)
-  const [rounds, setRounds] = useState<TwoStepInvestmentData[]>([])
-  const [pipeline, setPipeline] = useState<PipelineGroups>({
-    waitingVote: [],
-    developing: [],
-    waitingSettlement: [],
-    settled: [],
-  })
+  const [overview, setOverview] = useState<FundingOverviewData | null>(null)
 
   useAsyncEffect(async () => {
     setLoading(true)
     setLoadError('')
 
     try {
-      const contractTokenPromise = fetchContractTokenInfo()
-      const roundsPromise = getTwoStepInvestment()
-      const repositoriesPromise = fetchRepositoryList()
-
-      const [contractTokenResult, roundResult, repositoryResult] =
-        await Promise.all([
-          contractTokenPromise,
-          roundsPromise,
-          repositoriesPromise,
-        ])
-
-      const contractToken = contractTokenResult.data
-      setTokenInfo(contractToken)
-      setRounds(roundResult.data.items || [])
-
-      const normalToken = await newProviderContract(
-        contractService.getAddressOfNormalToken(),
-        erc20,
-      )
-      const [dividendRaw, acquiredRaw, projectRaw] = await Promise.all([
-        normalToken.balanceOf(contractService.getAddressOfDividend()),
-        normalToken.balanceOf(contractService.getAddressOfAquired()),
-        normalToken.balanceOf(contractService.getAddressOfProject()),
-      ])
-
-      setTreasury({
-        bddtReleased: contractToken.dev.totalReleased,
-        bddtUnreleased: contractToken.dev.unrelease,
-        bdtInDividend: Number(
-          wrapUnits(dividendRaw.toString(), contractToken.normal.decimals),
-        ),
-        bdtInAcquired: Number(
-          wrapUnits(acquiredRaw.toString(), contractToken.normal.decimals),
-        ),
-        bdtInProject: Number(
-          wrapUnits(projectRaw.toString(), contractToken.normal.decimals),
-        ),
-      })
-
-      const decodedProjects = (repositoryResult.data || [])
-        .map(safeDecodeProject)
-        .filter((item): item is ProjectItem => item !== null)
-
-      const versionResponses = await Promise.allSettled(
-        decodedProjects.map((project) => getProjectVersions(project.project_name)),
-      )
-
-      const versions = versionResponses.flatMap((result) => {
-        if (result.status !== 'fulfilled') {
-          return []
-        }
-        return (result.value?.data?.items || []) as ProjectVersionProps[]
-      })
-
-      const sortByEndDate = (items: ProjectVersionProps[]) =>
-        [...items].sort((a, b) => b.end_date - a.end_date)
-
-      setPipeline({
-        waitingVote: sortByEndDate(versions.filter((item) => Number(item.state) === 0)),
-        developing: sortByEndDate(versions.filter((item) => Number(item.state) === 1)),
-        waitingSettlement: sortByEndDate(
-          versions.filter((item) => Number(item.state) === 2),
-        ),
-        settled: sortByEndDate(versions.filter((item) => Number(item.state) === 3)),
-      })
+      const fundingOverview = await fetchFundingOverview()
+      setOverview(fundingOverview.data)
     } catch (error: any) {
       console.error('failed to load funding overview', error)
       setLoadError(error?.message || 'Failed to load treasury and funding overview')
@@ -200,26 +96,19 @@ export default function Funding() {
   }, [])
 
   const now = Date.now()
-
-  const activeRounds = useMemo(
-    () =>
-      rounds
-        .filter((item) => !item.end && now < item.step2EndTime * 1000)
-        .sort((a, b) => a.step2EndTime - b.step2EndTime),
-    [now, rounds],
-  )
-
-  const historyRounds = useMemo(
-    () => [...rounds].sort((a, b) => b.id - a.id),
-    [rounds],
-  )
-
-  const totalRaisedDao = useMemo(() => {
-    return rounds.reduce((acc, item) => acc + BigInt(item.daoTokenAmount), 0n)
-  }, [rounds])
-
-  const totalRounds = rounds.length
-  const closedRounds = rounds.filter((item) => item.end || now >= item.step2EndTime * 1000).length
+  const tokenInfo = overview?.tokenInfo || null
+  const treasury = overview?.treasury || null
+  const activeRounds = overview?.rounds.activeRounds || []
+  const historyRounds = overview?.rounds.historyRounds || []
+  const pipeline = overview?.pipeline || {
+    waitingVote: [],
+    developing: [],
+    waitingSettlement: [],
+    settled: [],
+  }
+  const totalRounds = overview?.rounds.totalCount || 0
+  const closedRounds = overview?.rounds.closedCount || 0
+  const totalRaisedDao = overview?.rounds.totalSubscribedDao || 0
 
   return (
     <main className='w-full max-w-[1200px] mx-auto my-10 px-4'>
@@ -425,9 +314,7 @@ export default function Funding() {
               />
               <TreasuryMetricCard
                 title='Total Subscribed DAO'
-                value={`${formatTokenAmount(
-                  Number(wrapUnits(totalRaisedDao.toString(), tokenInfo?.normal.decimals || 18)),
-                )} ${tokenInfo?.normal.symbol || 'BDT'}`}
+                value={`${formatTokenAmount(totalRaisedDao)} ${tokenInfo?.normal.symbol || 'BDT'}`}
                 caption='Sum of DAO tokens subscribed across the indexed two-step investment rounds.'
               />
             </div>
