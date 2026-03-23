@@ -22,11 +22,29 @@ function encodeUintParam(value: unknown) {
   return zeroPadLeft(String(value))
 }
 
+function isEncodedBytes32(value: unknown) {
+  return typeof value === 'string' && /^0x[0-9a-fA-F]{64}$/.test(value)
+}
+
+function encodeVersionParam(value: unknown) {
+  const raw = String(value)
+
+  if (isEncodedBytes32(raw)) {
+    return raw
+  }
+
+  if (/^\d+$/.test(raw)) {
+    return encodeUintParam(raw)
+  }
+
+  return encodeUintParam(convertVersion(raw))
+}
+
 function encodeProjectProposalParams(params: any[]) {
   return [
     encodeUintParam(params[0]),
     encodeProposalFlag(params[1]),
-    encodeUintParam(convertVersion(String(params[2]))),
+    encodeVersionParam(params[2]),
     encodeUintParam(params[3]),
     encodeUintParam(params[4]),
     encodeProposalFlag(params[5]),

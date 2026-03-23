@@ -5,15 +5,16 @@ import { Button, Modal, Tag, Tooltip, message } from 'antd'
 import { useBindWalletAddress, useCommittee } from '@hooks/index'
 import { contractService, newProviderContract, voteProposal, supportsProposalVotingOnWeb } from '@contracts/index'
 import { abis } from '@contracts/abis'
+import { decodeIfEncoded } from '@utils/encode'
 import {
   decodePaddedAddress,
-  extractMessage,
   getProposalMetadataConflictMessage,
   getProposalMissingMetadataMessage,
   getProposalType,
   hasTrustedProposalMetadata,
   isProposalMetadataConflict,
   proposalTypeMap,
+  showErrorMessage,
   transactionWait,
 } from '@utils/index'
 import { ProposalState } from '@vars/index'
@@ -39,7 +40,9 @@ function getProposalTargetSummary(proposal: ProposalResponseData) {
     proposalType === proposalTypeMap.CreateVersion ||
     proposalType === proposalTypeMap.SettlementVersion
   ) {
-    return `${proposal.params[1]} ${proposal.params[2]}`
+    const pname = proposal.project?.pname || decodeIfEncoded(String(proposal.params[1]))
+    const version = proposal.project?.version || String(proposal.params[2])
+    return `${pname} ${version}`
   }
 
   return 'See proposal details below before confirming this vote.'
@@ -175,7 +178,10 @@ const ProposalVoteButtons: React.FC<{
       const tx = await voteProposal(proposal, action)
       const receipt = await transactionWait(tx)
       if (receipt?.status !== 1) {
-        message.error(`Vote failed [${receipt?.status}]`)
+        showErrorMessage(
+          new Error(`Vote transaction failed with status ${receipt?.status}`),
+          'Vote failed',
+        )
         return
       }
 
@@ -186,7 +192,7 @@ const ProposalVoteButtons: React.FC<{
       )
       await fetchData()
     } catch (error) {
-      message.error(extractMessage(error))
+      showErrorMessage(error, 'Vote failed')
     } finally {
       setLoadingAction('')
     }
