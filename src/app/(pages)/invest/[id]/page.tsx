@@ -10,7 +10,7 @@ import dayjs from 'dayjs'
 
 import { getTwoStepInvestmentDetail } from '@services/index'
 import InvestmentSubscriptionModal from '@components/modal/InvestmentSubscriptionModal'
-import { useUserStore, useContractStore } from '@hooks/index'
+import { useBindWalletAddress, useUserStore, useContractStore } from '@hooks/index'
 import { contractService, endInvestment } from '@contracts/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
@@ -157,10 +157,20 @@ const InvestDetailPage = () => {
   const [data, setData] = useState<TwoStepInvestmentData>()
   const { user } = useUserStore()
   const [isInvestor, setIsInvestor] = useState(false)
+  const { activeAddress, hasActiveWallet } = useBindWalletAddress()
+  const isWhitelisted = !!(data && activeAddress && data.whitelist[activeAddress])
 
   const onSubscribe = async () => {
     if (data!.end) {
       message.info('Investment already end')
+      return
+    }
+    if (!activeAddress || !hasActiveWallet) {
+      message.info('Please connect your browser wallet first')
+      return
+    }
+    if (!isWhitelisted) {
+      message.info('Only whitelisted addresses can subscribe to this investment')
       return
     }
 
@@ -240,12 +250,21 @@ const InvestDetailPage = () => {
         <div className='flex items-center mt-10 gap-4'>
           <div
             onClick={onSubscribe}
-            className='flex-center bg-cyfs-green hover:bg-cyfs-green2 text-white h-8 px-4 rounded-lg cursor-pointer text-sm'
+            className={`flex-center h-8 px-4 rounded-lg text-sm ${
+              data?.end || !hasActiveWallet || !isWhitelisted
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-cyfs-green hover:bg-cyfs-green2 text-white cursor-pointer'
+            }`}
           >
             Subscribe
           </div>
         </div>
       </div>
+      {!data?.end && hasActiveWallet && !isWhitelisted && (
+        <div className='mt-3 text-center text-sm text-orange-500'>
+          The current wallet is not in this investment whitelist.
+        </div>
+      )}
     </>
   )
 }
