@@ -16,7 +16,7 @@ const HeaderTokenInfo: React.FC<{
     const [show, setShow] = useState(false)
 
     return (
-        <div className='flex flex-wrap items-center justify-end gap-x-2 gap-y-1 xl:mr-4'>
+        <div className='flex max-w-full flex-wrap items-center justify-end gap-x-2 gap-y-1'>
             <div className='flex flex-wrap items-center justify-end gap-2'>
                 <div className='flex items-center gap-1 whitespace-nowrap'>
                     <div>{devTokenAmount ? devTokenAmount : 0}</div>

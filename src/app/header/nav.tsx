@@ -16,6 +16,13 @@ const Nav = () => {
       </Link>
 
       <Link
+        href="/overview"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Overview
+      </Link>
+
+      <Link
         href="/#members"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
       >

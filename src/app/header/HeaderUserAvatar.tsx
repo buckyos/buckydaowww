@@ -19,10 +19,27 @@ const HeaderUserAvatar = () => {
     ? userBind.boundAddress || userBind.activeAddress
     : userBind.activeAddress
   const hasGithubIdentity = !!user.user.github_account && !userBind.isLocalChainMode
-  const displayName =
+  const compactAddressLikeValue = (value: string) => {
+    if (/^0x[a-fA-F0-9]{40}$/.test(value)) {
+      return `${value.slice(0, 6)}...${value.slice(-5)}`
+    }
+
+    if (value.length <= 28) {
+      return value
+    }
+
+    return `${value.slice(0, 16)}...${value.slice(-8)}`
+  }
+
+  const rawDisplayName =
     user.user.nickname
     || (hasGithubIdentity ? user.user.github_account : '')
-    || (identityAddress ? userBind.addressEllipsis(identityAddress) : 'Wallet')
+    || identityAddress
+    || 'Wallet'
+  const displayName =
+    rawDisplayName && identityAddress && rawDisplayName === identityAddress
+      ? userBind.addressEllipsis(identityAddress)
+      : compactAddressLikeValue(rawDisplayName)
   const identityHint = isLoggedIn
     ? userBind.isLocalChainMode
       ? 'Local session'
@@ -127,13 +144,15 @@ const HeaderUserAvatar = () => {
             <UserOutlined className='text-xl' />
           </div>
         )}
-        <div className='flex min-w-0 max-w-[280px] 2xl:max-w-[340px] flex-col gap-1.5'>
+        <div className='flex min-w-0 max-w-[220px] xl:max-w-[260px] 2xl:max-w-[300px] flex-col gap-1.5'>
           <div className='flex min-w-0 items-center gap-2'>
             <Tooltip
               title={
-                !user.user.nickname && !user.user.github_account && identityAddress
-                  ? identityAddress
-                  : undefined
+                rawDisplayName !== displayName
+                  ? rawDisplayName
+                  : !user.user.nickname && !user.user.github_account && identityAddress
+                    ? identityAddress
+                    : undefined
               }
             >
               <span className='min-w-0 truncate text-base font-medium cursor-default'>
@@ -180,7 +199,7 @@ const HeaderUserAvatar = () => {
           )}
 
           {userBind.isAddressMismatch && (
-            <div className='max-w-[280px] 2xl:max-w-[340px] rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-700 cursor-default'>
+            <div className='max-w-[220px] xl:max-w-[260px] 2xl:max-w-[300px] rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs text-amber-700 cursor-default'>
               <div>{mismatchMessage}</div>
               <div className='mt-2 flex flex-wrap gap-2'>
                 {userBind.shouldShowBindWalletAction && (
