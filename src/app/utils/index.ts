@@ -146,6 +146,18 @@ const hasTrustedProposalMetadata = (proposal: ProposalResponseData) => {
   return syncState === 'legacy' || syncState === 'ready'
 }
 
+const getEffectiveProposalState = (proposal: ProposalResponseData) => {
+  return proposal.effectiveState ?? proposal.state
+}
+
+const isProposalVotingOpen = (proposal: ProposalResponseData) => {
+  if (typeof proposal.isVotingOpen === 'boolean') {
+    return proposal.isVotingOpen
+  }
+
+  return getEffectiveProposalState(proposal) === 1
+}
+
 // 获取提案类型
 const getProposalType = (proposal: ProposalResponseData) => {
   if (!hasTrustedProposalMetadata(proposal)) {
@@ -288,6 +300,8 @@ export {
   getProposalMissingMetadataMessage,
   getProposalMetadataConflictMessage,
   hasTrustedProposalMetadata,
+  getEffectiveProposalState,
+  isProposalVotingOpen,
   proposalExpiredTimeDisplay,
   zeroPadLeft,
   extractMessage,

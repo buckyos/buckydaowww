@@ -74,6 +74,8 @@ interface ProposalResponseData {
   investmentId: string
   result: string
   state: number
+  effectiveState?: number
+  isVotingOpen?: boolean
   fromGroup: string
   expired: number
   supportCount: number

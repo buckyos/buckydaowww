@@ -3,15 +3,22 @@
 import { useEffect, useState } from 'react'
 import { Button, Modal, Tag, Tooltip, message } from 'antd'
 import { useBindWalletAddress, useCommittee } from '@hooks/index'
-import { contractService, newProviderContract, voteProposal, supportsProposalVotingOnWeb } from '@contracts/index'
+import {
+  contractService,
+  newProviderContract,
+  voteProposal,
+  supportsProposalVotingOnWeb,
+} from '@contracts/index'
 import { abis } from '@contracts/abis'
 import { decodeIfEncoded } from '@utils/encode'
 import {
   decodePaddedAddress,
+  getEffectiveProposalState,
   getProposalMetadataConflictMessage,
   getProposalMissingMetadataMessage,
   getProposalType,
   hasTrustedProposalMetadata,
+  isProposalVotingOpen,
   isProposalMetadataConflict,
   proposalTypeMap,
   showErrorMessage,
@@ -144,7 +151,9 @@ const ProposalVoteButtons: React.FC<{
   const trustedMetadata = hasTrustedProposalMetadata(proposal)
   const metadataConflict = isProposalMetadataConflict(proposal)
   const supportsWebVoting = supportsProposalVotingOnWeb(proposal)
-  const voteClosed = proposal.state !== ProposalState.InProgress
+  const effectiveState = getEffectiveProposalState(proposal)
+  const votingOpen = isProposalVotingOpen(proposal)
+  const voteClosed = !votingOpen || effectiveState !== ProposalState.InProgress
   const proposalType = getProposalType(proposal)
   const ordinaryVoteHint = proposal.full
     ? 'Token holders can vote on this full proposal.'
@@ -166,11 +175,13 @@ const ProposalVoteButtons: React.FC<{
             ? 'Checking committee voting eligibility...'
             : hasActiveWallet && !proposal.full && !isCommittee
               ? 'Only committee members can vote on this proposal.'
-      : voteClosed
-        ? 'Voting is closed for this proposal.'
-        : currentVote
-          ? `You already ${currentVote === 'support' ? 'supported' : 'rejected'} this proposal.`
-          : ''
+                : !votingOpen
+                ? 'Voting has already ended for this proposal on chain.'
+                : voteClosed
+                  ? 'Voting is closed for this proposal.'
+                  : currentVote
+                    ? `You already ${currentVote === 'support' ? 'supported' : 'rejected'} this proposal.`
+                    : ''
 
   const executeVote = async (action: 'support' | 'reject') => {
     setLoadingAction(action)
