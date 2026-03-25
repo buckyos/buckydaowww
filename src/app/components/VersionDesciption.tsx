@@ -34,6 +34,22 @@ function normalizeAddress(address?: string) {
   return address?.trim().toLowerCase() || ''
 }
 
+function formatBudget(
+  budget: string | null | undefined,
+  decimals: string | number | bigint,
+  symbol: string,
+) {
+  if (budget === undefined || budget === null || budget === '') {
+    return '-'
+  }
+
+  try {
+    return `${parseToFloat(wrapUnits(budget, decimals))} ${symbol}`
+  } catch {
+    return '-'
+  }
+}
+
 function buildVersionStateExplanation(params: {
   version: ProjectVersionProps
   activeAddress?: string
@@ -138,11 +154,7 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
     {
       key: '3',
       label: 'budget',
-      children: (
-        <div>
-          {parseToFloat(wrapUnits(version.budget, decimals))} {symbol}
-        </div>
-      ),
+      children: <div>{formatBudget(version.budget, decimals, symbol)}</div>,
     },
     {
       key: '4',
@@ -164,7 +176,7 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
           target='_blank'
         >
           <GithubOutlined />
-          <span className='ml-2'>#{version.issue_link.split('/').pop()}</span>
+          <span className='ml-2'>#{version.issue_link?.split('/').pop() || '-'}</span>
         </a>
       ),
     },

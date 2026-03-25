@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Tag } from 'antd'
 import { wrapUnits } from '@utils/numberConverter'
 import _ from 'lodash'
@@ -72,16 +72,31 @@ const CommitteeListSection: React.FC<{
   )
 }
 
-const ProposalSettlementContent: React.FC<{ versionID: string }> = ({ versionID }) => {
+function parseNumberishId(value?: string | number) {
+  if (value === undefined || value === null || value === '') {
+    return null
+  }
+  try {
+    return Number(BigInt(value.toString()))
+  } catch {
+    return null
+  }
+}
+
+const ProposalSettlementContent: React.FC<{
+  versionID: string
+  project?: ProjectVersionProps
+}> = ({ versionID, project }) => {
   const [contributions, setContributions] = useState<ContributionInfoV2[]>([])
+  const numericProjectId = useMemo(() => parseNumberishId(versionID), [versionID])
 
   useAsyncEffect(async () => {
-    if (!versionID) {
+    if (numericProjectId === null) {
       return
     }
-    const result = await getVersionSettlementInfo(Number(versionID))
+    const result = await getVersionSettlementInfo(numericProjectId)
     setContributions(result.contributions)
-  }, [versionID])
+  }, [numericProjectId])
 
 
   return (
@@ -89,12 +104,18 @@ const ProposalSettlementContent: React.FC<{ versionID: string }> = ({ versionID 
       <div className='pt-20'>
         <div className='text-2xl '>Link:</div>
 
-        <Link
-          href={`/projects/1/version/${versionID}`}
-          target='_blank'
-        >
-          Corresponding settlement version infomation
-        </Link>
+        {project ? (
+          <Link
+            href={`/projects/${encodeURIComponent(project.pname)}/version/${project.id}`}
+            target='_blank'
+          >
+            Corresponding settlement version information
+          </Link>
+        ) : (
+          <span className='text-cyfs-gray'>
+            Version detail link is unavailable for this legacy settlement proposal.
+          </span>
+        )}
 
         <div className='text-2xl mt-10'>
           Corresponding contribution value of contributors in project
@@ -242,7 +263,10 @@ const ProposalExtraContent: React.FC<{
       )}
 
       {proposalType === proposalTypeMap.SettlementVersion && (
-        <ProposalSettlementContent versionID={proposal.params[0]} />
+        <ProposalSettlementContent
+          versionID={proposal.params[0]}
+          project={proposal.project as ProjectVersionProps | undefined}
+        />
       )}
 
       {proposalType === proposalTypeMap.UpgradeContract && (

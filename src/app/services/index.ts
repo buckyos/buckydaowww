@@ -657,8 +657,16 @@ export async function getManagedProjectVersions(
 
 // 版本详情
 export async function getProjectVersionDetail(versionId: string) {
+  let normalizedVersionId = versionId
+  if (/^0x[0-9a-fA-F]{64}$/.test(versionId)) {
+    try {
+      normalizedVersionId = BigInt(versionId).toString()
+    } catch {
+      normalizedVersionId = versionId
+    }
+  }
   // `/project/${params.versionId}`
-  const resp = await fetch('/api/project/' + versionId, {
+  const resp = await fetch('/api/project/' + normalizedVersionId, {
     method: 'GET',
   })
   const data = await resp.json()
