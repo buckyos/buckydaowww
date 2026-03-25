@@ -36,6 +36,7 @@ interface StateExplanationCardProps {
   why: string[]
   next: string[]
   tone?: StateExplanationTone
+  footer?: React.ReactNode
 }
 
 export default function StateExplanationCard({
@@ -44,6 +45,7 @@ export default function StateExplanationCard({
   why,
   next,
   tone = 'info',
+  footer,
 }: StateExplanationCardProps) {
   const classes = toneClasses[tone]
 
@@ -83,6 +85,8 @@ export default function StateExplanationCard({
           </ul>
         </div>
       </div>
+
+      {footer ? <div className='mt-4'>{footer}</div> : null}
     </section>
   )
 }

@@ -8,7 +8,8 @@ import { transformPercentNumber, wrapUnits, formatNumberWithCommas } from '@util
 import ExecuteProposalButton from '@components/ExecuteProposalButton'
 import ProposalType from '@components/proposal/ProposalType'
 import ProposalStateLine from '@components/ProposalStateLine'
-import { useUserStore } from '@hooks/index'
+import StateExplanationCard from '@components/StateExplanationCard'
+import { useBindWalletAddress, useCommittee, useUserStore } from '@hooks/index'
 import ProposalEdition from './ProposalEdition'
 import FullVoteExecuteButton from './FullVoteExecuteButton'
 import ProposalVoteButtons from './ProposalVoteButtons'
@@ -24,7 +25,14 @@ import {
 import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { ProposalState } from '@vars/index'
-import { getEffectiveProposalState } from '@utils/index'
+import {
+    getEffectiveProposalState,
+    getProposalMetadataConflictMessage,
+    getProposalMissingMetadataMessage,
+    hasTrustedProposalMetadata,
+    isProposalMetadataConflict,
+    isProposalVotingOpen,
+} from '@utils/index'
 
 
 enum VoteType {
@@ -247,6 +255,208 @@ const FullProposalProgress: React.FC<{
 
 
 
+function buildVoteActionExplanation(params: {
+    proposal: ProposalResponseData
+    hasActiveWallet: boolean
+    isCommittee: boolean
+    isCommitteeUnknown: boolean
+    activeAddress?: string
+}): {
+    status: string
+    why: string[]
+    next: string[]
+    tone: 'info' | 'success' | 'warning' | 'danger'
+} {
+    const { proposal, hasActiveWallet, isCommittee, isCommitteeUnknown, activeAddress } = params
+    const trustedMetadata = hasTrustedProposalMetadata(proposal)
+    const metadataConflict = isProposalMetadataConflict(proposal)
+    const votingOpen = isProposalVotingOpen(proposal)
+    const effectiveState = getEffectiveProposalState(proposal)
+    const normalizedActiveAddress = activeAddress?.trim().toLowerCase() || ''
+    const currentVote = normalizedActiveAddress
+        ? proposal.support.some((address) => address.trim().toLowerCase() === normalizedActiveAddress)
+            ? 'support'
+            : proposal.reject.some((address) => address.trim().toLowerCase() === normalizedActiveAddress)
+                ? 'reject'
+                : ''
+        : ''
+
+    const why: string[] = []
+    const next: string[] = []
+    let status = proposal.full ? 'Full vote review' : 'Committee vote review'
+    let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+
+    if (!trustedMetadata) {
+        tone = metadataConflict ? 'danger' : 'warning'
+        status = metadataConflict ? 'Metadata conflict blocks web voting' : 'Metadata missing for web voting'
+        why.push(
+            metadataConflict
+                ? getProposalMetadataConflictMessage()
+                : getProposalMissingMetadataMessage(),
+        )
+        next.push('Use the offline guide only if you have independently verified the intended payload.')
+        return { status, why, next, tone }
+    }
+
+    if (effectiveState !== ProposalState.InProgress || !votingOpen) {
+        tone = 'warning'
+        status = 'Voting closed'
+        why.push('This proposal is no longer inside an active on-chain voting window.')
+        next.push('Review the recorded vote result below or wait for settlement/execution steps.')
+        return { status, why, next, tone }
+    }
+
+    if (!hasActiveWallet) {
+        tone = 'warning'
+        status = 'Connect wallet to vote'
+        why.push('Voting actions require a connected browser wallet.')
+        next.push('Connect a wallet, then review support or reject using the action buttons below.')
+        return { status, why, next, tone }
+    }
+
+    if (proposal.full) {
+        if (currentVote) {
+            tone = 'success'
+            status = `You already ${currentVote === 'support' ? 'supported' : 'rejected'}`
+            why.push('Your current wallet has already cast a full-vote decision for this proposal.')
+            next.push('Track the final tally or wait for the full-vote settlement step after expiry.')
+            return { status, why, next, tone }
+        }
+
+        status = 'Voting open for token holders'
+        why.push('This proposal is using full-member voting, so eligible token holders can vote directly on chain.')
+        next.push('Review the payload summary and choose support or reject.')
+        return { status, why, next, tone }
+    }
+
+    if (isCommitteeUnknown) {
+        tone = 'warning'
+        status = 'Checking committee eligibility'
+        why.push('The UI is still checking whether the current wallet belongs to a committee member.')
+        next.push('Wait a moment before voting, or confirm the correct wallet is connected.')
+        return { status, why, next, tone }
+    }
+
+    if (currentVote) {
+        tone = 'success'
+        status = `You already ${currentVote === 'support' ? 'supported' : 'rejected'}`
+        why.push('Your current wallet has already recorded a committee vote for this proposal.')
+        next.push('Review the vote breakdown below or wait for the proposal to reach its next state.')
+        return { status, why, next, tone }
+    }
+
+    if (!isCommittee) {
+        tone = 'warning'
+        status = 'Committee wallet required'
+        why.push('This proposal uses committee voting, so only committee wallets can vote here.')
+        next.push('Switch to an eligible committee wallet or use the proposal detail for observation only.')
+        return { status, why, next, tone }
+    }
+
+    status = 'Committee voting open'
+    why.push('This proposal is still in progress and the current wallet is eligible to vote.')
+    next.push('Choose support or reject below after reviewing the payload summary.')
+    return { status, why, next, tone }
+}
+
+function buildExecutionActionExplanation(params: {
+    proposal: ProposalResponseData
+    hasActiveWallet: boolean
+    isCommittee: boolean
+    extra?: ContractProposalExtra
+}): {
+    status: string
+    why: string[]
+    next: string[]
+    tone: 'info' | 'success' | 'warning' | 'danger'
+} {
+    const { proposal, hasActiveWallet, isCommittee, extra } = params
+    const trustedMetadata = hasTrustedProposalMetadata(proposal)
+    const metadataConflict = isProposalMetadataConflict(proposal)
+    const effectiveState = getEffectiveProposalState(proposal)
+    const isFullProposal = proposal.full
+    const allVoters = Array.from(new Set([...proposal.support, ...proposal.reject]))
+    const settledCount = extra ? Number(extra.settled) : 0
+    const pendingSettleCount = Math.max(allVoters.length - settledCount, 0)
+    const why: string[] = []
+    const next: string[] = []
+    let status = isFullProposal ? 'Awaiting full-vote settlement' : 'Execution not available yet'
+    let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+
+    if (!trustedMetadata && !isFullProposal) {
+        tone = metadataConflict ? 'danger' : 'warning'
+        status = metadataConflict ? 'Metadata conflict blocks execution' : 'Metadata missing for execution'
+        why.push(
+            metadataConflict
+                ? getProposalMetadataConflictMessage()
+                : getProposalMissingMetadataMessage(),
+        )
+        next.push('Recover proposal metadata before trying to execute the committee action from the web UI.')
+        return { status, why, next, tone }
+    }
+
+    if (isFullProposal) {
+        if (effectiveState !== ProposalState.Expired) {
+            tone = 'warning'
+            status = 'Settle after expiry'
+            why.push('Full-vote proposals must first reach their expired state before the final settlement transaction can run.')
+            next.push('Wait for the proposal to expire on chain, then settle the remaining voters.')
+            return { status, why, next, tone }
+        }
+
+        if (pendingSettleCount === 0) {
+            tone = 'success'
+            status = 'No pending voter settlement'
+            why.push('All voter settlement entries tracked by the UI are already accounted for.')
+            next.push('Refresh proposal status and inspect whether the final state has already transitioned.')
+            return { status, why, next, tone }
+        }
+
+        status = 'Full-vote settlement available'
+        why.push(`There are ${pendingSettleCount} voter entries left to settle for this expired full-vote proposal.`)
+        next.push('Run the full-vote settlement transaction to finalize the proposal state.')
+        return { status, why, next, tone: 'success' }
+    }
+
+    if (effectiveState === ProposalState.Executed) {
+        tone = 'success'
+        status = 'Proposal already executed'
+        why.push('The execution transaction has already been confirmed on chain.')
+        next.push('Inspect the downstream project, funding, or token state changes instead of executing again.')
+        return { status, why, next, tone }
+    }
+
+    if (effectiveState !== ProposalState.Accepted) {
+        tone = effectiveState === ProposalState.Rejected ? 'danger' : 'warning'
+        status = 'Execution locked by proposal state'
+        why.push('Committee execution is only available after the proposal reaches the accepted state.')
+        next.push('Wait for acceptance or review why the proposal ended without an executable outcome.')
+        return { status, why, next, tone }
+    }
+
+    if (!hasActiveWallet) {
+        tone = 'warning'
+        status = 'Connect wallet to execute'
+        why.push('Execution requires a connected browser wallet.')
+        next.push('Connect the appropriate operator wallet and then run the execution action below.')
+        return { status, why, next, tone }
+    }
+
+    if (!isCommittee) {
+        tone = 'warning'
+        status = 'Committee wallet required'
+        why.push('Only committee wallets should execute accepted committee proposals from the web UI.')
+        next.push('Switch to an eligible committee wallet before running execution.')
+        return { status, why, next, tone }
+    }
+
+    status = 'Ready to execute'
+    tone = 'success'
+    why.push('The proposal has been accepted and the current wallet is suitable for execution.')
+    next.push('Run the execution transaction once you are ready to apply the approved change on chain.')
+    return { status, why, next, tone }
+}
+
 const ProposalHeaderContent: React.FC<{
     proposal: ProposalResponseData,
     members: CommitteeMember[],
@@ -264,6 +474,8 @@ const ProposalHeaderContent: React.FC<{
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
     })
+    const { activeAddress, hasActiveWallet } = useBindWalletAddress()
+    const { isCommittee, isUnknown } = useCommittee(activeAddress)
 
     useAsyncEffect(async () => {
         const supportVotesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
@@ -299,9 +511,19 @@ const ProposalHeaderContent: React.FC<{
 
     const currentVoteType = proposal.full ? VoteType.FullMember : VoteType.Committee
     const effectiveState = getEffectiveProposalState(proposal)
-    const executeDisabled = proposal.full
-        ? effectiveState != ProposalState.Accepted
-        : effectiveState != ProposalState.Accepted
+    const voteActionExplanation = buildVoteActionExplanation({
+        proposal,
+        hasActiveWallet,
+        isCommittee,
+        isCommitteeUnknown: isUnknown,
+        activeAddress,
+    })
+    const executionActionExplanation = buildExecutionActionExplanation({
+        proposal,
+        hasActiveWallet,
+        isCommittee,
+        extra,
+    })
 
     return (
         <>
@@ -457,27 +679,53 @@ const ProposalHeaderContent: React.FC<{
                     </div>
                 </div>
             }
-            <div className='flex-center gap-6 mt-10'>
-                <Link
-                    className='text-cyfs-blue'
-                    href={"https://github.com/buckyos/SourceDAO/blob/main/docs/VoteGuide.md"}
-                    target='_blank'
-                >
-                    How to vote?
-                </Link>
-                <ProposalVoteButtons
-                    proposal={proposal}
-                    fetchData={fetchData}
+            <div className='mt-8 grid gap-4 xl:grid-cols-2'>
+                <StateExplanationCard
+                    heading='Voting Action'
+                    status={voteActionExplanation.status}
+                    why={voteActionExplanation.why}
+                    next={voteActionExplanation.next}
+                    tone={voteActionExplanation.tone}
+                    footer={(
+                        <div className='flex flex-wrap items-center gap-4'>
+                            <Link
+                                className='text-cyfs-blue'
+                                href={'https://github.com/buckyos/SourceDAO/blob/main/docs/VoteGuide.md'}
+                                target='_blank'
+                            >
+                                How to vote?
+                            </Link>
+                            <ProposalVoteButtons
+                                proposal={proposal}
+                                fetchData={fetchData}
+                            />
+                        </div>
+                    )}
                 />
-                {currentVoteType == VoteType.FullMember &&
-                    <FullVoteExecuteButton
-                        proposal={proposal}
-                        extra={extra}
-                        fetchData={fetchData}
-                    />}
-                <ExecuteProposalButton
-                    disabled={executeDisabled}
-                    proposal={proposal} />
+
+                <StateExplanationCard
+                    heading={currentVoteType == VoteType.FullMember ? 'Settlement Action' : 'Execution Action'}
+                    status={executionActionExplanation.status}
+                    why={executionActionExplanation.why}
+                    next={executionActionExplanation.next}
+                    tone={executionActionExplanation.tone}
+                    footer={(
+                        <div className='flex flex-wrap items-center gap-4'>
+                            {currentVoteType == VoteType.FullMember ? (
+                                <FullVoteExecuteButton
+                                    proposal={proposal}
+                                    extra={extra}
+                                    fetchData={fetchData}
+                                />
+                            ) : (
+                                <ExecuteProposalButton
+                                    disabled={effectiveState != ProposalState.Accepted}
+                                    proposal={proposal}
+                                />
+                            )}
+                        </div>
+                    )}
+                />
             </div>
 
         </>
