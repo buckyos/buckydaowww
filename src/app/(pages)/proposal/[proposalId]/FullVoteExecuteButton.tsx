@@ -6,7 +6,7 @@ import React, { useState } from "react"
 import dayjs from 'dayjs'
 import {
     transactionWait,
-    extractMessage,
+    showErrorMessage,
 } from '@utils/index'
 
 const FullVoteExecuteButton: React.FC<{
@@ -42,7 +42,7 @@ const FullVoteExecuteButton: React.FC<{
             message.success("proposal execute success")
             await fetchData()
         } catch (error) {
-            message.error(extractMessage(error))
+            showErrorMessage(error, 'Settle full vote failed')
         } finally {
             setLoading(false)
         }

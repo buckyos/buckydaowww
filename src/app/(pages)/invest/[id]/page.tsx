@@ -15,6 +15,7 @@ import { useBindWalletAddress, useUserStore } from '@hooks/index'
 import { contractService, endInvestment, getDecimals, getSymbol } from '@contracts/index'
 import TokenWithSymbol from '@components/funding/TokenWithSymbol'
 import SubscribeProgress from '@components/invest/SubscribeProgress'
+import StateExplanationCard from '@components/StateExplanationCard'
 import { formatAmount, formatNumberWithCommas } from '@utils/numberConverter'
 
 import InvestStatusTag from '@components/invest/InvestStatusTag'
@@ -111,6 +112,57 @@ function SummaryCard(props: {
       <div className='mt-2 text-sm leading-6 text-[#8C8C8C]'>{props.caption}</div>
     </div>
   )
+}
+
+function buildInvestmentStateExplanation(params: {
+  data: TwoStepInvestmentData
+  stage: InvestmentStage
+  activeAddress?: string
+  hasActiveWallet: boolean
+  isWhitelisted: boolean
+  isInvestor: boolean
+}) {
+  const { data, stage, activeAddress, hasActiveWallet, isWhitelisted, isInvestor } = params
+  const why: string[] = [getStageDescription(stage)]
+  const next: string[] = []
+  let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+  let status =
+    stage === 'step1'
+      ? 'Step 1 allocation window'
+      : stage === 'step2'
+        ? 'Step 2 remainder window'
+        : 'Round closed'
+
+  if (!hasActiveWallet || !activeAddress) {
+    why.push('The page can show round information without a wallet, but it cannot evaluate your whitelist or subscription position.')
+    next.push('Connect a wallet to see whether this round is actionable for your address.')
+    tone = 'warning'
+  } else if (!isWhitelisted) {
+    why.push('The active wallet is not in the whitelist for this round, so it cannot subscribe.')
+    next.push('Switch to a whitelisted wallet or inspect the round as read-only.')
+    tone = stage === 'ended' ? 'info' : 'warning'
+  } else {
+    why.push('The active wallet is currently recognized in the round whitelist.')
+    next.push(
+      stage === 'ended'
+        ? 'Subscription is closed now. Review the final round outcome or switch to investor controls if you own the round.'
+        : 'Use the subscribe flow after confirming your current allowance and the round ratio.',
+    )
+  }
+
+  if (isInvestor) {
+    why.push('The active governance identity is also the investor that can end this round once the end conditions are met.')
+    next.push(getInvestorEndDescription(data))
+  }
+
+  if (data.end) {
+    tone = 'success'
+    status = 'Round ended on chain'
+  } else if (stage === 'ended') {
+    tone = 'warning'
+  }
+
+  return { status, why, next, tone }
 }
 
 const InvestDetailPageContent: React.FC<{
@@ -311,6 +363,18 @@ const InvestDetailPage = () => {
     }
   }, [assetDecimals, currentWhitelist, daoDecimals, data, stage])
 
+  const investmentStateExplanation =
+    data
+      ? buildInvestmentStateExplanation({
+          data,
+          stage,
+          activeAddress,
+          hasActiveWallet,
+          isWhitelisted,
+          isInvestor,
+        })
+      : null
+
   const onSubscribe = async () => {
     if (data!.end) {
       message.info('Investment already end')
@@ -441,6 +505,18 @@ const InvestDetailPage = () => {
               </div>
             </div>
           </div>
+
+          {investmentStateExplanation && (
+            <div className='mt-6'>
+              <StateExplanationCard
+                heading='Round Status'
+                status={investmentStateExplanation.status}
+                why={investmentStateExplanation.why}
+                next={investmentStateExplanation.next}
+                tone={investmentStateExplanation.tone}
+              />
+            </div>
+          )}
 
           <div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4'>
             <SummaryCard

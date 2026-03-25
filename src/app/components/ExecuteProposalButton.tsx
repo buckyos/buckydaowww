@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Button, message, Tooltip } from 'antd'
 import { useBindWalletAddress, useCommittee } from '@hooks/index'
 import {
-  extractMessage,
   getProposalType,
   getProposalMissingMetadataMessage,
   getProposalMetadataConflictMessage,
@@ -11,6 +10,7 @@ import {
   transactionWait,
   decodePaddedAddress,
   isProposalMetadataConflict,
+  showErrorMessage,
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import {
@@ -92,8 +92,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
         message.error('This proposal type error')
       }
     } catch (e) {
-      const msg = extractMessage(e)
-      message.error(msg)
+      showErrorMessage(e, 'Execute proposal failed')
     }
 
     setLoading(false)

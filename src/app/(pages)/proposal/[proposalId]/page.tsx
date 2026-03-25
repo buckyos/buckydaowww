@@ -11,18 +11,82 @@ import { CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ProposalExtraContent from '@components/ProposalExtraContent'
+import StateExplanationCard from '@components/StateExplanationCard'
 import ProposalHeaderContent from './ProposalHeaderContent'
 import {
   extractUpgradeCalldataFromExtra,
+  getEffectiveProposalState,
   getProposalSyncState,
+  getProposalType,
   hasTrustedProposalMetadata,
   getProposalMissingMetadataMessage,
   getProposalMetadataConflictMessage,
   isProposalMetadataMissing,
   isProposalMetadataConflict,
+  isProposalVotingOpen,
 } from '@utils/index'
+import { ProposalState } from '@vars/index'
 
 dayjs.extend(relativeTime)
+
+function buildProposalStateExplanation(proposal: ProposalResponseData) {
+  const effectiveState = getEffectiveProposalState(proposal)
+  const votingOpen = isProposalVotingOpen(proposal)
+  const syncState = getProposalSyncState(proposal)
+  const proposalType = getProposalType(proposal)
+  const voteTypeLabel = proposal.full ? 'Full members vote' : 'Committee vote'
+  const why: string[] = []
+  const next: string[] = []
+  let status = `${voteTypeLabel} · In progress`
+  let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+
+  if (syncState === 'chain_only') {
+    why.push('Backend only has the on-chain shell of this proposal, so metadata and params are not fully available yet.')
+    next.push('Wait for metadata recovery or use the linked offline/cold-wallet voting path if you already know the intended payload.')
+    tone = 'warning'
+  } else if (syncState === 'conflict') {
+    why.push('Submitted metadata conflicts with the on-chain creator, so the UI falls back to chain-trusted fields only.')
+    next.push('Avoid acting on the proposal metadata until the conflict is resolved or manually verified.')
+    tone = 'danger'
+  }
+
+  if (effectiveState === ProposalState.InProgress) {
+    why.push(
+      votingOpen
+        ? 'The proposal is still within its on-chain voting window.'
+        : 'The database still shows it in progress, but the current chain time has already passed its voting deadline.',
+    )
+    next.push(
+      votingOpen
+        ? 'Review the proposal payload and cast support or reject if your current wallet is eligible.'
+        : 'Voting is closed now. Wait for settlement or the next chain-side state transition.',
+    )
+  } else if (effectiveState === ProposalState.Accepted) {
+    status = `${voteTypeLabel} · Accepted`
+    tone = 'success'
+    why.push('The proposal reached its approval condition and is now waiting for the execution step.')
+    next.push('Review the execution target and run the proposal if you are the appropriate operator.')
+  } else if (effectiveState === ProposalState.Executed) {
+    status = `${voteTypeLabel} · Executed`
+    tone = 'success'
+    why.push('The approved action has already been executed on chain.')
+    next.push('Use the linked project, funding, or token pages to inspect the downstream state changes caused by this proposal.')
+  } else if (effectiveState === ProposalState.Rejected) {
+    status = `${voteTypeLabel} · Rejected`
+    tone = 'danger'
+    why.push('This proposal no longer has a path to execution because it was rejected by governance.')
+    next.push('Review the vote distribution or create a revised proposal if the underlying change is still needed.')
+  } else if (effectiveState === ProposalState.Expired) {
+    status = `${voteTypeLabel} · Expired`
+    tone = 'warning'
+    why.push('The proposal passed its on-chain deadline before it reached a valid accepted outcome.')
+    next.push('Treat voting as closed and review whether a follow-up or replacement proposal is needed.')
+  }
+
+  why.push(`Proposal type is currently interpreted as "${proposalType || 'unknown'}".`)
+
+  return { status, why, next, tone }
+}
 
 export default function ProposalDetailPage() {
   const { proposalId } = useParams() as { proposalId: string }
@@ -65,6 +129,8 @@ export default function ProposalDetailPage() {
         ? `Proposal #${proposal.id} (Metadata Conflict)`
         : `Proposal #${proposal.id}`)
 
+  const stateExplanation = buildProposalStateExplanation(proposal)
+
   return (
     <>
       <div className='w-[1000px] mx-auto'>
@@ -86,6 +152,15 @@ export default function ProposalDetailPage() {
             }
           />
         )}
+        <div className='mt-6'>
+          <StateExplanationCard
+            heading='Proposal Status'
+            status={stateExplanation.status}
+            why={stateExplanation.why}
+            next={stateExplanation.next}
+            tone={stateExplanation.tone}
+          />
+        </div>
         <ProposalHeaderContent
           proposal={proposal}
           members={members}

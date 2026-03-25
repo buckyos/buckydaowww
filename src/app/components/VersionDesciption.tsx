@@ -3,6 +3,7 @@ import { Button, Descriptions, Tooltip } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import useContractStore from '@hooks/useContract'
+import StateExplanationCard from '@components/StateExplanationCard'
 import dayjs from 'dayjs'
 import {
   GithubOutlined,
@@ -31,6 +32,55 @@ function ellipsisAddress(address?: string) {
 
 function normalizeAddress(address?: string) {
   return address?.trim().toLowerCase() || ''
+}
+
+function buildVersionStateExplanation(params: {
+  version: ProjectVersionProps
+  activeAddress?: string
+  isManagerWallet: boolean
+  settlementBlockers: string[]
+}) {
+  const { version, activeAddress, isManagerWallet, settlementBlockers } = params
+  const why: string[] = []
+  const next: string[] = []
+  let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+  let status = transformVersionStateWord(version.state)
+
+  if (version.state === 0) {
+    why.push('The version proposal exists, but governance has not approved the version start yet.')
+    next.push('Monitor the linked proposal and wait for it to move the version into Developing.')
+  } else if (version.state === 1) {
+    why.push('The version has passed its start proposal and is now in the active development window.')
+    if (!activeAddress) {
+      next.push('Connect the manager wallet when development is complete and a settlement proposal needs to be created.')
+      tone = 'warning'
+    } else if (isManagerWallet) {
+      next.push(
+        settlementBlockers.length > 0
+          ? settlementBlockers[0]
+          : 'When the work is ready, create the settlement proposal and submit contributor points for review.',
+      )
+    } else {
+      next.push('Only the manager wallet can create the settlement proposal for this version.')
+      tone = 'warning'
+    }
+  } else if (version.state === 2) {
+    tone = 'warning'
+    why.push('Development is complete and the version is now waiting for settlement voting.')
+    next.push('Open the settlement proposal and track whether the committee accepts or rejects the submitted result.')
+  } else if (version.state === 3) {
+    tone = 'success'
+    why.push('The version has already been settled and can now feed downstream token release or withdrawal flows.')
+    next.push('Review contribution withdrawal and token release consequences on the project and token pages.')
+  } else if (version.state === 4) {
+    tone = 'danger'
+    why.push('The version was rejected, so it will not proceed through the normal settlement path.')
+    next.push('Inspect the related proposal outcome and prepare a revised version if the work should continue.')
+  }
+
+  why.push(`Manager wallet: ${ellipsisAddress(version.manager)}`)
+
+  return { status, why, next, tone }
 }
 
 const VersionDescription: React.FC<VersionDescriptionProps> = ({
@@ -74,6 +124,13 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
   } else if (!isManagerWallet) {
     settlementBlockers.push('Only the version manager wallet can create the settlement proposal.')
   }
+
+  const versionStateExplanation = buildVersionStateExplanation({
+    version,
+    activeAddress,
+    isManagerWallet,
+    settlementBlockers,
+  })
 
   const items: DescriptionsProps['items'] = [
     { key: '1', label: 'title', children: version.title },
@@ -200,6 +257,17 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
   }
   return (
     <>
+      {!inProposalPage && (
+        <div className='mb-6'>
+          <StateExplanationCard
+            heading='Version Status'
+            status={versionStateExplanation.status}
+            why={versionStateExplanation.why}
+            next={versionStateExplanation.next}
+            tone={versionStateExplanation.tone}
+          />
+        </div>
+      )}
       <Descriptions bordered items={items} />
     </>
   )

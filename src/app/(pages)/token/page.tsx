@@ -9,6 +9,7 @@ import { useAsyncEffect } from 'ahooks'
 import { fetchTokenInfo, getDevRatio, newProviderContract, contractService } from '@contracts/index'
 import { abis, erc20, ISourceProject, ProjectManagement } from '@contracts/abis'
 import { useBindWalletAddress, useLockToken } from '@hooks/index'
+import StateExplanationCard from '@components/StateExplanationCard'
 import { showErrorMessage, transactionWait } from '@utils/index'
 import { formatAmount, wrapUnits } from '@utils/numberConverter'
 
@@ -49,6 +50,85 @@ function decodeProjectName(bytes32Name: string) {
   } catch {
     return bytes32Name
   }
+}
+
+function buildLockupExplanation(params: {
+  hasActiveWallet: boolean
+  canClaim: bigint
+  unlockProjectName: string
+  releasedAt: bigint
+}) {
+  const { hasActiveWallet, canClaim, unlockProjectName, releasedAt } = params
+  const why: string[] = []
+  const next: string[] = []
+  let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+  let status = 'Tracking lockup release'
+
+  if (!hasActiveWallet) {
+    status = 'Wallet not connected'
+    tone = 'warning'
+    why.push('Lockup status is personal, so the page needs a connected wallet to resolve assigned, locked, and claimable balances.')
+    next.push('Connect a wallet to inspect lockup assignment and claimability.')
+    return { status, why, next, tone }
+  }
+
+  if (!unlockProjectName) {
+    why.push('No unlock target is currently exposed for this wallet, so only generic lockup totals can be shown.')
+    next.push('Review assigned and locked totals while waiting for a version release to define the unlock trigger.')
+    return { status, why, next, tone }
+  }
+
+  if (releasedAt <= 0n) {
+    status = 'Waiting for version release'
+    tone = 'warning'
+    why.push('The target project version has not been released on chain yet, so the claimable amount stays at zero.')
+    next.push('Track the project release milestone first. Claim only becomes possible after release starts the 180-day unlock schedule.')
+    return { status, why, next, tone }
+  }
+
+  if (canClaim > 0n) {
+    status = 'Claim available now'
+    tone = 'success'
+    why.push('The unlock schedule is already active and this wallet has a positive claimable amount right now.')
+    next.push('Use Claim Lockup to move the currently unlocked portion into your wallet.')
+    return { status, why, next, tone }
+  }
+
+  status = 'Unlock active, no claimable amount yet'
+  why.push('Release has started, but no additional tokens are claimable at this exact moment.')
+  next.push('Wait for more of the 180-day linear unlock schedule to mature, then claim again.')
+  return { status, why, next, tone }
+}
+
+function buildDividendExplanation(params: {
+  hasActiveWallet: boolean
+  withdrawableRewards: RewardAmount[]
+}) {
+  const { hasActiveWallet, withdrawableRewards } = params
+  const why: string[] = []
+  const next: string[] = []
+  let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+  let status = 'Watching dividend cycles'
+
+  if (!hasActiveWallet) {
+    status = 'Wallet not connected'
+    tone = 'warning'
+    why.push('Dividend entitlement depends on the connected wallet, especially historical cycle stake and closed-cycle rewards.')
+    next.push('Connect a wallet to inspect your stake history and withdrawable rewards.')
+    return { status, why, next, tone }
+  }
+
+  if (withdrawableRewards.length > 0) {
+    status = 'Rewards withdrawable now'
+    tone = 'success'
+    why.push('The previous closed cycle contains rewards for this wallet that have not been withdrawn yet.')
+    next.push('Use Withdraw Dividends to claim every currently available reward token from the last closed cycle.')
+    return { status, why, next, tone }
+  }
+
+  why.push('There are no withdrawable rewards for the active wallet right now, even though current-cycle stake may still be accumulating future entitlement.')
+  next.push('Review current-cycle and previous-cycle stake, then come back after a reward-bearing cycle closes.')
+  return { status, why, next, tone }
 }
 
 const cardClassName =
@@ -330,6 +410,16 @@ export default function TokenCenterPage() {
   const withdrawableRewards = dividendOverview.estimatedPreviousRewards.filter(
     (reward) => !reward.withdrawed && reward.amount > 0n,
   )
+  const lockupExplanation = buildLockupExplanation({
+    hasActiveWallet,
+    canClaim: lockupDetails.canClaim,
+    unlockProjectName: lockupDetails.unlockProjectName,
+    releasedAt: lockupDetails.releasedAt,
+  })
+  const dividendExplanation = buildDividendExplanation({
+    hasActiveWallet,
+    withdrawableRewards,
+  })
 
   const claimLockup = async () => {
     if (!hasActiveWallet) {
@@ -679,6 +769,38 @@ export default function TokenCenterPage() {
         )}
       </section>
 
+      <StateExplanationCard
+        heading='Token Interaction Status'
+        status={
+          hasActiveWallet
+            ? 'Wallet-specific token actions available'
+            : 'Read-only protocol view'
+        }
+        why={
+          hasActiveWallet
+            ? [
+                'Protocol-wide token supply and contract addresses are always readable.',
+                'Wallet-specific actions such as lockup claim and dividend withdrawal are now evaluated against the connected governance address.',
+              ]
+            : [
+                'The page can still show protocol-wide supply and treasury state without a wallet.',
+                'Personal balances, voting power, lockup status, and dividend entitlement remain unavailable until a wallet is connected.',
+              ]
+        }
+        next={
+          hasActiveWallet
+            ? [
+                'Use the Lockup Details and Dividend Overview sections below to see whether any immediate actions are available.',
+                'If no action is currently available, keep using this page as the reference point for balances, release state, and future entitlement.',
+              ]
+            : [
+                'Connect a wallet to unlock personal token state and any claim or withdrawal actions.',
+                'Until then, use the protocol overview and contract addresses as a read-only reference.',
+              ]
+        }
+        tone={hasActiveWallet ? 'info' : 'warning'}
+      />
+
       <div className='grid gap-6 xl:grid-cols-2'>
         <section className={cardClassName}>
           <div className='flex items-center gap-2'>
@@ -688,6 +810,13 @@ export default function TokenCenterPage() {
             </Tooltip>
           </div>
           <div className='mt-4 space-y-4 text-sm text-gray-500'>
+            <StateExplanationCard
+              heading='Lockup Status'
+              status={lockupExplanation.status}
+              why={lockupExplanation.why}
+              next={lockupExplanation.next}
+              tone={lockupExplanation.tone}
+            />
             <p>
               Locked allocations do not become immediately withdrawable. Once the target release condition is met,
               claimable amount increases linearly over 180 days.
@@ -769,6 +898,13 @@ export default function TokenCenterPage() {
             </Tooltip>
           </div>
           <div className='mt-4 space-y-4 text-sm text-gray-500'>
+            <StateExplanationCard
+              heading='Dividend Status'
+              status={dividendExplanation.status}
+              why={dividendExplanation.why}
+              next={dividendExplanation.next}
+              tone={dividendExplanation.tone}
+            />
             <p>
               Dividend stake and unstake activity updates cycle checkpoints. Rewards for a closed cycle are based on
               historical effective stake, not just your live wallet balance.

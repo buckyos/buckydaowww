@@ -24,6 +24,7 @@ import {
 import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { ProposalState } from '@vars/index'
+import { getEffectiveProposalState } from '@utils/index'
 
 
 enum VoteType {
@@ -253,7 +254,8 @@ const ProposalHeaderContent: React.FC<{
 }> = ({ proposal, members, fetchData }) => {
     const [supportPercent, setSupportPercent] = useState<number>(0)
     const [rejectPercent, setRejectPercent] = useState<number>(0)
-    const [voteInfo, setVoteinfo] = useState<ProposalVoteInfomation[]>([])
+    const [supportVoteInfo, setSupportVoteInfo] = useState<ProposalVoteInfomation[]>([])
+    const [rejectVoteInfo, setRejectVoteInfo] = useState<ProposalVoteInfomation[]>([])
     // const [currentVoteType, setCurrentVoteType] = useState<VoteType>(VoteType.Unkonw)
 
 
@@ -264,7 +266,13 @@ const ProposalHeaderContent: React.FC<{
     })
 
     useAsyncEffect(async () => {
-        const votesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
+        const supportVotesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
+            return {
+                address: item,
+                isCommiittee: !!_.find(members, (member) => member.address == item)
+            }
+        })
+        const rejectVotesInfo: ProposalVoteInfomation[] = proposal.reject.map(item => {
             return {
                 address: item,
                 isCommiittee: !!_.find(members, (member) => member.address == item)
@@ -272,13 +280,16 @@ const ProposalHeaderContent: React.FC<{
         })
         const memberCount = members.length
 
-        console.log('vote result', votesInfo)
-        setVoteinfo(votesInfo)
+        console.log('vote result', supportVotesInfo, rejectVotesInfo)
+        setSupportVoteInfo(supportVotesInfo)
+        setRejectVoteInfo(rejectVotesInfo)
 
         setSupportPercent(
-            transformPercentNumber(votesInfo.filter(o => o.isCommiittee).length, memberCount),
+            transformPercentNumber(supportVotesInfo.filter(o => o.isCommiittee).length, memberCount),
         )
-        setRejectPercent(transformPercentNumber(proposal.rejectCount, memberCount))
+        setRejectPercent(
+            transformPercentNumber(rejectVotesInfo.filter(o => o.isCommiittee).length, memberCount),
+        )
         // 判断是否全员投票
         const extra = await getCommitteeProposalExtra(Number(proposal.id))
         // const isFullVote = extra.from != "0x0000000000000000000000000000000000000000"
@@ -287,6 +298,10 @@ const ProposalHeaderContent: React.FC<{
     }, [JSON.stringify({ proposal, members })])
 
     const currentVoteType = proposal.full ? VoteType.FullMember : VoteType.Committee
+    const effectiveState = getEffectiveProposalState(proposal)
+    const executeDisabled = proposal.full
+        ? effectiveState != ProposalState.Accepted
+        : effectiveState != ProposalState.Accepted
 
     return (
         <>
@@ -340,15 +355,106 @@ const ProposalHeaderContent: React.FC<{
                     </div>
                 </div>
             }
+            {currentVoteType == VoteType.Committee && (
+                <div className='mt-4 rounded-2xl border border-[#F0F0F0] bg-[#FAFAFA] p-5'>
+                    <div className='text-sm font-medium uppercase tracking-[0.16em] text-[#8C8C8C]'>
+                        Vote Breakdown
+                    </div>
+                    <div className='mt-4 grid gap-4 md:grid-cols-3'>
+                        <div className='rounded-xl border border-[#E6F4FF] bg-white p-4'>
+                            <div className='text-sm text-[#8C8C8C]'>Support</div>
+                            <div className='mt-2 text-2xl font-semibold text-[#0958D9]'>
+                                {proposal.support.filter((address) =>
+                                    _.find(members, (member) => member.address == address),
+                                ).length}
+                                <span className='ml-1 text-base font-medium text-[#8C8C8C]'>
+                                    / {members.length}
+                                </span>
+                            </div>
+                            <div className='mt-2 text-sm text-[#8C8C8C]'>
+                                {supportPercent.toFixed(2)}% of visible committee votes
+                            </div>
+                        </div>
+                        <div className='rounded-xl border border-[#FFF1F0] bg-white p-4'>
+                            <div className='text-sm text-[#8C8C8C]'>Reject</div>
+                            <div className='mt-2 text-2xl font-semibold text-[#CF1322]'>
+                                {proposal.reject.filter((address) =>
+                                    _.find(members, (member) => member.address == address),
+                                ).length}
+                                <span className='ml-1 text-base font-medium text-[#8C8C8C]'>
+                                    / {members.length}
+                                </span>
+                            </div>
+                            <div className='mt-2 text-sm text-[#8C8C8C]'>
+                                {rejectPercent.toFixed(2)}% of visible committee votes
+                            </div>
+                        </div>
+                        <div className='rounded-xl border border-[#F0F0F0] bg-white p-4'>
+                            <div className='text-sm text-[#8C8C8C]'>Result Signal</div>
+                            <div className='mt-2 text-base font-semibold text-black-primary'>
+                                {rejectPercent > supportPercent
+                                    ? 'Rejection currently dominates'
+                                    : supportPercent > rejectPercent
+                                        ? 'Support currently dominates'
+                                        : 'Votes are balanced'}
+                            </div>
+                            <div className='mt-2 text-sm text-[#8C8C8C]'>
+                                The database stores support and reject addresses separately for committee voting.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {
-                !!voteInfo.length && currentVoteType == VoteType.Committee &&
-                <div className='flex flex-col px-8 py-2 text-sm'>
-                    {voteInfo.map(item => {
-                        return (<div className='flex gap-2' key={item.address}>
-                            <div className='w-[460px]'>vote address: {item.address}</div>
-                            <Tag>{item.isCommiittee ? 'committee' : 'normal'}</Tag>
-                        </div>)
-                    })}
+                currentVoteType == VoteType.Committee &&
+                <div className='mt-4 grid gap-4 md:grid-cols-2'>
+                    <div className='rounded-2xl border border-[#D6E4FF] bg-[#F5F9FF] p-5'>
+                        <div className='text-sm font-medium uppercase tracking-[0.16em] text-[#8C8C8C]'>
+                            Supported By
+                        </div>
+                        <div className='mt-4 flex flex-col gap-3 text-sm'>
+                            {supportVoteInfo.length ? supportVoteInfo.map(item => {
+                                return (
+                                    <div className='flex items-center justify-between gap-3 rounded-xl bg-white px-4 py-3' key={`support-${item.address}`}>
+                                        <div className='min-w-0 font-mono text-black-primary'>
+                                            {item.address}
+                                        </div>
+                                        <Tag color={item.isCommiittee ? 'green' : 'default'}>
+                                            {item.isCommiittee ? 'committee' : 'normal'}
+                                        </Tag>
+                                    </div>
+                                )
+                            }) : (
+                                <div className='rounded-xl bg-white px-4 py-3 text-[#8C8C8C]'>
+                                    No support votes recorded.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className='rounded-2xl border border-[#FFCCC7] bg-[#FFF1F0] p-5'>
+                        <div className='text-sm font-medium uppercase tracking-[0.16em] text-[#8C8C8C]'>
+                            Rejected By
+                        </div>
+                        <div className='mt-4 flex flex-col gap-3 text-sm'>
+                            {rejectVoteInfo.length ? rejectVoteInfo.map(item => {
+                                return (
+                                    <div className='flex items-center justify-between gap-3 rounded-xl bg-white px-4 py-3' key={`reject-${item.address}`}>
+                                        <div className='min-w-0 font-mono text-black-primary'>
+                                            {item.address}
+                                        </div>
+                                        <Tag color={item.isCommiittee ? 'red' : 'default'}>
+                                            {item.isCommiittee ? 'committee' : 'normal'}
+                                        </Tag>
+                                    </div>
+                                )
+                            }) : (
+                                <div className='rounded-xl bg-white px-4 py-3 text-[#8C8C8C]'>
+                                    No reject votes recorded.
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             }
             <div className='flex-center gap-6 mt-10'>
@@ -370,7 +476,7 @@ const ProposalHeaderContent: React.FC<{
                         fetchData={fetchData}
                     />}
                 <ExecuteProposalButton
-                    disabled={proposal.full ? proposal.state != ProposalState.Accepted : (supportPercent <= 50 && rejectPercent < 50)}
+                    disabled={executeDisabled}
                     proposal={proposal} />
             </div>
 
