@@ -170,3 +170,73 @@ If the committee prefers the new direction, the next phase should be:
 1. decide whether `Overview` replaces `/` or becomes the primary top-level entry
 2. connect richer live summary data where useful
 3. refactor the old introduction page into a structured protocol guide
+
+## Overview v2 focus
+
+The second iteration should sharpen the page into a true first-entry overview.
+
+The practical test is simple:
+
+- a first-time visitor should form a usable protocol mental model in 30 seconds
+- they should understand what is happening now
+- they should know which next page matches their intent
+
+### 1. Live Snapshot becomes a protocol dashboard
+
+The snapshot section should move beyond static counts and feel like a lightweight protocol dashboard.
+
+Recommended direction:
+
+- top-line protocol metrics:
+  - open proposals
+  - versions in development
+  - active funding rounds
+  - released BDDT
+- grouped "right now" panels:
+  - governance now
+  - delivery now
+  - treasury now
+- emphasis on what is active and actionable, not only what exists
+
+### 2. System Map becomes more explicit
+
+The current card list is a useful start, but the next version should read more like a system graph than a glossary.
+
+Recommended direction:
+
+- show the protocol as a left-to-right flow:
+  - project profiles
+  - versions
+  - governance decisions
+  - settlement and release
+  - treasury and token flows
+- make the transitions explicit:
+  - projects create versions
+  - versions become proposals
+  - accepted work unlocks settlement and release
+  - treasury and token state reflect those outcomes
+
+### 3. Choose Your Path becomes stronger intent routing
+
+The page should route visitors by intent, not by their ability to decode DAO terminology.
+
+Recommended direction:
+
+- each card should answer:
+  - what kind of visitor is this for
+  - what is the first page to open
+  - what should they do next after that
+- each path should have one clear primary action and a smaller secondary action
+- examples:
+  - understand the DAO in 10 minutes
+  - follow live governance right now
+  - inspect roadmap and delivery
+  - inspect treasury and token flow
+
+### Review criteria for v2
+
+The next review should judge the page on:
+
+- whether a first-time visitor can explain the protocol shape after one pass
+- whether the snapshot feels like a live protocol dashboard
+- whether the path cards reduce navigation hesitation

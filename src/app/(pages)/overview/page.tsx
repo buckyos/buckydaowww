@@ -39,67 +39,95 @@ const primaryActions = [
 
 const systemMap = [
   {
-    title: 'Projects',
+    step: '01',
+    title: 'Projects frame the roadmap',
     description:
-      'Top-level project profiles frame the roadmap and route visitors into concrete version work.',
+      'Project profiles are the DAO-facing containers that tell visitors what work areas exist and where concrete delivery should be tracked.',
+    detail:
+      'A new visitor should think of projects as roadmap containers, not as execution units.',
+    href: '/projects',
   },
   {
-    title: 'Versions',
+    step: '02',
+    title: 'Versions define executable work',
     description:
-      'Each version defines budget, manager, time window, and delivery scope.',
+      'Versions carry manager, budget, time window, and issue context. They are the units that governance actually approves and settles.',
+    detail:
+      'This is where planned work turns into an auditable scope with a budget and a delivery window.',
+    href: '/projects',
   },
   {
-    title: 'Proposals',
+    step: '03',
+    title: 'Proposals decide movement',
     description:
-      'Governance proposals decide whether versions, treasury actions, and committee changes move forward.',
+      'Governance proposals decide whether versions start, settlements pass, treasury actions execute, and committee changes take effect.',
+    detail:
+      'Voting is the control layer that determines whether operational state can move forward.',
+    href: '/proposals',
   },
   {
-    title: 'Release',
+    step: '04',
+    title: 'Settlement unlocks release',
     description:
-      'Accepted work can unlock settlement, contribution withdrawal, and token release timing.',
+      'Accepted work can unlock contribution withdrawal, lockup release timing, and downstream token consequences.',
+    detail:
+      'Settlement is the bridge between delivered work and economic consequences.',
+    href: '/projects',
   },
   {
-    title: 'Treasury',
+    step: '05',
+    title: 'Treasury reflects outcomes',
     description:
-      'Funding rounds, dividend cycles, and token balances show how capital moves through the DAO.',
+      'Funding rounds, dividend balances, and token supply movement show where capital currently sits in the protocol.',
+    detail:
+      'Treasury and token views explain where value has accumulated and what can happen next.',
+    href: '/funding',
   },
 ]
 
 const intentPaths = [
   {
-    title: 'I am new and want the big picture',
+    eyebrow: 'Start Here',
+    title: 'Understand the DAO in 10 minutes',
     description:
-      'Start with the governance guide, then scan proposals and the token center once the vocabulary is clear.',
-    links: [
-      { href: '/governance_introducing', label: 'Read governance guide' },
+      'Read the current guide first, then open Token Center once the governance and release vocabulary is clear.',
+    primary: { href: '/governance_introducing', label: 'Read governance guide' },
+    secondary: [
       { href: '/token', label: 'Open token center' },
+      { href: '/projects', label: 'Browse project workspace' },
     ],
   },
   {
-    title: 'I want to follow live governance',
+    eyebrow: 'Operate',
+    title: 'Follow live governance right now',
     description:
-      'Review active proposals, voting state, and your personal action queue before opening specific items.',
-    links: [
-      { href: '/proposals', label: 'Open proposals' },
+      'Open the proposal workbench first, then check your personal dashboard for wallet-specific actions and eligibility.',
+    primary: { href: '/proposals', label: 'Open proposals' },
+    secondary: [
       { href: '/me', label: 'Open my dashboard' },
+      { href: '/token', label: 'Check token power' },
     ],
   },
   {
-    title: 'I want to track roadmap execution',
+    eyebrow: 'Ship Work',
+    title: 'Inspect roadmap and delivery',
     description:
-      'Projects and versions show which work is waiting for votes, in delivery, or approaching settlement.',
-    links: [
-      { href: '/projects', label: 'Browse projects' },
+      'Projects and versions show what is waiting for votes, what is actively being built, and what is near settlement or release.',
+    primary: { href: '/projects', label: 'Browse projects' },
+    secondary: [
       { href: '/funding', label: 'See release pipeline' },
+      { href: '/proposals', label: 'Inspect related proposals' },
     ],
   },
   {
-    title: 'I want capital and token flow',
+    eyebrow: 'Capital',
+    title: 'Inspect treasury and token flow',
     description:
-      'Funding explains acquisition rounds and treasury buckets, while Token Center shows balances and release mechanics.',
-    links: [
-      { href: '/funding', label: 'Funding overview' },
+      'Funding shows acquisition rounds and treasury buckets, while Token Center explains balances, lockups, dividends, and release mechanics.',
+    primary: { href: '/funding', label: 'Funding overview' },
+    secondary: [
       { href: '/invest', label: 'Investment rounds' },
+      { href: '/token', label: 'Open token center' },
     ],
   },
 ]
@@ -222,13 +250,12 @@ export default function OverviewPage() {
               System Map
             </div>
             <h2 className='mt-3 text-3xl font-semibold text-black-primary'>
-              A first-time visitor should understand the protocol graph
+              A first-time visitor should be able to read the protocol from left to right
             </h2>
           </div>
           <div className='hidden max-w-xl text-sm leading-7 text-black-secondary xl:block'>
-            This section is less about process ceremony and more about how
-            projects, proposals, release, and treasury state connect to each
-            other.
+            This is not a glossary. It is the shortest path to seeing how work,
+            decisions, release, and treasury outcomes connect across the DAO.
           </div>
         </div>
 
@@ -238,8 +265,13 @@ export default function OverviewPage() {
               key={step.title}
               className='rounded-[24px] border border-[#ececec] bg-[#fafafa] p-6'
             >
-              <div className='mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-sm font-semibold text-white'>
-                {index + 1}
+              <div className='mb-4 flex items-center justify-between gap-3'>
+                <div className='inline-flex rounded-full bg-black px-3 py-1 text-xs font-semibold tracking-[0.16em] text-white'>
+                  {step.step}
+                </div>
+                {index < systemMap.length - 1 ? (
+                  <span className='hidden text-[#bfbfbf] xl:inline'>→</span>
+                ) : null}
               </div>
               <h3 className='mb-2 text-xl font-semibold text-black-primary'>
                 {step.title}
@@ -247,6 +279,16 @@ export default function OverviewPage() {
               <p className='mb-0 text-sm leading-7 text-black-secondary'>
                 {step.description}
               </p>
+              <p className='mb-0 mt-4 text-sm leading-7 text-[#595959]'>
+                {step.detail}
+              </p>
+              <Link
+                href={step.href}
+                className='mt-5 inline-flex items-center gap-2 text-sm font-medium text-black-primary no-underline'
+              >
+                Open related workspace
+                <ArrowRightOutlined />
+              </Link>
             </div>
           ))}
         </div>
@@ -257,7 +299,7 @@ export default function OverviewPage() {
           Choose Your Path
         </div>
         <h2 className='mt-3 text-3xl font-semibold text-black-primary'>
-          Start from intent, not from a menu full of unexplained tabs
+          Route new visitors by intent, not by their ability to decode DAO terminology
         </h2>
         <div className='mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
           {intentPaths.map((path) => (
@@ -265,14 +307,26 @@ export default function OverviewPage() {
               key={path.title}
               className='rounded-[22px] border border-[#efefef] bg-[#fafafa] p-5'
             >
+              <div className='text-xs font-medium uppercase tracking-[0.16em] text-[#8c8c8c]'>
+                {path.eyebrow}
+              </div>
               <div className='text-lg font-semibold text-black-primary'>
                 {path.title}
               </div>
               <p className='mb-0 mt-3 text-sm leading-7 text-black-secondary'>
                 {path.description}
               </p>
+              <div className='mt-5'>
+                <Link
+                  href={path.primary.href}
+                  className='inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white no-underline transition hover:bg-[#2b2b2b]'
+                >
+                  {path.primary.label}
+                  <ArrowRightOutlined />
+                </Link>
+              </div>
               <div className='mt-4 flex flex-wrap gap-2'>
-                {path.links.map((link) => (
+                {path.secondary.map((link) => (
                   <Link
                     key={link.href + link.label}
                     href={link.href}
@@ -292,7 +346,7 @@ export default function OverviewPage() {
           Recommended Next Steps
         </div>
         <h2 className='mt-3 text-3xl font-semibold text-black-primary'>
-          Keep the deep links, but use them as guided exits from the overview
+          Keep the deep links, but make them feel like guided exits from the overview
         </h2>
         <div className='mt-3 grid gap-4 md:grid-cols-2 xl:grid-cols-5'>
           {guideLinks.map((guide) => (
