@@ -12,8 +12,8 @@ const font = localFont({
 })
 
 export const metadata = {
-  title: 'Bucky DAO (power by CYFS source DAO)',
-  description: 'Bucky DAO (power by CYFS source DAO)',
+  title: 'BuckyDAO',
+  description: 'BuckyDAO governance, projects, funding, and token operations for BuckyOS.',
 }
 
 export default function RootLayout({
