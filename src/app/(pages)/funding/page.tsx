@@ -445,9 +445,12 @@ export default function Funding() {
                         >
                           <div className='flex items-start justify-between gap-3'>
                             <div className='min-w-0'>
-                              <div className='truncate font-medium text-black-primary'>
+                              <Link
+                                href={`/projects/${encodeURIComponent(version.pname)}/version/${version.id}`}
+                                className='block truncate font-medium text-black-primary no-underline hover:text-cyfs-green'
+                              >
                                 {version.pname} {version.version}
-                              </div>
+                              </Link>
                               <div className='mt-1 text-xs text-[#8C8C8C]'>
                                 Manager{' '}
                                 <span className='font-mono text-black-primary'>
@@ -464,9 +467,19 @@ export default function Funding() {
                               {' -> '}
                               {dayjs(version.end_date * 1000).format('YYYY-MM-DD')}
                             </span>
-                            <span>Proposal #{version.proposal_id}</span>
+                            <Link
+                              href={`/proposal/${version.proposal_id}`}
+                              className='text-[#8C8C8C] no-underline hover:text-cyfs-green'
+                            >
+                              Proposal #{version.proposal_id}
+                            </Link>
                             {version.accept_proposal_id > 0 && (
-                              <span>Settlement #{version.accept_proposal_id}</span>
+                              <Link
+                                href={`/proposal/${version.accept_proposal_id}`}
+                                className='text-[#8C8C8C] no-underline hover:text-cyfs-green'
+                              >
+                                Settlement #{version.accept_proposal_id}
+                              </Link>
                             )}
                           </div>
                         </div>
