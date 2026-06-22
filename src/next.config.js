@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   productionBrowserSourceMaps: true,
+  outputFileTracingRoot: __dirname,
   images: {
     remotePatterns: [
       {
