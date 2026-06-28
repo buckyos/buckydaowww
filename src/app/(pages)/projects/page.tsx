@@ -1,4 +1,5 @@
-// import CreateProject from '@components/project/CreateProject'
+import CreateProject from '@components/project/CreateProject'
+import CreateProjectModal from '@components/project/CreateProjectModal'
 import ProjectList from '@components/project/ProjectList'
 import { Timeline } from 'antd'
 
@@ -45,8 +46,21 @@ export default function ProjectsPage() {
   return (
     <>
       {/* <ProjectRoadmap /> */}
-      <div className='text-2xl font-medium my-6'>Project Dashboard</div>
+      <div className='my-6 flex items-center justify-between gap-4'>
+        <div>
+          <div className='text-2xl font-medium'>Project Dashboard</div>
+          <a
+            className='text-sm text-cyfs-green underline underline-offset-2'
+            href='https://github.com/buckyos/SourceDAO/blob/main/docs/ProjectVersionGuide.md'
+            target='_blank'
+          >
+            Project / Version guide
+          </a>
+        </div>
+        <CreateProject />
+      </div>
       <ProjectList />
+      <CreateProjectModal />
     </>
   )
 }

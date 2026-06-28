@@ -569,6 +569,35 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "proxyContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newImplementAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "calldataHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "prepareContractUpgrade",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "member",
         "type": "address"
       }
@@ -966,6 +995,30 @@
         "internalType": "address",
         "name": "newImplementAddress",
         "type": "address"
+      }
+    ],
+    "name": "verifyContractUpgrade",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "calldataHash",
+        "type": "bytes32"
       }
     ],
     "name": "verifyContractUpgrade",

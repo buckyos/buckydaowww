@@ -13,11 +13,13 @@ import _ from 'lodash'
 type LastestProposalsProps = {
   showButton: boolean
   showPage: boolean
+  pageSize?: number
 }
 
 const LatestProposals: React.FC<LastestProposalsProps> = ({
   showButton,
   showPage,
+  pageSize = 10,
 }) => {
   const router = useRouter()
   const [proposals, setProposals] = useState<ProposalResponseData[]>([])
@@ -32,7 +34,7 @@ const LatestProposals: React.FC<LastestProposalsProps> = ({
 
   useAsyncEffect(async () => {
     const [result, memberResult] = await Promise.all([
-      getProposals(page, 10),
+      getProposals(page, pageSize),
       fetchMembers(),
     ])
     if (result.code !== 0 || memberResult.code !== 0) {
@@ -54,7 +56,7 @@ const LatestProposals: React.FC<LastestProposalsProps> = ({
     setTotal(result.data.totalSize)
     setMemberCount(memberResult.data.length)
     // console.log('🍻 proposal :', data)
-  }, [page])
+  }, [page, pageSize])
 
   return (
     <div>
@@ -75,7 +77,7 @@ const LatestProposals: React.FC<LastestProposalsProps> = ({
               <Pagination
                 current={page}
                 total={total}
-                pageSize={10}
+                pageSize={pageSize}
                 onChange={(page) => {
                   setPage(page)
                 }}

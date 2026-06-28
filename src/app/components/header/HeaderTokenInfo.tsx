@@ -16,20 +16,20 @@ const HeaderTokenInfo: React.FC<{
     const [show, setShow] = useState(false)
 
     return (
-        <div className='flex-center gap-2 mr-4'>
-            <div className='flex gap-2'>
-                <div className='flex gap-1'>
+        <div className='flex max-w-full flex-wrap items-center justify-end gap-x-2 gap-y-1'>
+            <div className='flex flex-wrap items-center justify-end gap-2'>
+                <div className='flex items-center gap-1 whitespace-nowrap'>
                     <div>{devTokenAmount ? devTokenAmount : 0}</div>
                     <div className='font-bold text-cyfs-green'>BDDT</div>
                 </div>
-                <div>
+                <div className='flex items-center'>
                     <SwapRightOutlined className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={() => {
                         setShow(true)
                     }} />
 
                 </div>
 
-                <div className='flex gap-1'>
+                <div className='flex items-center gap-1 whitespace-nowrap'>
                     <div>{normalTokenAmount ? normalTokenAmount : 0}</div>
                     <div className='font-bold text-cyfs-green'>BDT</div>
                 </div>

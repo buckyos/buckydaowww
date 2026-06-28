@@ -1,5 +1,8 @@
 'use client'
-import { Button, Tag, Input, message } from 'antd'
+import Image from 'next/image'
+import { Button, Tag } from 'antd'
+import { UserOutlined } from '@ant-design/icons'
+import { useAsyncEffect } from 'ahooks'
 import {
   useCommittee,
   useContractStore,
@@ -15,20 +18,53 @@ import UserInfoInput from './UserInfoInput'
 export default function UserInfoPage() {
   const user = useUserStore()
   const contract = useContractStore()
-  const { handleConnect } = useBindWalletAddress()
-  const { token } = useLockToken(user.user.address)
-  const { isCommittee } = useCommittee(user.user)
+  const {
+    handleConnectWallet,
+    handleBindWallet,
+    bindWalletLabel,
+    boundAddress,
+    activeAddress,
+    governanceAddress,
+    hasActiveWallet,
+    isAddressMismatch,
+    shouldShowBindWalletAction,
+    isLocalChainMode,
+  } = useBindWalletAddress()
+  const updateUser = useUserStore((state) => state.updateUser)
+  const { token } = useLockToken(governanceAddress)
+  const { isCommittee } = useCommittee(governanceAddress)
+  const hasProfile = !!user.user.avatar
+  const displayName =
+    user.user.nickname
+    || user.user.github_account
+    || boundAddress
+    || activeAddress
+    || 'Wallet'
+
+  useAsyncEffect(async () => {
+    if (user.isLogin()) {
+      await updateUser()
+    }
+  }, [])
 
   return (
     <div className='flex flex-col px-40 mt-20 pb-80'>
       <div className='flex items-center'>
-        <img
-          className='w-16 h-16 rounded-full overflow-hidden'
-          src={user.user.avatar}
-          alt=''
-        />
+        {hasProfile ? (
+          <Image
+            className='h-16 w-16 rounded-full overflow-hidden'
+            src={user.user.avatar || ''}
+            alt='user avatar'
+            width={64}
+            height={64}
+          />
+        ) : (
+          <div className='w-16 h-16 rounded-full overflow-hidden bg-gray-100 text-gray-500 flex items-center justify-center'>
+            <UserOutlined className='text-2xl' />
+          </div>
+        )}
         <h2 className='ml-4 text-2xl cursor-default text-cyfs-green'>
-          {user.user.nickname}
+          {displayName}
         </h2>
         {isCommittee && (
           <div className='ml-2'>
@@ -48,16 +84,41 @@ export default function UserInfoPage() {
         </div>
 
         <div>
-          <label className='inline-block w-48 font-bold'>wallet address</label>
-          <span>{user.user.address}</span>
+          <label className='inline-block w-48 font-bold'>bound wallet</label>
+          <span>{boundAddress || '-'}</span>
+        </div>
 
-          {user.user.address && (
-            <Button className='ml-10' type='primary' onClick={handleConnect}>
-              Change wallet
+        <div>
+          <label className='inline-block w-48 font-bold'>active wallet</label>
+          <span>{activeAddress || '-'}</span>
+
+          {!hasActiveWallet && (
+            <Button className='ml-10' type='primary' onClick={handleConnectWallet}>
+              Connect wallet
             </Button>
           )}
         </div>
-        {user.user.address && (
+        {shouldShowBindWalletAction && (
+          <div>
+            <label className='inline-block w-48 font-bold'>bind action</label>
+            <Button className='ml-0' type='primary' onClick={handleBindWallet}>
+              {bindWalletLabel}
+            </Button>
+          </div>
+        )}
+        {isLocalChainMode && hasActiveWallet && !boundAddress && (
+          <div>
+            <label className='inline-block w-48 font-bold'>wallet status</label>
+            <Tag color='blue'>Local test mode skips wallet binding</Tag>
+          </div>
+        )}
+        {isAddressMismatch && (
+          <div>
+            <label className='inline-block w-48 font-bold'>wallet status</label>
+            <Tag color='warning'>Active wallet differs from bound address</Tag>
+          </div>
+        )}
+        {governanceAddress && (
           <>
             <div>
               <label className='inline-block w-48 font-bold'>Total Token</label>
@@ -65,17 +126,19 @@ export default function UserInfoPage() {
               {contract.symbol}
             </div>
             <div>
-              <label className='inline-block w-48 font-bold'>
-                Unlocked Token
-              </label>
-              {parseToFloat(token.unlocked)}
+              <label className='inline-block w-48 font-bold'>Assigned Lockup</label>
+              {parseToFloat(token.assigned)}
               {contract.symbol}
             </div>
 
             <div>
-              <label className='inline-block w-48 font-bold'>
-                Locked Token
-              </label>
+              <label className='inline-block w-48 font-bold'>Claimed Lockup</label>
+              {parseToFloat(token.claimed)}
+              {contract.symbol}
+            </div>
+
+            <div>
+              <label className='inline-block w-48 font-bold'>Remaining Locked</label>
               {parseToFloat(token.locked)}
               {contract.symbol}
             </div>

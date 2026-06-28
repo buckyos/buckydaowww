@@ -8,6 +8,7 @@ import {
   DatePicker,
 } from 'antd'
 import { useState } from 'react'
+import { useBindWalletAddress } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
 import dayjs from 'dayjs'
@@ -15,7 +16,12 @@ import { create } from 'zustand'
 import { unwrapUnits } from '@utils/numberConverter'
 import { createProjectVersionExtra, proposalSetExtraAndParams } from '@services/index'
 import TextArea from 'antd/es/input/TextArea'
-import { transactionWait, convertVersion, showErrorMessage } from '@utils/index'
+import {
+  transactionWait,
+  convertVersion,
+  showErrorMessage,
+  formatNumberWithCommas,
+} from '@utils/index'
 import { contractService } from '@contracts/index'
 import { ethers } from 'ethers'
 
@@ -63,21 +69,39 @@ function parseReceiptLog(receipt: any): number {
 const CreateVersionModal = () => {
   const { visible, project_name, close, project_id } = useCreateVersionModalStore()
   const contract = useContractStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { jwt } = useUserStore((state) => {
-    return { jwt: state.jwt }
-  })
+  const maxBudget = contract.totalSupply > 0 ? contract.totalSupply * 0.025 : 0
 
   const onFinish = async (values: any) => {
     setIsSubmitting(true)
     const fn = async () => {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        return
+      }
+
       if (!project_name) {
         message.error('error: missing project name')
         return
       }
       const startDate = dayjs(values.startDate).unix()
       const endDate = dayjs(values.endDate).unix()
+      if (startDate >= endDate) {
+        message.error('End time must be later than start time')
+        return
+      }
+
+      if (maxBudget > 0 && Number(values.budget) > maxBudget) {
+        message.error(
+          `Budget exceeds the current limit. Max allowed is ${formatNumberWithCommas(
+            maxBudget,
+          )} ${contract.symbol}.`,
+          8,
+        )
+        return
+      }
+
       // TODO mark update decimals
       const budget = unwrapUnits(values.budget, contract.decimals)
       // const issueId = values.issueId as number
@@ -104,6 +128,7 @@ const CreateVersionModal = () => {
       }
 
       // service
+      const jwt = useUserStore.getState().jwt
       const result = await createProjectVersionExtra(
         jwt,
         values.title,
@@ -213,6 +238,12 @@ const CreateVersionModal = () => {
             placeholder='Budget token applied for the project version'
           />
         </Form.Item>
+        {maxBudget > 0 && (
+          <div className='-mt-4 mb-4 text-xs text-gray-400'>
+            Current max budget: {formatNumberWithCommas(maxBudget)} {contract.symbol}
+            {' '} (2.5% of total supply)
+          </div>
+        )}
 
         <Form.Item
           name='startDate'

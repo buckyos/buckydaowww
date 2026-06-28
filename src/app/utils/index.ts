@@ -2,6 +2,7 @@ import { nowTimestamp, timeago } from '@utils/time'
 import { ethers } from 'ethers'
 import _ from 'lodash'
 import { message } from 'antd'
+import { createElement } from 'react'
 import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import { decodeIfEncoded, decodePaddedAddress } from '@utils/encode'
 
@@ -27,6 +28,22 @@ const zeroPadLeft = (value: number | string | undefined) => {
 function extractMessage(error: unknown) {
   const errorInfo = (error as any).message
   try {
+    if (
+      typeof errorInfo === 'string' &&
+      errorInfo.includes('missing revert data') &&
+      errorInfo.includes('estimateGas')
+    ) {
+      return 'Transaction simulation failed before the wallet could send it on chain.\n\nCommon causes:\n- budget exceeds the current 2.5% token supply limit\n- version is not greater than the latest version\n- token/amount array lengths do not match'
+    }
+
+    if (
+      typeof errorInfo === 'string' &&
+      errorInfo.includes('eth_sendTransaction') &&
+      errorInfo.includes('Failed to fetch')
+    ) {
+      return 'MetaMask could not reach the local Hardhat RPC while sending the transaction. Re-select or re-add the Hardhat Local network (RPC http://127.0.0.1:8545, chainId 31337) and try again.'
+    }
+
     // 先正则匹配
     const regex = /execution reverted: "([^"]+)"/
     const match = errorInfo.match(regex)
@@ -46,12 +63,43 @@ function extractMessage(error: unknown) {
   }
 }
 
+function formatLongErrorMessage(messageText: string) {
+  return messageText
+    .replace(/\]\[/g, ']\n[')
+    .replace(/, transaction=\{/g, ',\ntransaction={')
+    .replace(/, invocation=/g, ',\ninvocation=')
+    .replace(/, revert=/g, ',\nrevert=')
+    .replace(/, code=/g, ',\ncode=')
+}
+
 function showErrorMessage(e: any, msg: string) {
-    let result = extractMessage(e)
-    message.error(`${msg}[${result}]`, 10)
+    const result = extractMessage(e)
+    const formatted = formatLongErrorMessage(`${msg}\n${result}`)
+    message.open({
+      type: 'error',
+      duration: 10,
+      style: { marginTop: '20vh' },
+      content: createElement(
+        'div',
+        {
+          style: {
+            whiteSpace: 'pre-wrap',
+            textAlign: 'left',
+            maxWidth: '720px',
+            wordBreak: 'break-word',
+            lineHeight: 1.5,
+          },
+        },
+        formatted,
+      ),
+    })
 }
 
 async function transactionWait(tx: any) {
+  if (!tx || typeof tx.wait !== 'function') {
+    throw new Error('No transaction response was returned from the contract call')
+  }
+
   message.info(
     'The contract has been called, tx is being confirmed, please wait...',
   )
@@ -71,8 +119,51 @@ enum proposalTypeMap {
   unknown = '',
 }
 
+const getProposalSyncState = (
+  proposal: ProposalResponseData,
+): ProposalSyncState => {
+  return proposal.syncState ?? 'legacy'
+}
+
+const isProposalMetadataMissing = (proposal: ProposalResponseData) => {
+  return getProposalSyncState(proposal) === 'chain_only'
+}
+
+const isProposalMetadataConflict = (proposal: ProposalResponseData) => {
+  return getProposalSyncState(proposal) === 'conflict'
+}
+
+const getProposalMissingMetadataMessage = () => {
+  return 'This proposal exists on chain, but backend metadata has not been submitted or accepted yet.'
+}
+
+const getProposalMetadataConflictMessage = () => {
+  return 'Backend received proposal metadata that does not match the on-chain creator. Only chain data is trusted right now.'
+}
+
+const hasTrustedProposalMetadata = (proposal: ProposalResponseData) => {
+  const syncState = getProposalSyncState(proposal)
+  return syncState === 'legacy' || syncState === 'ready'
+}
+
+const getEffectiveProposalState = (proposal: ProposalResponseData) => {
+  return proposal.effectiveState ?? proposal.state
+}
+
+const isProposalVotingOpen = (proposal: ProposalResponseData) => {
+  if (typeof proposal.isVotingOpen === 'boolean') {
+    return proposal.isVotingOpen
+  }
+
+  return getEffectiveProposalState(proposal) === 1
+}
+
 // 获取提案类型
 const getProposalType = (proposal: ProposalResponseData) => {
+  if (!hasTrustedProposalMetadata(proposal)) {
+    return proposalTypeMap.unknown
+  }
+
   const proposalType = decodeIfEncoded(_.last(proposal.params))
   if (proposalType === 'releaseTokens') {
     return proposalTypeMap.releaseTokens
@@ -137,12 +228,60 @@ function transformVersionStateWord(state: number | string) {
     return 'Waiting vote'
   }
   if (state == 1) {
-    return 'Proposal passed'
+    return 'Developing'
+  }
+  if (state == 2) {
+    return 'Waiting settlement vote'
   }
   if (state == 3) {
     return 'Version settled'
   }
+  if (state == 4) {
+    return 'Rejected'
+  }
   return 'Unknown'
+}
+
+const UPGRADE_CALLDATA_BLOCK_START = '[upgrade-calldata]'
+const UPGRADE_CALLDATA_BLOCK_END = '[/upgrade-calldata]'
+
+function normalizeUpgradeCalldata(calldata?: string) {
+  const trimmed = calldata?.trim() || ''
+  if (!trimmed) {
+    return '0x'
+  }
+  if (!ethers.isHexString(trimmed)) {
+    throw new Error('Migration calldata must be a hex string')
+  }
+  return trimmed
+}
+
+function appendUpgradeCalldataToExtra(extra: string, calldata?: string) {
+  const normalizedCalldata = normalizeUpgradeCalldata(calldata)
+  const trimmedExtra = extra.trimEnd()
+  if (normalizedCalldata === '0x') {
+    return trimmedExtra
+  }
+
+  const markerBlock = `${UPGRADE_CALLDATA_BLOCK_START}\n${normalizedCalldata}\n${UPGRADE_CALLDATA_BLOCK_END}`
+  return trimmedExtra ? `${trimmedExtra}\n\n${markerBlock}` : markerBlock
+}
+
+function extractUpgradeCalldataFromExtra(extra: string) {
+  const regex = /\n?\[upgrade-calldata\]\n(0x[a-fA-F0-9]*)\n\[\/upgrade-calldata\]\s*$/s
+  const match = extra.match(regex)
+
+  if (!match) {
+    return {
+      content: extra,
+      calldata: '0x',
+    }
+  }
+
+  return {
+    content: extra.slice(0, match.index).trimEnd(),
+    calldata: normalizeUpgradeCalldata(match[1]),
+  }
 }
 
 export {
@@ -155,10 +294,21 @@ export {
   proposalTypeMap,
   checkProposalVote,
   getProposalType,
+  getProposalSyncState,
+  isProposalMetadataMissing,
+  isProposalMetadataConflict,
+  getProposalMissingMetadataMessage,
+  getProposalMetadataConflictMessage,
+  hasTrustedProposalMetadata,
+  getEffectiveProposalState,
+  isProposalVotingOpen,
   proposalExpiredTimeDisplay,
   zeroPadLeft,
   extractMessage,
   convertVersion,
   showErrorMessage,
   transformVersionStateWord,
+  normalizeUpgradeCalldata,
+  appendUpgradeCalldataToExtra,
+  extractUpgradeCalldataFromExtra,
 }

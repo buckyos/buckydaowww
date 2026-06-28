@@ -10,17 +10,19 @@ export default function Fetcher() {
 
   // header 最前面的地方先获取合约地址
   useLayoutEffect(() => {
+    fetchTokenInfo().then(result => {
+      const token = result.dev
+      update(token.totalSupply, token.totalReleased, result.normal.totalSupply, token.symbol, token.decimals)
+    }).catch((error) => {
+      console.error('failed to fetch token info', error)
+    })
+
     if (isBrowserHasWallet()) {
-      fetchTokenInfo().then(result => {
-        const token = result.dev
-        update(token.totalSupply, token.totalReleased, result.normal.totalSupply, token.symbol, token.decimals)
-      })
       window.ethereum.request({ method: 'eth_chainId' }).then((chainId: any) => {
         console.log('当前连接的网络ID是：', chainId)
       })
     }
-
-  }, [])
+  }, [update])
 
   return <></>
 }

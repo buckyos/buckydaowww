@@ -63,14 +63,19 @@ interface CommitteeMember extends User {
   homepage?: string
 }
 
+type ProposalSyncState = 'legacy' | 'chain_only' | 'ready' | 'conflict'
+
 interface ProposalResponseData {
   id: string
+  txHash: string
   title: string
   extra: string
   proposalId: string
   investmentId: string
   result: string
   state: number
+  effectiveState?: number
+  isVotingOpen?: boolean
   fromGroup: string
   expired: number
   supportCount: number
@@ -82,6 +87,7 @@ interface ProposalResponseData {
   project?: ProjectVersionProps
   paramroot?: string
   full: boolean // 投票类型，是否全员投票
+  syncState?: ProposalSyncState
   params: any[]
 }
 
@@ -99,6 +105,11 @@ interface ProposalDetailResponseData {
   data: ProposalResponseData
 }
 
+interface ProposalVoteRecord {
+  proposal: ProposalResponseData
+  support: boolean
+}
+
 interface ProposalCardProps {
   item: ProposalResponseData
   memberCount: number
@@ -114,10 +125,17 @@ interface UserAvatar {
 }
 
 interface WalletStoreDefine {
-  defaultChannelIdentifier: string
-  connectingChannelIdentifier: string
-  isConnecting: () => boolean
-  setConnectingChannel: (channel: string) => void
+  activeAddress: string
+  chainId: string
+  hasWallet: boolean
+  initialized: boolean
+  updateWalletState: (payload: {
+    activeAddress?: string
+    chainId?: string
+    hasWallet?: boolean
+    initialized?: boolean
+  }) => void
+  resetWalletState: () => void
 }
 
 type UserLoginData = User
@@ -142,6 +160,12 @@ interface CreateVersionDefine {
 interface RepositoryItem {
   name: string
   detail: string
+  projectId?: string
+  owner?: User
+  updatedBy?: User
+  createdAt?: number
+  updatedAt?: number
+  legacy?: boolean
 }
 
 interface ResponseTokenInfo {
@@ -167,6 +191,11 @@ interface ProjectItem {
   github_url: string
   description: string
   project_logs?: ProjectLogsDefine[]
+  owner?: User
+  updatedBy?: User
+  createdAt?: number
+  updatedAt?: number
+  legacy?: boolean
 }
 
 interface ProjectLogsDefine {
@@ -287,6 +316,13 @@ interface ContributionItem {
   projectId: number
 }
 
+interface WithdrawableContributionItem {
+  address: string
+  amount: string
+  projectId: number
+  project: ProjectVersionProps
+}
+
 interface SettlementVersionProposalParams {
   result: number
   projectId: number
@@ -357,5 +393,53 @@ interface ContractTokenInfo {
     totalReleasedPercent: number
     unrelease: number
     unreleasePercent: number
+  }
+}
+
+interface FundingOverviewResponseData {
+  tokenInfo: ResponseTokenInfo
+  treasury: {
+    bdtInDividend: string
+    bdtInAcquired: string
+    bdtInProject: string
+  }
+  rounds: {
+    activeCount: number
+    closedCount: number
+    totalCount: number
+    totalSubscribedDao: string
+    activeRounds: TwoStepInvestmentData[]
+    historyRounds: TwoStepInvestmentData[]
+  }
+  pipeline: {
+    waitingVote: ProjectVersionProps[]
+    developing: ProjectVersionProps[]
+    waitingSettlement: ProjectVersionProps[]
+    settled: ProjectVersionProps[]
+  }
+}
+
+interface FundingOverviewData {
+  tokenInfo: ContractTokenInfo
+  treasury: {
+    bddtReleased: number
+    bddtUnreleased: number
+    bdtInDividend: number
+    bdtInAcquired: number
+    bdtInProject: number
+  }
+  rounds: {
+    activeCount: number
+    closedCount: number
+    totalCount: number
+    totalSubscribedDao: number
+    activeRounds: TwoStepInvestmentData[]
+    historyRounds: TwoStepInvestmentData[]
+  }
+  pipeline: {
+    waitingVote: ProjectVersionProps[]
+    developing: ProjectVersionProps[]
+    waitingSettlement: ProjectVersionProps[]
+    settled: ProjectVersionProps[]
   }
 }

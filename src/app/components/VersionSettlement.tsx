@@ -10,26 +10,39 @@ import {
 } from '@services/index'
 import { getVersionSettlementInfo } from '@contracts/index'
 import useUserStore from '@hooks/useUserStore'
+import { useBindWalletAddress } from '@hooks/index'
 import { wrapUnits, calculateProportion } from '@utils/numberConverter'
 import { contractService } from '@contracts/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useAsyncEffect } from 'ahooks'
 import _ from 'lodash'
 
-const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
+function normalizeAddress(address?: string) {
+  return address?.trim().toLowerCase() || ''
+}
+
+const WithdrawButton: React.FC<{
+  proposal: ProposalResponseData
+  canWithdraw: boolean
+  withdrawDisabledReason?: string
+}> = ({
   proposal,
+  canWithdraw,
+  withdrawDisabledReason,
 }) => {
-  const { jwt, isLogin } = useUserStore((state) => ({
-    jwt: state.jwt,
-    isLogin: state.isLogin,
-  }))
+  const { ensureAuthenticated } = useBindWalletAddress()
   const [loading, setLoading] = useState(false)
 
   const onWithdraw = async () => {
+    if (!canWithdraw) {
+      if (withdrawDisabledReason) {
+        message.info(withdrawDisabledReason)
+      }
+      return
+    }
     setLoading(true)
     const fn = async () => {
-      if (!isLogin()) {
-        message.error('error: please login first')
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
         return
       }
 
@@ -54,6 +67,7 @@ const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
         return false
       }
 
+      const jwt = useUserStore.getState().jwt
       const result = await postContributionWithdraw(jwt, [proposal.project.id])
       console.log('result', result)
     }
@@ -73,6 +87,7 @@ const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
         <Button
           size='large'
           type='primary'
+          disabled={!canWithdraw}
           loading={loading}
           onClick={onWithdraw}
         >
@@ -88,6 +103,9 @@ const WithdrawButton: React.FC<{ proposal: ProposalResponseData }> = ({
           The number of withdrawal tokens is calculated based on the version
           budget and your contribution value.
         </p>
+        {withdrawDisabledReason && (
+          <p className='text-amber-600 mt-2'>{withdrawDisabledReason}</p>
+        )}
       </div>
     </>
   )
@@ -102,6 +120,7 @@ const VersionSettlement: React.FC<{
     decimals: state.decimals,
     symbol: state.symbol,
   }))
+  const { activeAddress } = useBindWalletAddress()
 
   const [contributions, setContributions] = useState<ContributionInfo[]>([])
 
@@ -132,6 +151,29 @@ const VersionSettlement: React.FC<{
 
   if (!proposal || proposal.params == null) {
     return null
+  }
+
+  const activeContribution = contributions.find(
+    (item) => normalizeAddress(item.contributor) === normalizeAddress(activeAddress),
+  )
+  const canWithdraw =
+    !!activeAddress &&
+    proposal.state === ProposalState.Executed &&
+    !!activeContribution &&
+    !activeContribution.hasClaim
+
+  let withdrawDisabledReason = ''
+  if (!activeAddress) {
+    withdrawDisabledReason = 'Connect the contributor wallet to withdraw.'
+  } else if (proposal.state !== ProposalState.Executed) {
+    withdrawDisabledReason =
+      'Contribution rewards can only be withdrawn after the settlement proposal is executed.'
+  } else if (!activeContribution) {
+    withdrawDisabledReason =
+      'The current wallet is not an eligible contributor for this version.'
+  } else if (activeContribution.hasClaim) {
+    withdrawDisabledReason =
+      'This wallet has already withdrawn its contribution reward for this version.'
   }
 
   // const budget = BigInt(proposal.params[0].budget)
@@ -206,7 +248,11 @@ const VersionSettlement: React.FC<{
         />
       </div>
 
-      <WithdrawButton proposal={proposal} />
+      <WithdrawButton
+        proposal={proposal}
+        canWithdraw={canWithdraw}
+        withdrawDisabledReason={withdrawDisabledReason}
+      />
     </>
   )
 }

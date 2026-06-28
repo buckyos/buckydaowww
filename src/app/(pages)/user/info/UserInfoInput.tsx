@@ -12,18 +12,29 @@ import TextArea from 'antd/es/input/TextArea'
 import { useUserinfo } from './useUserInfo'
 
 const UserInfoInput = () => {
-  const { isEdit, setJob, setDesc, job, desc } = useUserinfo()
+  const { isEdit, setNickname, setJob, setDesc, nickname, job, desc } = useUserinfo()
   const user = useUserStore()
   useEffect(() => {
+    setNickname(user.user.nickname || '')
     setJob(user.user.job)
-    setDesc(user.user.desc)
-  }, [user.user.job, user.user.desc, setJob, setDesc])
+    setDesc(user.user.desc || '')
+  }, [user.user.nickname, user.user.job, user.user.desc, setNickname, setJob, setDesc])
 
   return (
     <>
       <div className='mt-20 flex items-center'>
         <label className='inline-block w-48 font-bold flex-shrink-0'>
-          position
+          nickname
+        </label>
+        {isEdit && (
+          <Input value={nickname} onChange={(e) => setNickname(e.target.value)} />
+        )}
+        {!isEdit && <div>{user.user.nickname ? user.user.nickname : '---'}</div>}
+      </div>
+
+      <div className='mt-6 flex items-center'>
+        <label className='inline-block w-48 font-bold flex-shrink-0'>
+          Job
         </label>
         {isEdit && (
           <Input value={job} onChange={(e) => setJob(e.target.value)}></Input>

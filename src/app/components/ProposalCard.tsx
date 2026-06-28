@@ -1,7 +1,14 @@
 'use client'
 import React, { useCallback } from 'react'
 import { Progress, Tag, Tooltip } from 'antd'
-import { proposalExpiredTimeDisplay } from '@utils/index'
+import {
+  proposalExpiredTimeDisplay,
+  getProposalSyncState,
+  isProposalMetadataMissing,
+  isProposalMetadataConflict,
+  getProposalMissingMetadataMessage,
+  getProposalMetadataConflictMessage,
+} from '@utils/index'
 import UserAvatar from './UserAvatar'
 import { useRouter } from 'next/navigation'
 import ProposalStateTag from '@components/ProposalStateTag'
@@ -9,6 +16,9 @@ import ProposalStateTag from '@components/ProposalStateTag'
 
 const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
   const router = useRouter()
+  const syncState = getProposalSyncState(item)
+  const metadataMissing = isProposalMetadataMissing(item)
+  const metadataConflict = isProposalMetadataConflict(item)
 
   const proposalCreatorDisplay = useCallback(() => {
     const nickname = item.creator?.nickname
@@ -24,6 +34,13 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
   }, [item.creator?.address, item.creator?.nickname])
 
   const proposalExtraDisplay = useCallback(() => {
+    if (metadataMissing) {
+      return getProposalMissingMetadataMessage()
+    }
+    if (metadataConflict) {
+      return getProposalMetadataConflictMessage()
+    }
+
     const extra = item?.extra ?? ''
 
     if (extra.length < 48) {
@@ -31,7 +48,24 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
     }
 
     return `${extra.slice(0, 48)}...`
-  }, [item?.extra])
+  }, [item?.extra, metadataConflict, metadataMissing])
+
+  const proposalTitleDisplay = useCallback(() => {
+    const title = item.title?.trim()
+    if (title) {
+      return title
+    }
+
+    if (metadataMissing) {
+      return 'Chain-only proposal'
+    }
+
+    if (metadataConflict) {
+      return 'Metadata conflict'
+    }
+
+    return 'Untitled proposal'
+  }, [item.title, metadataConflict, metadataMissing])
 
   const supportPercent = () => {
     return (item.supportCount / memberCount) * 100
@@ -61,6 +95,8 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
           </Tooltip>
           <div className='flex-1'></div>
           {!!item.investment && <Tag color='green'>Investment</Tag>}
+          {syncState === 'chain_only' && <Tag color='orange'>Chain only</Tag>}
+          {syncState === 'conflict' && <Tag color='red'>Metadata conflict</Tag>}
           <ProposalStateTag
             proposal={item}
             is_reject={!item.full ? rejectPercent() > 50 : item.state == 3 }
@@ -70,7 +106,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({ item, memberCount }) => {
 
         <div className='mt-2'>
           <span className='font-bold mr-2'>#{item.id}</span>
-          {item?.title ?? ''}
+          {proposalTitleDisplay()}
         </div>
 
         <div className='text-sm text-black-secondary'>

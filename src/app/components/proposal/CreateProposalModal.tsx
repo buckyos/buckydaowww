@@ -13,6 +13,7 @@ import {
   Spin,
 } from 'antd'
 import useContractStore from '@hooks/useContract'
+import { useBindWalletAddress } from '@hooks/index'
 import { unwrapUnits, parseToBigInt } from '@utils/numberConverter'
 import { toBigInt } from 'ethers'
 import dayjs from 'dayjs'
@@ -34,11 +35,17 @@ const CreateProposalModal: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
-  const user = useUserStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
+
+    if (!(await ensureAuthenticated({ requireWallet: true }))) {
+      setIsSubmitting(false)
+      return
+    }
+
     const mainAddress = contractService.getAddressOfMain()
     const proposalDuration = values.proposalDuration * 24 * 60 * 60
     const daoTokenDecimals = contract.decimals
@@ -111,7 +118,7 @@ const CreateProposalModal: React.FC<{
     // 访问后端
     console.log('🍻 receipt :', receipt)
     const result = await createInvestmentExtra(
-      user.jwt,
+      useUserStore.getState().jwt,
       title,
       content,
       receipt.hash,

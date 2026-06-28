@@ -24,7 +24,25 @@ const useUserStore = create<UserStoreDefine>()(
             'DAO-TOKEN': jwt,
           },
         })
-        const result = (await resp.json()) as UserinfoResponse
+
+        const text = await resp.text()
+        if (!text) {
+          if (resp.status === 401 || resp.status === 403) {
+            get().logout()
+          }
+          return resp.status || -1
+        }
+
+        let result: UserinfoResponse
+        try {
+          result = JSON.parse(text) as UserinfoResponse
+        } catch (_error) {
+          if (resp.status === 401 || resp.status === 403) {
+            get().logout()
+            return resp.status || -1
+          }
+          throw new Error('Invalid user info response')
+        }
 
         console.log('Store fetch and update user info', result)
         if (result.code == 0) {
@@ -33,6 +51,11 @@ const useUserStore = create<UserStoreDefine>()(
             user: user,
           })
         }
+
+        if ((resp.status === 401 || resp.status === 403) && result.code !== 0) {
+          get().logout()
+        }
+
         return result.code
       },
       updateJwt: (jwt: string) => {
@@ -88,8 +111,8 @@ const useUserStore = create<UserStoreDefine>()(
             desc: '',
           },
           jwt: '',
+          expiration: 0,
         })
-        localStorage.removeItem('committee-type')
       },
     }),
     { name: 'user-store' },

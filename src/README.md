@@ -1,20 +1,21 @@
-# github login
+# Frontend App Directory
 
-✔ user avatar hover menu
-✔ menu: userinfo
-✔ menu: logout
-✔ page: userinfo
-✔ get user info from service
+这个目录是 `buckydaowww` 的实际前端应用目录：
 
-✔ useContract
-✔ 获取各子合约地址
+- `package.json`
+- Next.js 配置
+- 页面与组件代码
+- `.env.local`
 
-✔ contract token
-layout get contract address
-project detail page
-project log list
-project issue link
-project action panel
+仓库级说明请优先看根 README：
 
-set jwt in request header
-bind address in service
+- [`../README.md`](/home/bucky/work/buckydaowww/README.md)
+
+最常用命令：
+
+```bash
+npm install
+npm run dev
+npm run lint
+npm run build
+```

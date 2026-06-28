@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Button, message, Tooltip } from 'antd'
-import { useCommittee } from '@hooks/index'
-import useUserStore from '@hooks/useUserStore'
-import _ from 'lodash'
+import { useBindWalletAddress, useCommittee } from '@hooks/index'
 import {
-  extractMessage,
   getProposalType,
+  getProposalMissingMetadataMessage,
+  getProposalMetadataConflictMessage,
+  hasTrustedProposalMetadata,
   proposalTypeMap,
   transactionWait,
   decodePaddedAddress,
+  isProposalMetadataConflict,
+  showErrorMessage,
 } from '@utils/index'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import {
@@ -26,15 +28,34 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
   proposal,
   disabled,
 }) => {
-  const user = useUserStore()
+  const { governanceAddress, hasActiveWallet } = useBindWalletAddress()
   // const contract = useContractStore()
-  const { isCommittee } = useCommittee(user.user)
+  const { isCommittee } = useCommittee(governanceAddress)
   const [loading, setLoading] = useState(false)
+  const metadataConflict = isProposalMetadataConflict(proposal)
+  const trustedMetadata = hasTrustedProposalMetadata(proposal)
 
   const executeProposal = async () => {
     setLoading(true)
+    if (!trustedMetadata) {
+      message.error(
+        metadataConflict
+          ? getProposalMetadataConflictMessage()
+          : getProposalMissingMetadataMessage(),
+      )
+      setLoading(false)
+      return
+    }
+
+    if (!hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      setLoading(false)
+      return
+    }
+
     if (!isCommittee) {
       message.error('You are not a committee member')
+      setLoading(false)
       return
     }
 
@@ -50,8 +71,12 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
           'Execute settlement version proposal success',
         )
       } else if (proposalType === proposalTypeMap.UpgradeContract) {
-        // await executeUpgradeContract()
-        await executeUpgradeContract(proposal.params[0], proposal.params[1])
+        await executeUpgradeContract(
+          proposal.params[0],
+          proposal.params[1],
+          proposal.extra,
+          proposal.params.length >= 4 ? proposal.params[2] : undefined,
+        )
       } else if (proposalType === proposalTypeMap.ChangeCommittee) {
         await executeChangeCommittee(
           proposal.id.toString(),
@@ -67,8 +92,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
         message.error('This proposal type error')
       }
     } catch (e) {
-      const msg = extractMessage(e)
-      message.error(msg)
+      showErrorMessage(e, 'Execute proposal failed')
     }
 
     setLoading(false)
@@ -123,7 +147,7 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
     <div className='flex-center gap-1'>
       <Button
         loading={loading}
-        disabled={disabled}
+        disabled={disabled || !trustedMetadata}
         type='primary'
         onClick={executeProposal}
         className=''
@@ -133,7 +157,11 @@ const ExecuteProposalButton: React.FC<ExecuteProposalButtonProps> = ({
 
       <Tooltip
         placement='top'
-        title={'Can only be implemented after voting'}
+        title={!trustedMetadata
+          ? metadataConflict
+            ? getProposalMetadataConflictMessage()
+            : getProposalMissingMetadataMessage()
+          : 'Can only be implemented after voting'}
       >
         <ExclamationCircleOutlined />
       </Tooltip>

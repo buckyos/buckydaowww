@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { Descriptions, Tooltip } from 'antd'
+import { Button, Descriptions, Tooltip } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { parseToFloat, wrapUnits } from '@utils/numberConverter'
 import useContractStore from '@hooks/useContract'
+import StateExplanationCard from '@components/StateExplanationCard'
 import dayjs from 'dayjs'
 import {
   GithubOutlined,
@@ -11,8 +12,7 @@ import {
 } from '@ant-design/icons'
 import Loading from '@components/Loading'
 import { useVersionSettlementModalStore } from '@hooks/modal'
-import useUserStore from '@hooks/useUserStore'
-import { message } from 'antd'
+import { useBindWalletAddress } from '@hooks/index'
 import { transformVersionStateWord } from '@utils/index'
 
 interface VersionDescriptionProps {
@@ -20,20 +20,98 @@ interface VersionDescriptionProps {
   inProposalPage?: boolean
 }
 
+function ellipsisAddress(address?: string) {
+  if (!address) {
+    return '-'
+  }
+  if (address.length <= 15) {
+    return address
+  }
+  return `${address.slice(0, 6)}...${address.slice(-5)}`
+}
+
+function normalizeAddress(address?: string) {
+  return address?.trim().toLowerCase() || ''
+}
+
+function formatBudget(
+  budget: string | null | undefined,
+  decimals: string | number | bigint,
+  symbol: string,
+) {
+  if (budget === undefined || budget === null || budget === '') {
+    return '-'
+  }
+
+  try {
+    return `${parseToFloat(wrapUnits(budget, decimals))} ${symbol}`
+  } catch {
+    return '-'
+  }
+}
+
+function buildVersionStateExplanation(params: {
+  version: ProjectVersionProps
+  activeAddress?: string
+  isManagerWallet: boolean
+  settlementBlockers: string[]
+}) {
+  const { version, activeAddress, isManagerWallet, settlementBlockers } = params
+  const why: string[] = []
+  const next: string[] = []
+  let tone: 'info' | 'success' | 'warning' | 'danger' = 'info'
+  let status = transformVersionStateWord(version.state)
+
+  if (version.state === 0) {
+    why.push('The version proposal exists, but governance has not approved the version start yet.')
+    next.push('Monitor the linked proposal and wait for it to move the version into Developing.')
+  } else if (version.state === 1) {
+    why.push('The version has passed its start proposal and is now in the active development window.')
+    if (!activeAddress) {
+      next.push('Connect the manager wallet when development is complete and a settlement proposal needs to be created.')
+      tone = 'warning'
+    } else if (isManagerWallet) {
+      next.push(
+        settlementBlockers.length > 0
+          ? settlementBlockers[0]
+          : 'When the work is ready, create the settlement proposal and submit contributor points for review.',
+      )
+    } else {
+      next.push('Only the manager wallet can create the settlement proposal for this version.')
+      tone = 'warning'
+    }
+  } else if (version.state === 2) {
+    tone = 'warning'
+    why.push('Development is complete and the version is now waiting for settlement voting.')
+    next.push('Open the settlement proposal and track whether the committee accepts or rejects the submitted result.')
+  } else if (version.state === 3) {
+    tone = 'success'
+    why.push('The version has already been settled and can now feed downstream token release or withdrawal flows.')
+    next.push('Review contribution withdrawal and token release consequences on the project and token pages.')
+  } else if (version.state === 4) {
+    tone = 'danger'
+    why.push('The version was rejected, so it will not proceed through the normal settlement path.')
+    next.push('Inspect the related proposal outcome and prepare a revised version if the work should continue.')
+  }
+
+  why.push(`Manager wallet: ${ellipsisAddress(version.manager)}`)
+
+  return { status, why, next, tone }
+}
+
 const VersionDescription: React.FC<VersionDescriptionProps> = ({
   version,
   inProposalPage = false,
 }) => {
   const { show } = useVersionSettlementModalStore()
+  const { ensureAuthenticated, activeAddress } = useBindWalletAddress()
   const { decimals, symbol } = useContractStore((state) => ({
     decimals: state.decimals,
     symbol: state.symbol,
   }))
-  const { isLogin } = useUserStore((state) => ({ isLogin: state.isLogin }))
 
-  const onCreateSettlementProposal = () => {
-    if (!isLogin()) {
-      message.error('error: please login first')
+  const onCreateSettlementProposal = async () => {
+    if (!(await ensureAuthenticated({ requireWallet: true }))) {
       return
     }
 
@@ -46,17 +124,37 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
     return <Loading className='mt-20' />
   }
 
+  const isManagerWallet =
+    !!activeAddress &&
+    normalizeAddress(activeAddress) === normalizeAddress(version.manager)
+  const settlementBlockers: string[] = []
+
+  if (version.state !== 1) {
+    settlementBlockers.push(
+      'Settlement proposal can only be created after the version proposal passes and the version enters Developing state.',
+    )
+  }
+
+  if (!activeAddress) {
+    settlementBlockers.push('Connect the manager wallet before creating a settlement proposal.')
+  } else if (!isManagerWallet) {
+    settlementBlockers.push('Only the version manager wallet can create the settlement proposal.')
+  }
+
+  const versionStateExplanation = buildVersionStateExplanation({
+    version,
+    activeAddress,
+    isManagerWallet,
+    settlementBlockers,
+  })
+
   const items: DescriptionsProps['items'] = [
     { key: '1', label: 'title', children: version.title },
     { key: '2', label: 'version', children: version.version },
     {
       key: '3',
       label: 'budget',
-      children: (
-        <div>
-          {parseToFloat(wrapUnits(version.budget, decimals))} {symbol}
-        </div>
-      ),
+      children: <div>{formatBudget(version.budget, decimals, symbol)}</div>,
     },
     {
       key: '4',
@@ -78,7 +176,7 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
           target='_blank'
         >
           <GithubOutlined />
-          <span className='ml-2'>#{version.issue_link.split('/').pop()}</span>
+          <span className='ml-2'>#{version.issue_link?.split('/').pop() || '-'}</span>
         </a>
       ),
     },
@@ -111,7 +209,13 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
         </Tooltip>
       </>
     ),
-    children: version?.manager,
+    children: (
+      <Tooltip title={version?.manager}>
+        <span className='font-mono text-sm text-cyfs-green'>
+          {ellipsisAddress(version?.manager)}
+        </span>
+      </Tooltip>
+    ),
   })
 
   if (!inProposalPage) {
@@ -132,25 +236,50 @@ const VersionDescription: React.FC<VersionDescriptionProps> = ({
       items.push({
         label: 'settlement status',
         children: (
-          <>
-            <div>
-              <div className='flex-center gap-4'>
-                <div>No settlement proposal</div>
-                <a
-                  className='btn-dan w-60 h-9'
-                  onClick={onCreateSettlementProposal}
-                >
-                  Create settlement proposal
-                </a>
-              </div>
+          <div className='space-y-3'>
+            <div className='flex items-center gap-4 flex-wrap'>
+              <div>No settlement proposal</div>
+              <Button
+                className='btn-dan w-60 h-9'
+                type='primary'
+                disabled={settlementBlockers.length > 0}
+                onClick={onCreateSettlementProposal}
+              >
+                Create settlement proposal
+              </Button>
             </div>
-          </>
+            {settlementBlockers.length > 0 ? (
+              <div className='rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>
+                <div className='font-medium mb-2'>Settlement proposal is not available yet.</div>
+                <ul className='list-disc pl-5 space-y-1'>
+                  {settlementBlockers.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className='text-sm text-gray-500'>
+                Create the settlement proposal after development is complete, then submit contributor points for committee review.
+              </div>
+            )}
+          </div>
         ),
       })
     }
   }
   return (
     <>
+      {!inProposalPage && (
+        <div className='mb-6'>
+          <StateExplanationCard
+            heading='Version Status'
+            status={versionStateExplanation.status}
+            why={versionStateExplanation.why}
+            next={versionStateExplanation.next}
+            tone={versionStateExplanation.tone}
+          />
+        </div>
+      )}
       <Descriptions bordered items={items} />
     </>
   )

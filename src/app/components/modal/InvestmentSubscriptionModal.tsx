@@ -10,7 +10,7 @@ import {
   // getAddressOfToken,
   contractService
 } from '@contracts/index'
-import { useContractStore, useUserStore } from '@hooks/index'
+import { useBindWalletAddress, useContractStore } from '@hooks/index'
 import { extractMessage } from '@utils/index'
 import { parseInt } from 'lodash'
 import { formatUnits, parseUnits, toBigInt } from 'ethers'
@@ -26,10 +26,16 @@ async function countMaxTokenAmount(
   const now = Date.now()
   const tokenDecimals = await getDecimals(data.tokenAddress)
   // const totalAmount = parseUnits(token, tokenDecimals)
+  const currentUser = data.whitelist[address]
+
+  // Investment rounds are whitelist-only. A non-whitelisted address should see
+  // zero available capacity instead of crashing the modal.
+  if (!currentUser) {
+    return 0
+  }
 
   //计算占百分比
   if (now < data.step1EndTime * 1000 /* 处理UTC  */) {
-    const currentUser = data.whitelist[address]
     const percent = toBigInt(currentUser[0]) // 百分比的精度是10000
     // 这里的已认购是wei
     const hadSubscribe = toBigInt(currentUser[1])
@@ -65,12 +71,13 @@ const InvestmentSubscriptionModal: React.FC<{
   const [loadingTx, setloadingTx] = useState(false)
   const contract = useContractStore()
   const [maxTokenAmount, setMaxTokenAmount] = useState(0)
-  const { user } = useUserStore()
+  const { activeAddress, hasActiveWallet } = useBindWalletAddress()
 
   const DAO_TOKEN_ADDRESS = contractService.getAddressOfDevToken()
+  const isWhitelisted = !!(data && activeAddress && data.whitelist[activeAddress])
 
   useAsyncEffect(async () => {
-    if (!data || !user.address) {
+    if (!data || !activeAddress) {
       return
     }
     console.log('🍻 cout max token amount data :', data)
@@ -79,16 +86,24 @@ const InvestmentSubscriptionModal: React.FC<{
       toBigInt(data.totalAmount),
       // formatUnits(data.totalAmount, tokenDecimals),
       data,
-      user.address,
+      activeAddress,
     )
     setMaxTokenAmount(maxDaoTokenAmount)
 
     // 获取投资token的symbol
-  }, [data, user])
+  }, [activeAddress, data])
 
   // 认购投资份额
   const onSubscribe = async (values: StoreValue) => {
     console.log('🍻 values :', values)
+    if (!activeAddress || !hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      return
+    }
+    if (!isWhitelisted) {
+      message.error('Only whitelisted addresses can subscribe to this investment')
+      return
+    }
     setIsSubmitting(true)
     setloadingTx(true)
 
@@ -96,7 +111,7 @@ const InvestmentSubscriptionModal: React.FC<{
       const result = await subscribeInvestmentShare(
         values,
         data!.id.toString(),
-        user.address,
+        activeAddress,
       )
       if (result) {
         message.success('Create Investment success')
@@ -129,6 +144,11 @@ const InvestmentSubscriptionModal: React.FC<{
         The max remaining token you can subscribe to is {maxTokenAmount}{' '}
         {contract.symbol}
       </div>
+      {!isWhitelisted && (
+        <div className='mt-2 text-orange-500'>
+          The active wallet is not in this investment whitelist.
+        </div>
+      )}
 
       <div className='flex mt-2'>
         <TokenWithSymbol
@@ -167,13 +187,19 @@ const InvestmentSubscriptionModal: React.FC<{
               className='w-72'
               min={0}
               max={maxTokenAmount}
+              disabled={!isWhitelisted}
               placeholder='Input DAO token'
               suffix={contract.symbol}
             />
           </Form.Item>
 
           <div className='flex justify-center'>
-            <Button loading={isSubmitting} type='primary' htmlType='submit'>
+            <Button
+              loading={isSubmitting}
+              type='primary'
+              htmlType='submit'
+              disabled={!isWhitelisted}
+            >
               Subscribe for Shares
             </Button>
           </div>

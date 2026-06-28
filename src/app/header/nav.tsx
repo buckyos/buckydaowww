@@ -16,6 +16,13 @@ const Nav = () => {
       </Link>
 
       <Link
+        href="/overview"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Overview
+      </Link>
+
+      <Link
         href="/#members"
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
       >
@@ -26,6 +33,13 @@ const Nav = () => {
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
       >
         Proposal
+      </Link>
+
+      <Link
+        href="/funding"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Funding
       </Link>
 
       <Link
@@ -40,6 +54,20 @@ const Nav = () => {
         className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
       >
         Project
+      </Link>
+
+      <Link
+        href="/token"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Token
+      </Link>
+
+      <Link
+        href="/me"
+        className='text-base font-medium text-black-primary hover:text-black-secondary cursor-pointer no-underline'
+      >
+        Me
       </Link>
 
       <div className='block md:hidden'>{/* <WalletConnector /> */}</div>

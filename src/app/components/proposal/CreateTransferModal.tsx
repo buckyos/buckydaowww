@@ -4,6 +4,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { StoreValue } from 'antd/es/form/interface'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { Modal, Form, Input, Button, message, Spin, InputNumber } from 'antd'
+import { useBindWalletAddress } from '@hooks/index'
 import useContractStore from '@hooks/useContract'
 import useUserStore from '@hooks/useUserStore'
 import { createReleaseToken, proposalSetparams } from '@services/index'
@@ -25,11 +26,17 @@ const CreateTransferModal: React.FC<{
 }> = ({ showModal, setShowModal }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const contract = useContractStore()
-  const user = useUserStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const onCreateReleaseToken = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
+
+    if (!(await ensureAuthenticated({ requireWallet: true }))) {
+      setIsSubmitting(false)
+      return
+    }
+
     const title = values.title
     const content = values.content
 
@@ -81,8 +88,9 @@ const CreateTransferModal: React.FC<{
     }
     // 访问后端
     console.log('🍻 receipt :', receipt)
+    const jwt = useUserStore.getState().jwt
     const result = await createReleaseToken(
-      user.jwt,
+      jwt,
       title,
       content,
       address,
@@ -91,7 +99,7 @@ const CreateTransferModal: React.FC<{
     )
     console.log('🍻 createInvestmentExtra service result :', result)
     const setparamResult = await proposalSetparams(
-      user.jwt,
+      jwt,
       [address, amounts, 'releaseTokens'],
       receipt.hash,
     )

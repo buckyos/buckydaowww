@@ -3,7 +3,8 @@ import TextArea from 'antd/es/input/TextArea'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { updateProposalInfomation } from '@services/index'
-import useUserStore from '@hooks/useUserStore'
+import { useBindWalletAddress, useUserStore } from '@hooks/index'
+import { extractMessage } from '@utils/index'
 
 interface UpdateProposalModalProps {
   visible: boolean
@@ -18,28 +19,35 @@ const UpdateProposalModal: React.FC<UpdateProposalModalProps> = ({
 }) => {
   const { proposalId } = useParams() as { proposalId: string }
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { jwt } = useUserStore((state) => {
-    return { jwt: state.jwt }
-  })
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const onUpdateProposal = async (values: any) => {
     setIsSubmitting(true)
 
-    const result = await updateProposalInfomation(
-      proposalId,
-      jwt,
-      values.title,
-      values.content,
-    )
-    console.log('update result', result)
-    if (result.code !== 0) {
-      message.error('Failed to update proposal')
-    } else {
-      message.success('Update proposal successfully')
-      setVisible(false)
-      await fetchData()
+    try {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        return
+      }
+
+      const result = await updateProposalInfomation(
+        proposalId,
+        useUserStore.getState().jwt,
+        values.title,
+        values.content,
+      )
+      console.log('update result', result)
+      if (result.code !== 0) {
+        message.error('Failed to update proposal')
+      } else {
+        message.success('Update proposal successfully')
+        setVisible(false)
+        await fetchData()
+      }
+    } catch (error) {
+      message.error(`Failed to update proposal[${extractMessage(error)}]`, 10)
+    } finally {
+      setIsSubmitting(false)
     }
-    setIsSubmitting(false)
   }
 
   return (

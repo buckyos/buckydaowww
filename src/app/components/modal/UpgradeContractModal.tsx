@@ -2,8 +2,15 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { StoreValue } from 'antd/es/form/interface'
 import { Modal, Form, Input, Button, message, Spin } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import { ethers } from 'ethers'
+import { useBindWalletAddress } from '@hooks/index'
 import useUserStore from '@hooks/useUserStore'
-import { showErrorMessage, transactionWait } from '@utils/index'
+import {
+  appendUpgradeCalldataToExtra,
+  normalizeUpgradeCalldata,
+  showErrorMessage,
+  transactionWait,
+} from '@utils/index'
 import { proposalSetExtraAndParams } from '@services/index'
 import { contractService } from '@contracts/index'
 
@@ -13,16 +20,29 @@ const UpgradeContractModal: React.FC<{
   setShowModal: Dispatch<SetStateAction<boolean>>
 }> = ({ showModal, setShowModal }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const user = useUserStore()
+  const { ensureAuthenticated } = useBindWalletAddress()
 
   const onCreateProposal = async (values: StoreValue) => {
     console.log('🍻 values :', values)
     setIsSubmitting(true)
     const fn = async () => {
+      if (!(await ensureAuthenticated({ requireWallet: true }))) {
+        return
+      }
+
+      const migrationCalldata = normalizeUpgradeCalldata(values.migrationCalldata)
+      const calldataHash = ethers.keccak256(migrationCalldata)
+      const proposalExtra = appendUpgradeCalldataToExtra(
+        values.content || '',
+        migrationCalldata,
+      )
       const comitteeContract = await contractService.getCommitteeContract()
-      const tx = await comitteeContract?.prepareContractUpgrade(
+      const tx = await comitteeContract[
+        'prepareContractUpgrade(address,address,bytes32)'
+      ](
         values.contractProxyAddress,
         values.implAddress,
+        calldataHash,
       )
 
       const receipt = await transactionWait(tx)
@@ -34,10 +54,15 @@ const UpgradeContractModal: React.FC<{
         return
       }
       const result = await proposalSetExtraAndParams(
-        user.jwt,
-        [values.contractProxyAddress, values.implAddress, 'upgradeContract'],
+        useUserStore.getState().jwt,
+        [
+          values.contractProxyAddress,
+          values.implAddress,
+          calldataHash,
+          'upgradeContract',
+        ],
         values.title,
-        values.content,
+        proposalExtra,
         receipt.hash,
       )
       if (result.code !== 0) {
@@ -94,6 +119,30 @@ const UpgradeContractModal: React.FC<{
           >
             <Input className='' placeholder='impl address' />
           </Form.Item>
+
+          <Form.Item
+            name='migrationCalldata'
+            tooltip='Optional raw calldata for upgradeToAndCall. Leave empty for a plain implementation upgrade.'
+            rules={[
+              {
+                validator: async (_, value) => {
+                  if (!value) {
+                    return
+                  }
+                  if (!ethers.isHexString(value)) {
+                    throw new Error('Migration calldata must be a hex string')
+                  }
+                },
+              },
+            ]}
+          >
+            <TextArea
+              className=''
+              placeholder='optional migration calldata, e.g. 0x1234...'
+              autoSize={{ minRows: 2, maxRows: 4 }}
+            />
+          </Form.Item>
+
           <Form.Item
             name='title'
             rules={[{ required: true, message: 'title  is required ' }]}

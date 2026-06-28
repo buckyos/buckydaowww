@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
-import { bindAddress, fetchRepositoryList } from '@services/index'
+import { bindAddress, decodeProjectProfile, devLogin, fetchRepositoryList } from '@services/index'
 import { useAsyncEffect } from 'ahooks'
-import { ethers } from 'ethers'
 import { abis } from '@contracts/abis'
-import { useCommitteeStore, CommitteeType } from './useCommittee'
+import { CommitteeType } from './useCommittee'
+import { useWalletStore } from './useWallet'
 import {
   // getProvider,
   // getProjectContract,
@@ -18,50 +18,345 @@ import {
   // getAddressOfToken,
   newProviderContract,
   getProvider,
-  contractService
+  contractService,
+  getInjectedWalletState,
+  subscribeWalletChanges,
 } from '@contracts/index'
 
+let localDevLoginPromise: Promise<boolean> | null = null
+
+function normalizeAddress(address?: string) {
+  return address?.trim().toLowerCase() || ''
+}
+
+async function loginWithLocalDevSession(): Promise<boolean> {
+  if (localDevLoginPromise) {
+    return localDevLoginPromise
+  }
+
+  localDevLoginPromise = (async () => {
+    const provider = await getProvider()
+    if (!provider) {
+      message.error('Please connect your browser wallet first')
+      return false
+    }
+
+    try {
+      const signer = await provider.getSigner()
+      const address = await signer.getAddress()
+      const network = await provider.getNetwork()
+
+      useWalletStore.getState().updateWalletState({
+        activeAddress: address,
+        chainId: network.chainId.toString(),
+        hasWallet: true,
+        initialized: true,
+      })
+
+      const result = await devLogin(address)
+      if (result.code !== 0 || !result.data) {
+        message.error(result.msg || 'Local dev login failed')
+        return false
+      }
+
+      const store = useUserStore.getState()
+      store.updateJwt(result.data)
+      const code = await store.updateUser()
+      if (code !== 0 || !useUserStore.getState().isLogin()) {
+        store.logout()
+        message.error('Local dev login failed')
+        return false
+      }
+
+      const normalizedActiveAddress = normalizeAddress(address)
+      const normalizedBoundAddress = normalizeAddress(useUserStore.getState().user.address)
+
+      if (normalizedBoundAddress && normalizedBoundAddress === normalizedActiveAddress) {
+        return true
+      }
+
+      const signature = await signer.signMessage(result.data)
+      const bindStatus = await bindAddress(signature, result.data)
+      if (bindStatus !== 200) {
+        store.logout()
+        message.error('Local wallet bind failed')
+        return false
+      }
+
+      const refreshCode = await store.updateUser()
+      const refreshedBoundAddress = normalizeAddress(useUserStore.getState().user.address)
+      if (
+        refreshCode !== 0 ||
+        refreshedBoundAddress !== normalizedActiveAddress ||
+        !useUserStore.getState().isLogin()
+      ) {
+        store.logout()
+        message.error('Local wallet bind failed')
+        return false
+      }
+
+      return true
+    } catch (error) {
+      useUserStore.getState().logout()
+      console.warn('local dev login failed', error)
+      message.error('Local dev login failed')
+      return false
+    }
+  })().finally(() => {
+    localDevLoginPromise = null
+  })
+
+  return localDevLoginPromise
+}
+
+function ellipsisAddress(address: string) {
+  if (!address) {
+    return ''
+  }
+
+  if (address.length < 15) {
+    return address
+  }
+
+  return `${address.slice(0, 6)}...${address.slice(address.length - 5)}`
+}
+
+function useWalletAddress() {
+  const activeAddress = useWalletStore((state) => state.activeAddress)
+  const chainId = useWalletStore((state) => state.chainId)
+  const hasWallet = useWalletStore((state) => state.hasWallet)
+  const initialized = useWalletStore((state) => state.initialized)
+  const updateWalletState = useWalletStore((state) => state.updateWalletState)
+  const resetWalletState = useWalletStore((state) => state.resetWalletState)
+
+  useEffect(() => {
+    let disposed = false
+
+    const refreshWalletState = async () => {
+      try {
+        const walletState = await getInjectedWalletState()
+        if (disposed) {
+          return
+        }
+
+        updateWalletState({
+          ...walletState,
+          initialized: true,
+        })
+      } catch (error) {
+        console.warn('refresh wallet state failed', error)
+        if (!disposed) {
+          resetWalletState()
+        }
+      }
+    }
+
+    void refreshWalletState()
+    const unsubscribe = subscribeWalletChanges(() => {
+      void refreshWalletState()
+    })
+
+    return () => {
+      disposed = true
+      unsubscribe()
+    }
+  }, [resetWalletState, updateWalletState])
+
+  return {
+    activeAddress,
+    chainId,
+    hasWallet,
+    initialized,
+    hasActiveWallet: !!activeAddress,
+    addressEllipsis: (address = activeAddress) => ellipsisAddress(address),
+  }
+}
+
 function useBindWalletAddress() {
-  const { isConnect, user, updateUser, jwt } = useUserStore((state) => ({
+  const { isConnect, user, updateUser, jwt, expiration } = useUserStore((state) => ({
     isConnect: state.isConnect,
     user: state.user,
     updateUser: state.updateUser,
     jwt: state.jwt,
+    expiration: state.expiration,
   }))
+  const { activeAddress, hasActiveWallet, hasWallet, initialized, chainId } =
+    useWalletAddress()
+  const updateWalletState = useWalletStore((state) => state.updateWalletState)
+  const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
+  const useLocalDevLogin =
+    isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
 
-  const handleConnect = async () => {
+  const handleConnectWallet = async () => {
+    const provider = await getProvider()
+    if (!provider) {
+      return false
+    }
+    const signer = await provider.getSigner()
+    const address = await signer.getAddress()
+    const network = await provider.getNetwork()
+    updateWalletState({
+      activeAddress: address,
+      chainId: network.chainId.toString(),
+      hasWallet: true,
+      initialized: true,
+    })
+    message.success('Wallet connected')
+    return true
+  }
+
+  const handleLocalLogin = async () => {
+    if (!useLocalDevLogin) {
+      return false
+    }
+
+    if (!hasActiveWallet) {
+      const connected = await handleConnectWallet()
+      if (!connected) {
+        return false
+      }
+    }
+
+    return loginWithLocalDevSession()
+  }
+
+  const handleBindWallet = async () => {
+    if (useLocalDevLogin) {
+      message.info('Local chain mode does not require wallet binding')
+      return
+    }
+
+    if (!jwt || !user.nickname) {
+      message.error('Please login with GitHub first')
+      return
+    }
+
     const provider = await getProvider()
     if (!provider) {
       return
     }
     const signer = await provider.getSigner()
-    const address = signer.address
-    console.log('🍻 address :', address)
-    message.success('get user address success')
-
+    const address = await signer.getAddress()
     const signature = await signer.signMessage(jwt)
-    console.log('🍻 signature :', signature, signature.toString())
     const status = await bindAddress(signature, jwt)
     if (status == 200) {
-      console.log('🍻 refetch userinfo  ')
-      updateUser()
+      await updateUser()
+      message.success('Wallet bound successfully')
     }
+
+    const network = await provider.getNetwork()
+    updateWalletState({
+      activeAddress: address,
+      chainId: network.chainId.toString(),
+      hasWallet: true,
+      initialized: true,
+    })
   }
 
-  // ellipsis
-  const addressEllipsis = () => {
-    const displayed = user.address
-    if (displayed.length < 15) {
-      return displayed
+  const boundAddress = user.address
+  const displayAddress = activeAddress || boundAddress
+  const governanceAddress = activeAddress || boundAddress
+  const normalizedActiveAddress = normalizeAddress(activeAddress)
+  const normalizedBoundAddress = normalizeAddress(boundAddress)
+  const isAddressMismatch =
+    !!normalizedActiveAddress &&
+    !!normalizedBoundAddress &&
+    normalizedActiveAddress !== normalizedBoundAddress
+  const isAuthenticated = !!jwt && !!user.nickname && Date.now() <= expiration
+  const sessionState = isAuthenticated
+    ? 'authenticated'
+    : hasActiveWallet
+      ? 'anonymous'
+      : 'disconnected'
+  const canBindWallet = !useLocalDevLogin && !!jwt && hasActiveWallet
+  const shouldShowBindWalletAction = canBindWallet && (!boundAddress || isAddressMismatch)
+  const bindWalletLabel = boundAddress ? 'Rebind wallet' : 'Bind wallet'
+
+  const ensureAuthenticated = async ({
+    requireWallet = false,
+  }: {
+    requireWallet?: boolean
+  } = {}) => {
+    if (requireWallet && !hasActiveWallet) {
+      message.error('Please connect your browser wallet first')
+      return false
     }
-    return `${displayed.slice(0, 6)}...${displayed.slice(displayed.length - 5)}`
+
+    if (sessionState === 'authenticated') {
+      const refreshCode = await updateUser().catch((error) => {
+        console.warn('refresh authenticated session failed', error)
+        return -1
+      })
+
+      if (refreshCode !== 0) {
+        if (useLocalDevLogin && hasActiveWallet) {
+          return handleLocalLogin()
+        }
+
+        useUserStore.getState().logout()
+        message.error('Please login first')
+        return false
+      }
+
+      const refreshedActiveAddress = normalizeAddress(
+        useWalletStore.getState().activeAddress,
+      )
+      const refreshedBoundAddress = normalizeAddress(
+        useUserStore.getState().user.address,
+      )
+
+      if (
+        refreshedActiveAddress &&
+        refreshedBoundAddress &&
+        refreshedActiveAddress !== refreshedBoundAddress
+      ) {
+        message.error('Active wallet differs from the authenticated address')
+        return false
+      }
+
+      return true
+    }
+
+    if (sessionState === 'anonymous') {
+      message.error('error: please login first')
+      return false
+    }
+
+    if (useLocalDevLogin) {
+      message.error('Please connect your browser wallet and login first')
+      return false
+    }
+
+    message.error('error: please login first')
+    return false
   }
 
   return {
-    isConnect,
+    isConnect: () => hasActiveWallet || isConnect(),
     user,
-    handleConnect,
-    addressEllipsis,
+    boundAddress,
+    activeAddress,
+    displayAddress,
+    governanceAddress,
+    hasWallet,
+    initialized,
+    chainId,
+    hasActiveWallet,
+    hasBoundAddress: !!boundAddress,
+    isAddressMismatch,
+    isLocalChainMode,
+    useLocalDevLogin,
+    isAuthenticated,
+    sessionState,
+    canBindWallet,
+    shouldShowBindWalletAction,
+    bindWalletLabel,
+    ensureAuthenticated,
+    handleConnectWallet,
+    handleLocalLogin,
+    handleBindWallet,
+    handleConnect: handleConnectWallet,
+    addressEllipsis: (address = displayAddress) => ellipsisAddress(address),
   }
 }
 
@@ -70,15 +365,15 @@ function useLockToken(ownerAddress: string) {
   const lockupAddress = contractService.getAddressOfLockup()
 
   const [token, setToken] = useState<{
-    token: number
-    assigned: number
-    unlocked: number
-    locked: number
+    token: bigint
+    assigned: bigint
+    claimed: bigint
+    locked: bigint
   }>({
-    token: 0,
-    assigned: 0,
-    unlocked: 0,
-    locked: 0,
+    token: 0n,
+    assigned: 0n,
+    claimed: 0n,
+    locked: 0n,
   })
   useAsyncEffect(async () => {
     if (ownerAddress == '') {
@@ -86,58 +381,60 @@ function useLockToken(ownerAddress: string) {
     }
     const contract = await newProviderContract(lockupAddress, abis)
     console.log('🍻 ownerAddress :', ownerAddress)
-    const result = await Promise.all([
+    const [totalAssignedRaw, totalClaimedRaw] = await Promise.all([
       contract.totalAssigned(ownerAddress),
-      contract.totalUnlocked(ownerAddress),
-      contract.totalLocked(ownerAddress),
+      contract.totalClaimed(ownerAddress),
     ])
+    const totalAssigned = BigInt(totalAssignedRaw.toString())
+    const totalClaimed = BigInt(totalClaimedRaw.toString())
 
     const tokenContract =  await newProviderContract(contractService.getAddressOfDevToken(), abis)
-    const result2 = await tokenContract.balanceOf(ownerAddress)
-    console.log('🍻 tokenContract token balanceOf :', result2)
+    const tokenBalance = BigInt((await tokenContract.balanceOf(ownerAddress)).toString())
+    const locked: bigint = totalAssigned > totalClaimed
+      ? totalAssigned - totalClaimed
+      : 0n
+    console.log('🍻 tokenContract token balanceOf :', tokenBalance)
 
     setToken({
-      token: result2,
-      assigned: result[0],
-      unlocked: result[1],
-      locked: result[2],
+      token: tokenBalance,
+      assigned: totalAssigned,
+      claimed: totalClaimed,
+      locked,
     })
-    console.log('🍻 result totalLocked:', result)
+    console.log('🍻 lockup totals:', { totalAssigned, totalClaimed, locked })
   }, [ownerAddress])
   return { token }
 }
 
 // 是否是委员会成员
-function useCommittee(user: User) {
+function useCommittee(address: string) {
   const { decimals } = useContractStore((state) => ({
-    // getComitteeContract: state.getComitteeContract,
     decimals: state.decimals,
   }))
+  const [state, setState] = useState(CommitteeType.unknown)
 
-  const { update, ensureFetched, state } = useCommitteeStore()
-  // const [_isCommittee, setIsCommittee] = useState<boolean>(false)
   useAsyncEffect(async () => {
-    // console.log('useCommittee user', user)
-    if (!user.address) {
-      // message.error('Please connect wallet first')
-      return
-    }
-    if (ensureFetched()) {
-      // console.log('useCommittee ensureFetched')
+    if (!address) {
+      setState(CommitteeType.unknown)
       return
     }
 
-    const contract = await contractService.getCommitteeContract()
-    // 需要注意,这里是user表的, 可能和钱包地址不一致
-    const isMember = await contract.isMember(user.address)
-    // console.log('isCommitteeMember: ', isMember, user.address)
+    setState(CommitteeType.unknown)
 
-    update(isMember ? CommitteeType.committee : CommitteeType.normal)
-  }, [user])
+    try {
+      const contract = await contractService.getReadonlyCommitteeContract()
+      const isMember = await contract.isMember(address)
+      setState(isMember ? CommitteeType.committee : CommitteeType.normal)
+    } catch (error) {
+      console.warn('useCommittee failed', error)
+      setState(CommitteeType.unknown)
+    }
+  }, [address])
 
   return {
     isCommittee: state === CommitteeType.committee,
     isUnknown: state === CommitteeType.unknown,
+    checkedAddress: address,
     decimals,
   }
 }
@@ -147,34 +444,41 @@ function useGetProjectQuery(id: string) {
   // state
   const [data, setData] = useState<ProjectItem>()
   const [isLoading, setIsLoading] = useState(true)
-  //  const [error, setError] = useState<Error>()
-  useAsyncEffect(async () => {
+  const loadProject = async () => {
     // 没有单独的项目详情接口,
     // 需要先获取项目列表,然后再找到对应的项目
+    setIsLoading(true)
     const result = await fetchRepositoryList()
     if (result.code == 0) {
+      const decodedId = decodeURIComponent(String(id))
       const project = result.data
-        .map((item) => {
-          return JSON.parse(item.detail) as ProjectItem
-        })
-        .find((item) => item.id == id)
+        .map((item) => decodeProjectProfile(item))
+        .find(
+          (item) =>
+            String(item.id) === decodedId || item.project_name === decodedId,
+        )
       if (project) {
         setData(project)
       }
     }
     setIsLoading(false)
+  }
+
+  //  const [error, setError] = useState<Error>()
+  useAsyncEffect(async () => {
+    await loadProject()
   }, [])
 
-  return { data, isLoading }
+  return { data, isLoading, refetch: loadProject }
 }
 
 export {
   useLockToken,
   useCommittee,
   useBindWalletAddress,
+  useWalletAddress,
   useUserStore,
   useGetProjectQuery,
-  useCommitteeStore,
   useContractStore,
   getProvider,
   contractProxyContract,

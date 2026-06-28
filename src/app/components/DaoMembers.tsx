@@ -50,7 +50,7 @@ const MemberCard = ({ item }: MemberCardProps) => {
           </div>
           {!!item.job && (
             <div className='mt-1 text-sm text-black-secondary'>
-              <Tag color='green'>Position: {item.job}</Tag>
+              <Tag color='green'>Job: {item.job}</Tag>
             </div>
           )}
 
@@ -63,7 +63,11 @@ const MemberCard = ({ item }: MemberCardProps) => {
   )
 }
 
-const DaoMembers = () => {
+interface DaoMembersProps {
+  showTitle?: boolean
+}
+
+const DaoMembers = ({ showTitle = true }: DaoMembersProps) => {
   const [committeeMembers, setCommitteeMembers] = useState<CommitteeMember[]>(
     [],
   )
@@ -74,7 +78,9 @@ const DaoMembers = () => {
 
   return (
     <div id='members'>
-      <div className='text-2xl font-medium my-6'>DAO Members</div>
+      {showTitle && (
+        <div className='text-2xl font-medium my-6'>DAO Members</div>
+      )}
       <div className='grid grid-cols-2 gap-[18px] md:grid-cols-4'>
         {committeeMembers.map((item) => (
           <MemberCard item={item} key={item.address} />

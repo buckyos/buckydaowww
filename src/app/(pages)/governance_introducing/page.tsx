@@ -201,10 +201,10 @@ The project can contain multiple features, some of which come from planning (Git
   }
 
   return (
-    <main className='max-w-[90%] mx-auto my-6 md:max-w-[70%]'>
-      <div className='markdown-body-light py-10 px-4'>
+    <section className='w-full my-6 px-4 lg:px-6'>
+      <div className='markdown-body-light py-10 max-w-none'>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
       </div>
-    </main>
+    </section>
   )
 }
