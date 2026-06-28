@@ -16,17 +16,9 @@ const ContractAbout = () => {
   const contract = useContractStore()
   const router = useRouter()
   const toDaoContract = () => {
-    const daoAddress = process.env.NEXT_PUBLIC_REACT_APP_DAO_CONTRACT_ADDRESS
-    switch (process.env.NEXT_PUBLIC_REACT_APP_CHAIN_ID) {
-      case '5':
-        window.open(
-          `https://goerli.etherscan.io/address/${daoAddress}`,
-          '_blank',
-        )
-        break
-      default:
-        window.open(`https://etherscan.io/address/${daoAddress}`, '_blank')
-        break
+    const explorerBase = process.env.NEXT_PUBLIC_ADDRESS_LINK
+    if (explorerBase) {
+      window.open(`${explorerBase}${mainAddress}`, '_blank', 'noopener,noreferrer')
     }
   }
 
