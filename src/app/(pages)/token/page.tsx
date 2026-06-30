@@ -159,6 +159,9 @@ export default function TokenCenterPage() {
   const [submittingAction, setSubmittingAction] = useState<
     '' | 'claim-lockup' | 'withdraw-dividend'
   >('')
+  const [confirmAction, setConfirmAction] = useState<
+    '' | 'claim-lockup' | 'withdraw-dividend'
+  >('')
   const [tokenInfo, setTokenInfo] = useState<ContractTokenInfo>()
   const [devRatio, setDevRatio] = useState<bigint>(0n)
   const [walletBalances, setWalletBalances] = useState<{
@@ -434,51 +437,7 @@ export default function TokenCenterPage() {
       return
     }
 
-    Modal.confirm({
-      centered: true,
-      title: 'Claim lockup tokens',
-      okText: 'Claim now',
-      cancelText: 'Cancel',
-      content: (
-        <div className='mt-4 flex flex-col gap-3 text-sm'>
-          <div>
-            You are about to claim your currently unlocked lockup allocation.
-          </div>
-          <div>
-            <b>Claimable now:</b>{' '}
-            {formatTokenBigInt(lockupDetails.canClaim, normalDecimals, 4)}{' '}
-            {tokenInfo.normal.symbol}
-          </div>
-          <div>
-            <b>Unlock target:</b>{' '}
-            {lockupDetails.unlockProjectName
-              ? `${lockupDetails.unlockProjectName} v${lockupDetails.unlockProjectVersion.toString()}`
-              : 'Unknown'}
-          </div>
-          <div className='text-cyfs-gray'>
-            Your wallet will open for the on-chain claim transaction after you confirm.
-          </div>
-        </div>
-      ),
-      onOk: async () => {
-        try {
-          setSubmittingAction('claim-lockup')
-          const lockupContract = await contractService.getLockupContract()
-          const tx = await lockupContract.claimTokens(lockupDetails.canClaim)
-          const receipt = await transactionWait(tx)
-          if (receipt?.status !== 1) {
-            message.error(`Claim lockup failed [${receipt?.status}]`)
-            return
-          }
-          message.success('Lockup tokens claimed successfully')
-          await load()
-        } catch (error) {
-          showErrorMessage(error, 'Failed to claim lockup tokens')
-        } finally {
-          setSubmittingAction('')
-        }
-      },
-    })
+    setConfirmAction('claim-lockup')
   }
 
   const withdrawDividends = async () => {
@@ -494,61 +453,58 @@ export default function TokenCenterPage() {
       return
     }
 
+    setConfirmAction('withdraw-dividend')
+  }
+
+  const closeConfirmModal = () => {
+    if (!submittingAction) {
+      setConfirmAction('')
+    }
+  }
+
+  const executeClaimLockup = async () => {
+    try {
+      setSubmittingAction('claim-lockup')
+      const lockupContract = await contractService.getLockupContract()
+      const tx = await lockupContract.claimTokens(lockupDetails.canClaim)
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        message.error(`Claim lockup failed [${receipt?.status}]`)
+        return
+      }
+      message.success('Lockup tokens claimed successfully')
+      await load()
+    } catch (error) {
+      showErrorMessage(error, 'Failed to claim lockup tokens')
+    } finally {
+      setSubmittingAction('')
+      setConfirmAction('')
+    }
+  }
+
+  const executeWithdrawDividends = async () => {
     const tokens = withdrawableRewards.map((reward) => reward.token)
 
-    Modal.confirm({
-      centered: true,
-      title: 'Withdraw dividend rewards',
-      okText: 'Withdraw rewards',
-      cancelText: 'Cancel',
-      content: (
-        <div className='mt-4 flex flex-col gap-3 text-sm'>
-          <div>
-            You are about to withdraw all currently available dividend rewards for cycle #
-            {dividendOverview.previousCycleIndex.toString()}.
-          </div>
-          <div>
-            <b>Reward tokens:</b>
-            <div className='mt-2 flex flex-wrap gap-2'>
-              {withdrawableRewards.map((reward) => (
-                <Tag key={`withdraw-${reward.token}`}>
-                  {(rewardTokenMeta[reward.token]?.symbol ?? ellipsisAddress(reward.token))}:{' '}
-                  {formatTokenBigInt(
-                    reward.amount,
-                    rewardTokenMeta[reward.token]?.decimals ?? 18,
-                    4,
-                  )}
-                </Tag>
-              ))}
-            </div>
-          </div>
-          <div className='text-cyfs-gray'>
-            Your wallet will open for the on-chain withdrawal transaction after you confirm.
-          </div>
-        </div>
-      ),
-      onOk: async () => {
-        try {
-          setSubmittingAction('withdraw-dividend')
-          const dividendContract = await contractService.getDividendContract()
-          const tx = await dividendContract.withdrawDividends(
-            [dividendOverview.previousCycleIndex],
-            tokens,
-          )
-          const receipt = await transactionWait(tx)
-          if (receipt?.status !== 1) {
-            message.error(`Withdraw dividends failed [${receipt?.status}]`)
-            return
-          }
-          message.success('Dividend rewards withdrawn successfully')
-          await load()
-        } catch (error) {
-          showErrorMessage(error, 'Failed to withdraw dividends')
-        } finally {
-          setSubmittingAction('')
-        }
-      },
-    })
+    try {
+      setSubmittingAction('withdraw-dividend')
+      const dividendContract = await contractService.getDividendContract()
+      const tx = await dividendContract.withdrawDividends(
+        [dividendOverview.previousCycleIndex],
+        tokens,
+      )
+      const receipt = await transactionWait(tx)
+      if (receipt?.status !== 1) {
+        message.error(`Withdraw dividends failed [${receipt?.status}]`)
+        return
+      }
+      message.success('Dividend rewards withdrawn successfully')
+      await load()
+    } catch (error) {
+      showErrorMessage(error, 'Failed to withdraw dividends')
+    } finally {
+      setSubmittingAction('')
+      setConfirmAction('')
+    }
   }
 
   return (
@@ -1110,6 +1066,71 @@ export default function TokenCenterPage() {
           ) : null}
         </div>
       </section>
+      <Modal
+        centered
+        open={confirmAction === 'claim-lockup'}
+        title='Claim lockup tokens'
+        okText='Claim now'
+        cancelText='Cancel'
+        confirmLoading={submittingAction === 'claim-lockup'}
+        onCancel={closeConfirmModal}
+        onOk={executeClaimLockup}
+      >
+        <div className='mt-4 flex flex-col gap-3 text-sm'>
+          <div>
+            You are about to claim your currently unlocked lockup allocation.
+          </div>
+          <div>
+            <b>Claimable now:</b>{' '}
+            {formatTokenBigInt(lockupDetails.canClaim, normalDecimals, 4)}{' '}
+            {tokenInfo?.normal.symbol ?? ''}
+          </div>
+          <div>
+            <b>Unlock target:</b>{' '}
+            {lockupDetails.unlockProjectName
+              ? `${lockupDetails.unlockProjectName} v${lockupDetails.unlockProjectVersion.toString()}`
+              : 'Unknown'}
+          </div>
+          <div className='text-cyfs-gray'>
+            Your wallet will open for the on-chain claim transaction after you confirm.
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        centered
+        open={confirmAction === 'withdraw-dividend'}
+        title='Withdraw dividend rewards'
+        okText='Withdraw rewards'
+        cancelText='Cancel'
+        confirmLoading={submittingAction === 'withdraw-dividend'}
+        onCancel={closeConfirmModal}
+        onOk={executeWithdrawDividends}
+      >
+        <div className='mt-4 flex flex-col gap-3 text-sm'>
+          <div>
+            You are about to withdraw all currently available dividend rewards for cycle #
+            {dividendOverview.previousCycleIndex.toString()}.
+          </div>
+          <div>
+            <b>Reward tokens:</b>
+            <div className='mt-2 flex flex-wrap gap-2'>
+              {withdrawableRewards.map((reward) => (
+                <Tag key={`withdraw-${reward.token}`}>
+                  {(rewardTokenMeta[reward.token]?.symbol ?? ellipsisAddress(reward.token))}:{' '}
+                  {formatTokenBigInt(
+                    reward.amount,
+                    rewardTokenMeta[reward.token]?.decimals ?? 18,
+                    4,
+                  )}
+                </Tag>
+              ))}
+            </div>
+          </div>
+          <div className='text-cyfs-gray'>
+            Your wallet will open for the on-chain withdrawal transaction after you confirm.
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

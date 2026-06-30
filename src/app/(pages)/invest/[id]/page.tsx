@@ -305,6 +305,8 @@ const InvestDetailPageContent: React.FC<{
 const InvestDetailPage = () => {
   const { id } = useParams()
   const [showModal, setShowModal] = useState(false)
+  const [showEndInvestmentConfirm, setShowEndInvestmentConfirm] = useState(false)
+  const [endingInvestment, setEndingInvestment] = useState(false)
   const [data, setData] = useState<TwoStepInvestmentData>()
   const { user } = useUserStore()
   const [isInvestor, setIsInvestor] = useState(false)
@@ -398,19 +400,26 @@ const InvestDetailPage = () => {
       return
     }
 
-    Modal.confirm({
-      title: 'Are you sure to end the investment?',
-      onOk: async () => {
-        console.log('🍻 onEndInvestment data :', data)
-        // end investment
-        if (data && data.id) {
-          const result = await endInvestment(data.id.toString())
-          if (result) {
-            message.success('End investment success')
-          }
+    setShowEndInvestmentConfirm(true)
+  }
+
+  const executeEndInvestment = async () => {
+    try {
+      setEndingInvestment(true)
+      console.log('🍻 onEndInvestment data :', data)
+      if (data && data.id) {
+        const result = await endInvestment(data.id.toString())
+        if (result) {
+          message.success('End investment success')
         }
-      },
-    })
+      }
+    } catch (error) {
+      console.warn('end investment failed', error)
+      message.error('End investment failed')
+    } finally {
+      setEndingInvestment(false)
+      setShowEndInvestmentConfirm(false)
+    }
   }
 
   useAsyncEffect(async () => {
@@ -455,6 +464,33 @@ const InvestDetailPage = () => {
         setShowModal={setShowModal}
         data={data}
       />
+      <Modal
+        centered
+        open={showEndInvestmentConfirm}
+        title='End investment'
+        okText='End investment'
+        cancelText='Cancel'
+        confirmLoading={endingInvestment}
+        okButtonProps={{
+          danger: true,
+        }}
+        onCancel={() => {
+          if (!endingInvestment) {
+            setShowEndInvestmentConfirm(false)
+          }
+        }}
+        onOk={executeEndInvestment}
+      >
+        <div className='mt-4 flex flex-col gap-3 text-sm'>
+          <div>Are you sure to end this investment?</div>
+          <div>
+            <b>Investment ID:</b> {data?.id ?? '-'}
+          </div>
+          <div className='text-cyfs-gray'>
+            Your wallet will open for the on-chain end investment transaction after you confirm.
+          </div>
+        </div>
+      </Modal>
 
       <Breadcrumb>
         <Breadcrumb.Item>
