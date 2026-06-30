@@ -82,8 +82,10 @@ npm run start
 - `NEXT_PUBLIC_LOCKUP`
 - `NEXT_PUBLIC_DIVIDEND`
 - `NEXT_PUBLIC_ACQUIRED`
-- `NEXT_PUBLIC_GITHUB_CLIENT_ID`
-- `NEXT_PUBLIC_GITHUB_CALLBACK_URL`
+- `NEXT_PUBLIC_GITHUB_CLIENT_ID`（历史兼容字段；当前 GitHub OAuth
+  authorize URL 由 SourceDAOBackend 生成）
+- `NEXT_PUBLIC_GITHUB_CALLBACK_URL`（历史兼容字段；生产 callback 以
+  SourceDAOBackend 的 `user.github_callback_url` 为准）
 
 本地完整联调时，这个文件通常由 `SourceDAO` 的脚本自动生成：
 

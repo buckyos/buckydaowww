@@ -32,7 +32,11 @@ function LoginPageInner() {
         message.error(result.msg || 'GitHub login failed')
         return
       }
-      const jwt = result.data
+      const loginData = result.data
+      const jwt =
+        typeof loginData === 'string'
+          ? loginData
+          : loginData.token
       user.updateJwt(jwt)
 
       // fetch user info
@@ -40,10 +44,17 @@ function LoginPageInner() {
         const code = await user.updateUser()
         if (code == 0) {
           message.success('login successfully')
-          const redirect = params.get('redirect')
+          const redirect =
+            typeof loginData === 'string'
+              ? params.get('redirect')
+              : loginData.redirect
           if (redirect) {
             console.log('🍻 redirect :', redirect)
-            router.push(decodeURIComponent(redirect))
+            router.push(
+              typeof loginData === 'string'
+                ? decodeURIComponent(redirect)
+                : redirect,
+            )
           } else {
             router.push('/')
           }

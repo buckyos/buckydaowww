@@ -362,13 +362,13 @@ export async function beginGithubLogin(
 export async function completeGithubLogin(
   code: string,
   state: string,
-): Promise<CommonResponse<string>> {
+): Promise<CommonResponse<GithubLoginResponseData>> {
   const query = new URLSearchParams({ code, state })
   const resp = await fetch(`/api/user/githublogin?${query.toString()}`, {
     credentials: 'same-origin',
   })
 
-  return parseJsonResponse<CommonResponse<string>>(
+  return parseJsonResponse<CommonResponse<GithubLoginResponseData>>(
     resp,
     'Failed to complete GitHub login',
   )

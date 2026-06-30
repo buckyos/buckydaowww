@@ -139,6 +139,14 @@ interface WalletStoreDefine {
 }
 
 type UserLoginData = User
+
+interface GithubLoginResult {
+  token: string
+  redirect?: string
+}
+
+type GithubLoginResponseData = GithubLoginResult | string
+
 interface UserStoreDefine {
   user: User
   jwt: string

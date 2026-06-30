@@ -100,15 +100,15 @@
 
 1. 点击 `Login with GitHub`
 2. 跳转 GitHub OAuth
-3. GitHub 回调到 `NEXT_PUBLIC_GITHUB_CALLBACK_URL`
-4. 前端从 `/api/user/githublogin?code=...` 换取 jwt
+3. GitHub 回调到 SourceDAOBackend 配置的 `user.github_callback_url`
+4. 前端从 `/api/user/githublogin?code=...&state=...` 换取 jwt 和站内跳转目标
 5. 再通过 `/api/user/info` 获取用户资料
 6. 之后用户再绑定钱包地址
 
 这条路径依赖：
 
 - GitHub OAuth 应用配置
-- callback URL 与 GitHub 配置完全匹配
+- `user.github_callback_url` 与 GitHub OAuth App callback URL 完全匹配
 - 后端 `/api/user/githublogin`
 
 ### 2. 本地链测试模式
