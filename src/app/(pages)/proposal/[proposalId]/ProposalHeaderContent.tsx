@@ -1,7 +1,7 @@
 
 'use client'
 import React, { useState } from 'react'
-import { Progress, Tag, Tooltip, Spin, Collapse, Button } from 'antd'
+import { Progress, Tag, Tooltip, Spin, Collapse } from 'antd'
 import type { CollapseProps } from 'antd';
 import Link from 'next/link'
 import { transformPercentNumber, wrapUnits, formatNumberWithCommas } from '@utils/numberConverter'
@@ -24,7 +24,7 @@ import {
 } from '@contracts/index'
 import { erc20, ISourceDAODevToken } from '@contracts/abis'
 import { InfoCircleOutlined } from '@ant-design/icons'
-import { ProposalState } from '@vars/index'
+import { ProposalResult, ProposalState } from '@vars/index'
 import {
     getEffectiveProposalState,
     getProposalMetadataConflictMessage,
@@ -380,17 +380,32 @@ function buildExecutionActionExplanation(params: {
     hasActiveWallet: boolean
     isCommittee: boolean
     extra?: ContractProposalExtra
+    settleSimulationResult?: number
+    settleSimulationFailed: boolean
 }): {
     status: string
     why: string[]
     next: string[]
     tone: 'info' | 'success' | 'warning' | 'danger'
 } {
-    const { proposal, hasActiveWallet, isCommittee, extra } = params
+    const {
+        proposal,
+        hasActiveWallet,
+        isCommittee,
+        extra,
+        settleSimulationResult,
+        settleSimulationFailed,
+    } = params
     const trustedMetadata = hasTrustedProposalMetadata(proposal)
     const metadataConflict = isProposalMetadataConflict(proposal)
     const effectiveState = getEffectiveProposalState(proposal)
     const isFullProposal = proposal.full
+    const canExecuteAcceptedState = effectiveState === ProposalState.Accepted
+    const canExecuteAfterImplicitSettle =
+        !isFullProposal &&
+        effectiveState === ProposalState.InProgress &&
+        settleSimulationResult === ProposalResult.Accept
+    const canExecute = canExecuteAcceptedState || canExecuteAfterImplicitSettle
     const allVoters = Array.from(new Set([...proposal.support, ...proposal.reject]))
     const settledCount = extra ? Number(extra.settled) : 0
     const pendingSettleCount = Math.max(allVoters.length - settledCount, 0)
@@ -442,11 +457,20 @@ function buildExecutionActionExplanation(params: {
         return { status, why, next, tone }
     }
 
-    if (effectiveState !== ProposalState.Accepted) {
+    if (!canExecute) {
         tone = effectiveState === ProposalState.Rejected ? 'danger' : 'warning'
         status = 'Execution locked by proposal state'
-        why.push('Committee execution is only available after the proposal reaches the accepted state.')
-        next.push('Wait for acceptance or review why the proposal ended without an executable outcome.')
+        if (settleSimulationResult === ProposalResult.NoResult) {
+            why.push('A readonly chain simulation says the proposal has not reached an accepted result yet.')
+            next.push('Wait for more committee votes or for the proposal to reach a terminal state.')
+        } else {
+            why.push('Committee execution is only available after acceptance or after chain simulation confirms execution can settle the proposal as accepted.')
+            next.push(
+                settleSimulationFailed
+                    ? 'The browser could not simulate settlement. Wait for the proposal to be settled on chain or retry after RPC access recovers.'
+                    : 'Wait for acceptance or review why the proposal ended without an executable outcome.',
+            )
+        }
         return { status, why, next, tone }
     }
 
@@ -468,8 +492,13 @@ function buildExecutionActionExplanation(params: {
 
     status = 'Ready to execute'
     tone = 'success'
-    why.push('The proposal has been accepted and the current wallet is suitable for execution.')
-    next.push('Run the execution transaction once you are ready to apply the approved change on chain.')
+    if (canExecuteAfterImplicitSettle) {
+        why.push('A readonly chain simulation confirms that execution can settle this proposal as accepted before applying the approved action.')
+        next.push('Run the execution transaction once you are ready; the contract will settle first, then execute.')
+    } else {
+        why.push('The proposal has been accepted and the current wallet is suitable for execution.')
+        next.push('Run the execution transaction once you are ready to apply the approved change on chain.')
+    }
     return { status, why, next, tone }
 }
 
@@ -486,6 +515,8 @@ const ProposalHeaderContent: React.FC<{
 
 
     const [extra, setExtra] = useState<ContractProposalExtra>()
+    const [settleSimulationResult, setSettleSimulationResult] = useState<number>()
+    const [settleSimulationFailed, setSettleSimulationFailed] = useState(false)
 
     const { user } = useUserStore((state) => {
         return { user: state.user, jwt: state.jwt }
@@ -529,6 +560,31 @@ const ProposalHeaderContent: React.FC<{
         setExtra(extra)
     }, [JSON.stringify({ proposal, members })])
 
+    useAsyncEffect(async () => {
+        setSettleSimulationResult(undefined)
+        setSettleSimulationFailed(false)
+
+        if (proposal.full || proposal.state !== ProposalState.InProgress) {
+            return
+        }
+
+        try {
+            const committeeContract = await contractService.getReadonlyCommitteeContract()
+            const result = await committeeContract.settleProposal.staticCall(proposal.id)
+            setSettleSimulationResult(Number(result))
+        } catch (error) {
+            console.warn('settleProposal static check failed', error)
+            setSettleSimulationFailed(true)
+        }
+    }, [JSON.stringify({
+        id: proposal.id,
+        state: proposal.state,
+        full: proposal.full,
+        support: proposal.support,
+        reject: proposal.reject,
+        expired: proposal.expired,
+    })])
+
     const currentVoteType = proposal.full ? VoteType.FullMember : VoteType.Committee
     const effectiveState = getEffectiveProposalState(proposal)
     const voteActionExplanation = buildVoteActionExplanation({
@@ -544,7 +600,16 @@ const ProposalHeaderContent: React.FC<{
         hasActiveWallet,
         isCommittee,
         extra,
+        settleSimulationResult,
+        settleSimulationFailed,
     })
+    const canExecuteProposal =
+        effectiveState === ProposalState.Accepted ||
+        (
+            currentVoteType == VoteType.Committee &&
+            effectiveState === ProposalState.InProgress &&
+            settleSimulationResult === ProposalResult.Accept
+        )
 
     return (
         <>
@@ -740,7 +805,7 @@ const ProposalHeaderContent: React.FC<{
                                 />
                             ) : (
                                 <ExecuteProposalButton
-                                    disabled={effectiveState != ProposalState.Accepted}
+                                    disabled={!canExecuteProposal}
                                     proposal={proposal}
                                 />
                             )}
