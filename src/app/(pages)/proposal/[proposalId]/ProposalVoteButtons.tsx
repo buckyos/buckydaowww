@@ -73,7 +73,11 @@ const ProposalVoteButtons: React.FC<{
     hasActiveWallet,
     handleConnectWallet,
   } = useBindWalletAddress()
-  const { isCommittee, isUnknown } = useCommittee(activeAddress)
+  const {
+    isCommittee,
+    isChecking: isCommitteeChecking,
+    checkFailed: committeeCheckFailed,
+  } = useCommittee(activeAddress)
   const [loadingAction, setLoadingAction] = useState<'support' | 'reject' | ''>(
     '',
   )
@@ -157,6 +161,8 @@ const ProposalVoteButtons: React.FC<{
   const proposalType = getProposalType(proposal)
   const ordinaryVoteHint = !hasActiveWallet
     ? 'Connect your browser wallet before voting.'
+    : !proposal.full && committeeCheckFailed
+      ? 'The browser could not verify committee eligibility. You can still submit; the contract will enforce the final check.'
     : proposal.full
     ? 'Token holders can vote on this full proposal.'
     : isCommittee
@@ -173,9 +179,9 @@ const ProposalVoteButtons: React.FC<{
         ? 'Checking token-holder voting eligibility...'
         : hasActiveWallet && proposal.full && hasFullVotingPower === false
           ? 'Only token holders can vote on this full proposal.'
-          : hasActiveWallet && !proposal.full && isUnknown
+          : hasActiveWallet && !proposal.full && isCommitteeChecking
             ? 'Checking committee voting eligibility...'
-            : hasActiveWallet && !proposal.full && !isCommittee
+            : hasActiveWallet && !proposal.full && !committeeCheckFailed && !isCommittee
               ? 'Only committee members can vote on this proposal.'
                 : !votingOpen
                 ? 'Voting has already ended for this proposal on chain.'

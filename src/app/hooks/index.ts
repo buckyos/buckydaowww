@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
 import useContractStore from '@hooks/useContract'
-import { bindAddress, decodeProjectProfile, devLogin, fetchRepositoryList } from '@services/index'
+import {
+  bindAddress,
+  decodeProjectProfile,
+  devLogin,
+  fetchMembers,
+  fetchRepositoryList,
+} from '@services/index'
 import { useAsyncEffect } from 'ahooks'
 import { abis } from '@contracts/abis'
 import { CommitteeType } from './useCommittee'
@@ -27,6 +33,18 @@ let localDevLoginPromise: Promise<boolean> | null = null
 
 function normalizeAddress(address?: string) {
   return address?.trim().toLowerCase() || ''
+}
+
+async function fetchCommitteeMembership(address: string) {
+  const members = await fetchMembers()
+  if (members.code !== 0 || !Array.isArray(members.data)) {
+    throw new Error(members.msg || 'Failed to fetch committee members')
+  }
+
+  const normalizedAddress = normalizeAddress(address)
+  return members.data.some(
+    (member) => normalizeAddress(member.address) === normalizedAddress,
+  )
 }
 
 function getWalletConnectErrorMessage(error: unknown) {
@@ -434,28 +452,45 @@ function useCommittee(address: string) {
     decimals: state.decimals,
   }))
   const [state, setState] = useState(CommitteeType.unknown)
+  const [isChecking, setIsChecking] = useState(false)
+  const [checkFailed, setCheckFailed] = useState(false)
 
   useAsyncEffect(async () => {
     if (!address) {
       setState(CommitteeType.unknown)
+      setIsChecking(false)
+      setCheckFailed(false)
       return
     }
 
     setState(CommitteeType.unknown)
+    setIsChecking(true)
+    setCheckFailed(false)
 
     try {
       const contract = await contractService.getReadonlyCommitteeContract()
       const isMember = await contract.isMember(address)
       setState(isMember ? CommitteeType.committee : CommitteeType.normal)
     } catch (error) {
-      console.warn('useCommittee failed', error)
-      setState(CommitteeType.unknown)
+      console.warn('useCommittee contract check failed', error)
+      try {
+        const isMember = await fetchCommitteeMembership(address)
+        setState(isMember ? CommitteeType.committee : CommitteeType.normal)
+      } catch (fallbackError) {
+        console.warn('useCommittee fallback check failed', fallbackError)
+        setState(CommitteeType.unknown)
+        setCheckFailed(true)
+      }
+    } finally {
+      setIsChecking(false)
     }
   }, [address])
 
   return {
     isCommittee: state === CommitteeType.committee,
     isUnknown: state === CommitteeType.unknown,
+    isChecking,
+    checkFailed,
     checkedAddress: address,
     decimals,
   }

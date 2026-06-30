@@ -260,6 +260,7 @@ function buildVoteActionExplanation(params: {
     hasActiveWallet: boolean
     isCommittee: boolean
     isCommitteeUnknown: boolean
+    isCommitteeCheckFailed: boolean
     activeAddress?: string
 }): {
     status: string
@@ -267,7 +268,14 @@ function buildVoteActionExplanation(params: {
     next: string[]
     tone: 'info' | 'success' | 'warning' | 'danger'
 } {
-    const { proposal, hasActiveWallet, isCommittee, isCommitteeUnknown, activeAddress } = params
+    const {
+        proposal,
+        hasActiveWallet,
+        isCommittee,
+        isCommitteeUnknown,
+        isCommitteeCheckFailed,
+        activeAddress,
+    } = params
     const trustedMetadata = hasTrustedProposalMetadata(proposal)
     const metadataConflict = isProposalMetadataConflict(proposal)
     const votingOpen = isProposalVotingOpen(proposal)
@@ -334,6 +342,14 @@ function buildVoteActionExplanation(params: {
         status = 'Checking committee eligibility'
         why.push('The UI is still checking whether the current wallet belongs to a committee member.')
         next.push('Wait a moment before voting, or confirm the correct wallet is connected.')
+        return { status, why, next, tone }
+    }
+
+    if (isCommitteeCheckFailed) {
+        tone = 'warning'
+        status = 'Committee eligibility check unavailable'
+        why.push('The browser could not complete the committee membership pre-check.')
+        next.push('You can still submit the vote transaction; the contract will enforce the final eligibility check on chain.')
         return { status, why, next, tone }
     }
 
@@ -475,7 +491,11 @@ const ProposalHeaderContent: React.FC<{
         return { user: state.user, jwt: state.jwt }
     })
     const { activeAddress, hasActiveWallet } = useBindWalletAddress()
-    const { isCommittee, isUnknown } = useCommittee(activeAddress)
+    const {
+        isCommittee,
+        isChecking: isCommitteeChecking,
+        checkFailed: committeeCheckFailed,
+    } = useCommittee(activeAddress)
 
     useAsyncEffect(async () => {
         const supportVotesInfo: ProposalVoteInfomation[] = proposal.support.map(item => {
@@ -515,7 +535,8 @@ const ProposalHeaderContent: React.FC<{
         proposal,
         hasActiveWallet,
         isCommittee,
-        isCommitteeUnknown: isUnknown,
+        isCommitteeUnknown: isCommitteeChecking,
+        isCommitteeCheckFailed: committeeCheckFailed,
         activeAddress,
     })
     const executionActionExplanation = buildExecutionActionExplanation({
