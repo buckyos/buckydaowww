@@ -29,6 +29,20 @@ function normalizeAddress(address?: string) {
   return address?.trim().toLowerCase() || ''
 }
 
+function getWalletConnectErrorMessage(error: unknown) {
+  const code = (error as { code?: number | string })?.code
+  if (code === 4001 || code === 'ACTION_REJECTED') {
+    return 'Wallet connection was rejected'
+  }
+
+  const errorMessage = (error as { message?: string })?.message
+  if (typeof errorMessage === 'string' && errorMessage.trim()) {
+    return `Connect wallet failed: ${errorMessage}`
+  }
+
+  return 'Connect wallet failed. Please unlock your browser wallet and allow this site.'
+}
+
 async function loginWithLocalDevSession(): Promise<boolean> {
   if (localDevLoginPromise) {
     return localDevLoginPromise
@@ -188,21 +202,29 @@ function useBindWalletAddress() {
     isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
 
   const handleConnectWallet = async () => {
-    const provider = await getProvider()
-    if (!provider) {
+    try {
+      const provider = await getProvider()
+      if (!provider) {
+        return false
+      }
+
+      await provider.send('eth_requestAccounts', [])
+      const signer = await provider.getSigner()
+      const address = await signer.getAddress()
+      const network = await provider.getNetwork()
+      updateWalletState({
+        activeAddress: address,
+        chainId: network.chainId.toString(),
+        hasWallet: true,
+        initialized: true,
+      })
+      message.success('Wallet connected')
+      return true
+    } catch (error) {
+      console.warn('connect wallet failed', error)
+      message.error(getWalletConnectErrorMessage(error))
       return false
     }
-    const signer = await provider.getSigner()
-    const address = await signer.getAddress()
-    const network = await provider.getNetwork()
-    updateWalletState({
-      activeAddress: address,
-      chainId: network.chainId.toString(),
-      hasWallet: true,
-      initialized: true,
-    })
-    message.success('Wallet connected')
-    return true
   }
 
   const handleLocalLogin = async () => {

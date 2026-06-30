@@ -155,7 +155,9 @@ const ProposalVoteButtons: React.FC<{
   const votingOpen = isProposalVotingOpen(proposal)
   const voteClosed = !votingOpen || effectiveState !== ProposalState.InProgress
   const proposalType = getProposalType(proposal)
-  const ordinaryVoteHint = proposal.full
+  const ordinaryVoteHint = !hasActiveWallet
+    ? 'Connect your browser wallet before voting.'
+    : proposal.full
     ? 'Token holders can vote on this full proposal.'
     : isCommittee
       ? 'Committee members at the proposal snapshot can vote on this proposal.'
@@ -216,6 +218,7 @@ const ProposalVoteButtons: React.FC<{
     }
 
     if (!hasActiveWallet) {
+      message.info('Connect your browser wallet before voting.')
       const connected = await handleConnectWallet()
       if (!connected) {
         return
