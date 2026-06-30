@@ -81,6 +81,9 @@ const ProposalVoteButtons: React.FC<{
   const [loadingAction, setLoadingAction] = useState<'support' | 'reject' | ''>(
     '',
   )
+  const [confirmAction, setConfirmAction] = useState<'support' | 'reject' | ''>(
+    '',
+  )
   const [checkingFullVoteEligibility, setCheckingFullVoteEligibility] = useState(false)
   const [hasFullVotingPower, setHasFullVotingPower] = useState<boolean | null>(null)
 
@@ -232,20 +235,76 @@ const ProposalVoteButtons: React.FC<{
     }
 
     const actionLabel = action === 'support' ? 'support' : 'reject'
-    const descriptionPreview = getProposalDescriptionPreview(proposal)
+    setConfirmAction(actionLabel)
+  }
 
-    Modal.confirm({
-      centered: true,
-      title: `Confirm ${actionLabel} vote`,
-      okText: action === 'support' ? 'Confirm support' : 'Confirm reject',
-      cancelText: 'Cancel',
-      okButtonProps: {
-        danger: action === 'reject',
-      },
-      content: (
+  if (!supportsWebVoting && trustedMetadata) {
+    return null
+  }
+
+  const confirmActionLabel = confirmAction === 'reject' ? 'reject' : 'support'
+  const descriptionPreview = getProposalDescriptionPreview(proposal)
+
+  return (
+    <>
+      <div className='flex items-center gap-3'>
+        <Tooltip title={disabledReason || ordinaryVoteHint}>
+          <div className='flex items-center gap-2'>
+            <Button
+              type='primary'
+              ghost
+              disabled={!!disabledReason}
+              loading={loadingAction === 'support'}
+              onClick={() => void submitVote('support')}
+            >
+              Support
+            </Button>
+            <Button
+              danger
+              disabled={!!disabledReason}
+              loading={loadingAction === 'reject'}
+              onClick={() => void submitVote('reject')}
+            >
+              Reject
+            </Button>
+          </div>
+        </Tooltip>
+        {!!currentVote && (
+          <Tag color={currentVote === 'support' ? 'green' : 'red'}>
+            You {currentVote === 'support' ? 'supported' : 'rejected'}
+          </Tag>
+        )}
+      </div>
+      <Modal
+        centered
+        open={!!confirmAction}
+        title={`Confirm ${confirmActionLabel} vote`}
+        okText={
+          confirmAction === 'support' ? 'Confirm support' : 'Confirm reject'
+        }
+        cancelText='Cancel'
+        confirmLoading={!!loadingAction}
+        okButtonProps={{
+          danger: confirmAction === 'reject',
+        }}
+        onCancel={() => {
+          if (!loadingAction) {
+            setConfirmAction('')
+          }
+        }}
+        onOk={async () => {
+          if (!confirmAction) {
+            return
+          }
+
+          const action = confirmAction
+          await executeVote(action)
+          setConfirmAction('')
+        }}
+      >
         <div className='mt-4 flex flex-col gap-3 text-sm'>
           <div>
-            You are about to <b>{actionLabel}</b> this proposal on chain.
+            You are about to <b>{confirmActionLabel}</b> this proposal on chain.
           </div>
           <div>
             <b>Proposal:</b> {proposal.title?.trim() || `Proposal #${proposal.id}`}
@@ -271,44 +330,8 @@ const ProposalVoteButtons: React.FC<{
             After you confirm here, your wallet will open for the actual vote transaction.
           </div>
         </div>
-      ),
-      onOk: async () => executeVote(action),
-    })
-  }
-
-  if (!supportsWebVoting && trustedMetadata) {
-    return null
-  }
-
-  return (
-    <div className='flex items-center gap-3'>
-      <Tooltip title={disabledReason || ordinaryVoteHint}>
-        <div className='flex items-center gap-2'>
-          <Button
-            type='primary'
-            ghost
-            disabled={!!disabledReason}
-            loading={loadingAction === 'support'}
-            onClick={() => void submitVote('support')}
-          >
-            Support
-          </Button>
-          <Button
-            danger
-            disabled={!!disabledReason}
-            loading={loadingAction === 'reject'}
-            onClick={() => void submitVote('reject')}
-          >
-            Reject
-          </Button>
-        </div>
-      </Tooltip>
-      {!!currentVote && (
-        <Tag color={currentVote === 'support' ? 'green' : 'red'}>
-          You {currentVote === 'support' ? 'supported' : 'rejected'}
-        </Tag>
-      )}
-    </div>
+      </Modal>
+    </>
   )
 }
 
