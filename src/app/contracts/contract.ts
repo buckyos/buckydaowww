@@ -1,10 +1,8 @@
+import { publicConfig } from 'runtimeConfig'
 import { ethers, Interface, InterfaceAbi } from 'ethers'
 import { message } from 'antd'
 import { abis, ISourceProject, ProjectManagement, SourceDaoCommittee } from '@contracts/abis'
 
-const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL
-const CHAIN_NAME = process.env.NEXT_PUBLIC_CHAIN
 
 /**
  * 检查浏览器是否安装了以太坊钱包插件
@@ -24,7 +22,7 @@ function getInjectedProvider() {
 }
 
 function getExpectedNetworkId() {
-  return NETWORK_ID || '10'
+  return publicConfig.NETWORK_ID || '10'
 }
 
 function getExpectedChainIdHex() {
@@ -48,18 +46,18 @@ function getDefaultRpcUrl(networkId: string) {
 
 function getExpectedChainConfig() {
   const networkId = getExpectedNetworkId()
-  const rpcUrl = RPC_URL || getDefaultRpcUrl(networkId)
+  const rpcUrl = publicConfig.RPC_URL || getDefaultRpcUrl(networkId)
   if (!rpcUrl) {
     return undefined
   }
 
   return {
     chainId: getExpectedChainIdHex(),
-    chainName: CHAIN_NAME || `Chain ${networkId}`,
+    chainName: publicConfig.CHAIN || `Chain ${networkId}`,
     rpcUrls: [rpcUrl],
     nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
+      name: publicConfig.CURRENCY_NAME,
+      symbol: publicConfig.CURRENCY_SYMBOL,
       decimals: 18,
     },
   }
@@ -185,7 +183,7 @@ export async function getInjectedWalletState() {
 
 export function getReadOnlyProvider() {
   if (!readOnlyProvider) {
-    const rpcUrl = RPC_URL || getDefaultRpcUrl(getExpectedNetworkId())
+    const rpcUrl = publicConfig.RPC_URL || getDefaultRpcUrl(getExpectedNetworkId())
     if (!rpcUrl) {
       throw new Error('Readonly RPC URL is not configured')
     }
@@ -275,31 +273,19 @@ export async function newProviderContract(contractAddress: string, abi: Interfac
 
 
 class ContractService {
-  private COMMITTEE = process.env.NEXT_PUBLIC_COMMITTEE
-  private DIVIDEND = process.env.NEXT_PUBLIC_DIVIDEND
-  // private INVESTMENT = process.env.NEXT_PUBLIC_INVESTMENT
-  private LOCKUP = process.env.NEXT_PUBLIC_LOCKUP
-  private MAIN = process.env.NEXT_PUBLIC_MAIN
-  private PROJECT = process.env.NEXT_PUBLIC_PROJECT
-  private NORMAL_TOKEN = process.env.NEXT_PUBLIC_NORMAL_TOKEN
-  private DEV_TOKEN = process.env.NEXT_PUBLIC_DEV_TOKEN
-  private ACQUIRED = process.env.NEXT_PUBLIC_ACQUIRED
-  private NETWORK_ID = NETWORK_ID
+  private get COMMITTEE() { return publicConfig.COMMITTEE }
+  private get DIVIDEND() { return publicConfig.DIVIDEND }
+  // private get INVESTMENT() { return publicConfig.INVESTMENT }
+  private get LOCKUP() { return publicConfig.LOCKUP }
+  private get MAIN() { return publicConfig.MAIN }
+  private get PROJECT() { return publicConfig.PROJECT }
+  private get NORMAL_TOKEN() { return publicConfig.NORMAL_TOKEN }
+  private get DEV_TOKEN() { return publicConfig.DEV_TOKEN }
+  private get ACQUIRED() { return publicConfig.ACQUIRED }
+  private get NETWORK_ID() { return publicConfig.NETWORK_ID }
 
   private Contracts: { [key: string]: ethers.Contract | undefined } = {}
 
-  constructor() {
-    console.log('🔡 COMMITTEE contract address', this.COMMITTEE)
-    console.log('🔡 DIVIDEND contract address', this.DIVIDEND)
-    // console.log('🔡 INVESTMENT contract address', this.INVESTMENT)
-    console.log('🔡 LOCKUP contract address', this.LOCKUP)
-    console.log('🔡 MAIN contract address', this.MAIN)
-    console.log('🔡 PROJECT contract address', this.PROJECT)
-    console.log('🔡 NORMAL_TOKEN contract address', this.NORMAL_TOKEN)
-    console.log('🔡 DEV_TOKEN contract address', this.DEV_TOKEN)
-    console.log('🔡 ACQUIRED contract address', this.ACQUIRED)
-    console.log('🔡 NETWORK_ID contract address', this.NETWORK_ID)
-  }
 
   public getAddressOfDevToken() {
     if (!this.DEV_TOKEN) throw new Error('DEV_TOKEN is undefined')
@@ -343,7 +329,7 @@ class ContractService {
 
 
   public getNetworkId() {
-    if (!this.NETWORK_ID) throw new Error('NETWORK_ID is undefined')
+    if (!this.NETWORK_ID) throw new Error('publicConfig.NETWORK_ID is undefined')
     return this.NETWORK_ID
   }
 
@@ -351,11 +337,13 @@ class ContractService {
     this.Contracts = {}
   }
 
-  private generateContract(abi: any, key?: string, address?: string) {
-    if (address === undefined) throw new Error('address is undefined')
+  private generateContract(abi: any, key?: string, resolveAddress?: () => string) {
+    if (resolveAddress === undefined) throw new Error('address is undefined')
     if (key === undefined) throw new Error('key is undefined')
 
     return async (): Promise<ethers.Contract> => {
+      const address = resolveAddress()
+      if (!address) throw new Error('contract address is undefined')
       if (this.Contracts[key] !== undefined) {
         console.log('[', key, '] get contract instance ', address, 'from cache')
         return this.Contracts[key] as ethers.Contract
@@ -369,19 +357,19 @@ class ContractService {
     }
   }
 
-  public getCommitteeContract = this.generateContract([...abis, ...SourceDaoCommittee], 'COMMITTEE', this.COMMITTEE)
-  public getDividendContract = this.generateContract(abis, 'DIVIDEND', this.DIVIDEND)
-  // public getInvestmentContract = this.generateContract(abis, 'INVESTMENT', this.INVESTMENT)
-  public getLockupContract = this.generateContract(abis, 'LOCKUP', this.LOCKUP)
-  public getMainContract = this.generateContract(abis, 'MAIN', this.MAIN)
-  public getProjectContract = this.generateContract([...ISourceProject, ...ProjectManagement], 'PROJECT', this.PROJECT)
+  public getCommitteeContract = this.generateContract([...abis, ...SourceDaoCommittee], 'COMMITTEE', () => this.COMMITTEE)
+  public getDividendContract = this.generateContract(abis, 'DIVIDEND', () => this.DIVIDEND)
+  // public getInvestmentContract = this.generateContract(abis, 'INVESTMENT', () => this.INVESTMENT)
+  public getLockupContract = this.generateContract(abis, 'LOCKUP', () => this.LOCKUP)
+  public getMainContract = this.generateContract(abis, 'MAIN', () => this.MAIN)
+  public getProjectContract = this.generateContract([...ISourceProject, ...ProjectManagement], 'PROJECT', () => this.PROJECT)
 
   // BDT
-  public getNormalTokenContract = this.generateContract(abis, 'NORMAL_TOKEN', this.NORMAL_TOKEN)
+  public getNormalTokenContract = this.generateContract(abis, 'NORMAL_TOKEN', () => this.NORMAL_TOKEN)
 
   // BDDT
-  public getDevTokenContract = this.generateContract(abis, 'DEV_TOKEN', this.DEV_TOKEN)
-  public getAcquiredContract = this.generateContract(abis, 'ACQUIRED', this.ACQUIRED)
+  public getDevTokenContract = this.generateContract(abis, 'DEV_TOKEN', () => this.DEV_TOKEN)
+  public getAcquiredContract = this.generateContract(abis, 'ACQUIRED', () => this.ACQUIRED)
 
   public async getReadonlyCommitteeContract() {
     if (!this.COMMITTEE) throw new Error('COMMITTEE is undefined')

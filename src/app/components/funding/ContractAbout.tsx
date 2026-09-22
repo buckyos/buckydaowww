@@ -1,4 +1,6 @@
 'use client'
+
+import { publicConfig } from 'runtimeConfig'
 import { useState } from 'react'
 import cx from 'classnames'
 // import { ReactComponent as IconArrowRightUp } from 'assets/images/icon_arrow_right_up.svg'
@@ -16,7 +18,7 @@ const ContractAbout = () => {
   const contract = useContractStore()
   const router = useRouter()
   const toDaoContract = () => {
-    const explorerBase = process.env.NEXT_PUBLIC_ADDRESS_LINK
+    const explorerBase = publicConfig.ADDRESS_LINK
     if (explorerBase) {
       window.open(`${explorerBase}${mainAddress}`, '_blank', 'noopener,noreferrer')
     }

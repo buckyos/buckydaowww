@@ -31,7 +31,7 @@ async function getVersionSettlementInfo(versionID: number): Promise<{ contributi
 
 // 获取BDDT的投票比例
 async function getDevRatio() {
-  const committee = await contractService.getCommitteeContract()
+  const committee = await contractService.getReadonlyCommitteeContract()
   const devRatio = await committee.devRatio()
   console.log("devRatio", devRatio)
   return devRatio

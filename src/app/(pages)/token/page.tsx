@@ -1,5 +1,7 @@
 'use client'
 
+import { publicConfig } from 'runtimeConfig'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { decodeBytes32String } from 'ethers'
@@ -540,8 +542,8 @@ export default function TokenCenterPage() {
               </p>
             </div>
             <div className='flex items-center gap-2 text-sm text-gray-500'>
-              <span>{process.env.NEXT_PUBLIC_CHAIN}</span>
-              <Tag>Network {process.env.NEXT_PUBLIC_NETWORK_ID}</Tag>
+              <span>{publicConfig.CHAIN}</span>
+              <Tag>Network {publicConfig.NETWORK_ID}</Tag>
             </div>
           </div>
 
@@ -604,7 +606,7 @@ export default function TokenCenterPage() {
               <div className='text-gray-500'>Main</div>
               <a
                 className='font-mono text-cyfs-green break-all'
-                href={`${process.env.NEXT_PUBLIC_ADDRESS_LINK}${contractService.getAddressOfMain()}`}
+                href={`${publicConfig.ADDRESS_LINK}${contractService.getAddressOfMain()}`}
                 target='_blank'
               >
                 {contractService.getAddressOfMain()}
@@ -614,7 +616,7 @@ export default function TokenCenterPage() {
               <div className='text-gray-500'>BDT</div>
               <a
                 className='font-mono text-cyfs-green break-all'
-                href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${contractService.getAddressOfNormalToken()}`}
+                href={`${publicConfig.TOKEN_ADDRESS_LINK}${contractService.getAddressOfNormalToken()}`}
                 target='_blank'
               >
                 {contractService.getAddressOfNormalToken()}
@@ -624,7 +626,7 @@ export default function TokenCenterPage() {
               <div className='text-gray-500'>BDDT</div>
               <a
                 className='font-mono text-cyfs-green break-all'
-                href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${contractService.getAddressOfDevToken()}`}
+                href={`${publicConfig.TOKEN_ADDRESS_LINK}${contractService.getAddressOfDevToken()}`}
                 target='_blank'
               >
                 {contractService.getAddressOfDevToken()}

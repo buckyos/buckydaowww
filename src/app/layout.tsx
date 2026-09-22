@@ -1,3 +1,8 @@
+import RuntimeConfigGate from './RuntimeConfigGate'
+import { readPublicConfig } from '../../scripts/public-config.cjs'
+
+// Runtime configuration is read on each request, never frozen into static HTML.
+export const dynamic = 'force-dynamic'
 import './globals.css'
 import Header from './header/header'
 import Fetcher from 'header/Fetcher'
@@ -24,13 +29,15 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={font.className}>
-        <Fetcher />
-        <Header />
-        <LocalChainTimeNotice />
-        <main className='max-w-[1260px] mx-auto min-h-[calc(100vh-180px)]'>
-          {children}
-        </main>
-        <Footer />
+        <RuntimeConfigGate config={readPublicConfig(process.env.SOURCEDAO_PUBLIC_CONFIG)}>
+          <Fetcher />
+          <Header />
+          <LocalChainTimeNotice />
+          <main className='max-w-[1260px] mx-auto min-h-[calc(100vh-180px)]'>
+            {children}
+          </main>
+          <Footer />
+        </RuntimeConfigGate>
       </body>
     </html>
   )

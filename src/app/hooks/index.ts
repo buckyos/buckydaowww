@@ -1,3 +1,4 @@
+import { publicConfig } from 'runtimeConfig'
 import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import useUserStore from '@hooks/useUserStore'
@@ -215,9 +216,9 @@ function useBindWalletAddress() {
   const { activeAddress, hasActiveWallet, hasWallet, initialized, chainId } =
     useWalletAddress()
   const updateWalletState = useWalletStore((state) => state.updateWalletState)
-  const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
+  const isLocalChainMode = publicConfig.NETWORK_ID === '31337'
   const useLocalDevLogin =
-    isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
+    isLocalChainMode && publicConfig.LOCAL_AUTH_MODE !== 'github'
 
   const handleConnectWallet = async () => {
     try {

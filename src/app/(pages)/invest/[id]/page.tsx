@@ -1,4 +1,6 @@
 'use client'
+
+import { publicConfig } from 'runtimeConfig'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { useAsyncEffect } from 'ahooks'
@@ -207,7 +209,7 @@ const InvestDetailPageContent: React.FC<{
       label: 'Token Address',
       children: (
         <Link
-          href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${data.tokenAddress}`}
+          href={`${publicConfig.TOKEN_ADDRESS_LINK}${data.tokenAddress}`}
           target='_blank'
         >
           {data.tokenAddress}

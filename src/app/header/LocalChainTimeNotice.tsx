@@ -1,5 +1,7 @@
 'use client'
 
+import { publicConfig } from 'runtimeConfig'
+
 import { useEffect, useState } from 'react'
 import { Alert } from 'antd'
 import dayjs from 'dayjs'
@@ -39,7 +41,7 @@ export default function LocalChainTimeNotice() {
   } | null>(null)
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_NETWORK_ID !== LOCAL_CHAIN_ID) {
+    if (publicConfig.NETWORK_ID !== LOCAL_CHAIN_ID) {
       return
     }
 

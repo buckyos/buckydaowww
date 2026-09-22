@@ -183,3 +183,15 @@ npm run dev
 - 不覆盖
 - 允许多行
 - 不强行保持单行布局
+
+## Public network deployment
+
+Production containers read the public network configuration from `SOURCEDAO_PUBLIC_CONFIG`
+at request time; a new RPC, domain or DAO configuration does not require rebuilding the image.
+All network-dependent UI and wallet initialization waits until this configuration is installed.
+Without this variable, local development retains the existing `NEXT_PUBLIC_*` environment behavior.
+
+The coordinated deployment kit and operator handbook live in
+[`SourceDAOBackend/doc/SiteHandbook.md`](https://github.com/buckyos/SourceDAOBackend/blob/main/doc/SiteHandbook.md).
+The kit runs one public website per network, linked from USDB Explorer. It does not deploy contracts.
+The release build injects ABI from an explicit SourceDAO revision into both frontend and backend.

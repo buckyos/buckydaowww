@@ -1,4 +1,6 @@
 'use client'
+
+import { publicConfig } from 'runtimeConfig'
 import React from 'react'
 import { GithubOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import {
@@ -45,13 +47,13 @@ export default function DaoTokenBrief() {
         <DaoTokenCard />
         <div className='col-span-full font-bold'>Chain Network:</div>
         <div className='col-span-full'>
-          {process.env.NEXT_PUBLIC_CHAIN}
-          <Tag className='text-cyfs-gray ml-4'> NetworkID {process.env.NEXT_PUBLIC_NETWORK_ID}</Tag>
+          {publicConfig.CHAIN}
+          <Tag className='text-cyfs-gray ml-4'> NetworkID {publicConfig.NETWORK_ID}</Tag>
         </div>
         <div className='col-span-full font-bold'>Contract Address:</div>
         <a
           className='col-span-full break-all font-bold text-gray-500'
-          href={`${process.env.NEXT_PUBLIC_ADDRESS_LINK}${contractService.getAddressOfMain()}`}
+          href={`${publicConfig.ADDRESS_LINK}${contractService.getAddressOfMain()}`}
           target='_blank'
         >
           {contractService.getAddressOfMain()}
@@ -65,7 +67,7 @@ export default function DaoTokenBrief() {
         </div>
         <a
           className='col-span-full break-all font-bold text-gray-500'
-          href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${contractService.getAddressOfNormalToken()}`}
+          href={`${publicConfig.TOKEN_ADDRESS_LINK}${contractService.getAddressOfNormalToken()}`}
           target='_blank'
         >
           {contractService.getAddressOfNormalToken()}
@@ -78,7 +80,7 @@ export default function DaoTokenBrief() {
         </div>
         <a
           className='col-span-full break-all font-bold text-gray-500'
-          href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${contractService.getAddressOfDevToken()}`}
+          href={`${publicConfig.TOKEN_ADDRESS_LINK}${contractService.getAddressOfDevToken()}`}
           target='_blank'
         >
           {contractService.getAddressOfDevToken()}

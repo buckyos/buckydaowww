@@ -1,4 +1,6 @@
 'use client'
+
+import { publicConfig } from 'runtimeConfig'
 import { useBindWalletAddress } from '@hooks/index'
 import HeaderInfo from '@components/header/HeaderInfo'
 import { message, Tooltip } from 'antd'
@@ -6,9 +8,9 @@ import { beginGithubLogin } from '@services/index'
 
 const HeaderRight = () => {
   const userBind = useBindWalletAddress()
-  const isLocalChainMode = process.env.NEXT_PUBLIC_NETWORK_ID === '31337'
+  const isLocalChainMode = publicConfig.NETWORK_ID === '31337'
   const useLocalDevLogin =
-    isLocalChainMode && process.env.NEXT_PUBLIC_LOCAL_AUTH_MODE !== 'github'
+    isLocalChainMode && publicConfig.LOCAL_AUTH_MODE !== 'github'
   const loginLabel = useLocalDevLogin ? 'Login with Wallet' : 'Login with GitHub'
 
   const handleLogin = async () => {
