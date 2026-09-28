@@ -81,7 +81,7 @@ const DaoMembers = ({ showTitle = true }: DaoMembersProps) => {
       {showTitle && (
         <div className='text-2xl font-medium my-6'>DAO Members</div>
       )}
-      <div className='grid grid-cols-2 gap-[18px] md:grid-cols-4'>
+      <div className='grid grid-cols-1 gap-[18px] sm:grid-cols-2 md:grid-cols-4'>
         {committeeMembers.map((item) => (
           <MemberCard item={item} key={item.address} />
         ))}

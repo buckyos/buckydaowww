@@ -12,7 +12,7 @@ export default function Fetcher() {
   useLayoutEffect(() => {
     fetchTokenInfo().then(result => {
       const token = result.dev
-      update(token.totalSupply, token.totalReleased, result.normal.totalSupply, token.symbol, token.decimals)
+      update(token.totalSupply, token.totalReleased, token.unrelease, token.symbol, token.decimals)
     }).catch((error) => {
       console.error('failed to fetch token info', error)
     })

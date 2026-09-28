@@ -15,11 +15,11 @@ const font = localFont({
 
 export default function DaoTokenBrief() {
   return (
-    <div className='flex items-center justify-between md:flex-row md:items-start my-20'>
-      <div className='flex flex-col w-[820px]'>
+    <div className='my-20 flex flex-col gap-10 px-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6 lg:px-0'>
+      <div className='flex w-full min-w-0 flex-col lg:max-w-[820px]'>
         <div className='text-black-secondary'>Governance of Buckyos</div>
         <div
-          className={font.className + ' text-[40px] font-medium leading-[60px]'}
+          className={font.className + ' text-[28px] font-medium leading-[42px] sm:text-[40px] sm:leading-[60px]'}
           style={{
             background: 'linear-gradient(to right, black, gray)',
             WebkitBackgroundClip: 'text',
@@ -41,50 +41,50 @@ export default function DaoTokenBrief() {
           </p>
         </div>
       </div>
-      <div className='grid grid-cols-2 gap-x-4 gap-y-2 xs:grid-cols-1 '>
+      <div className='grid w-full min-w-0 grid-cols-1 gap-x-4 gap-y-2 sm:w-[404px] sm:grid-cols-2 sm:self-center lg:shrink-0 lg:self-auto'>
         <DaoTokenCard />
-        <div className='col-span-2 font-bold'>Chain Network:</div>
-        <div className='col-span-2 '>
+        <div className='col-span-full font-bold'>Chain Network:</div>
+        <div className='col-span-full'>
           {process.env.NEXT_PUBLIC_CHAIN}
           <Tag className='text-cyfs-gray ml-4'> NetworkID {process.env.NEXT_PUBLIC_NETWORK_ID}</Tag>
         </div>
-        <div className='col-span-2 font-bold'>Contract Address:</div>
+        <div className='col-span-full font-bold'>Contract Address:</div>
         <a
-          className='col-span-2 font-bold text-gray-500'
+          className='col-span-full break-all font-bold text-gray-500'
           href={`${process.env.NEXT_PUBLIC_ADDRESS_LINK}${contractService.getAddressOfMain()}`}
           target='_blank'
         >
           {contractService.getAddressOfMain()}
         </a>
 
-        <div className='col-span-2'>
+        <div className='col-span-full'>
           <span className='mr-1 font-bold'>NormalToken Address</span>
           <Tooltip title='ERC20 address'>
             <ExclamationCircleOutlined className='text-sm' />:
           </Tooltip>
         </div>
         <a
-          className='col-span-2 font-bold text-gray-500'
+          className='col-span-full break-all font-bold text-gray-500'
           href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${contractService.getAddressOfNormalToken()}`}
           target='_blank'
         >
           {contractService.getAddressOfNormalToken()}
         </a>
-        <div className='col-span-2'>
+        <div className='col-span-full'>
           <span className='mr-1 font-bold'>DevToken Address</span>
           <Tooltip title='ERC20 address'>
             <ExclamationCircleOutlined className='text-sm' />:
           </Tooltip>
         </div>
         <a
-          className='col-span-2 font-bold text-gray-500'
+          className='col-span-full break-all font-bold text-gray-500'
           href={`${process.env.NEXT_PUBLIC_TOKEN_ADDRESS_LINK}${contractService.getAddressOfDevToken()}`}
           target='_blank'
         >
           {contractService.getAddressOfDevToken()}
         </a>
         <a
-          className='col-span-2 text-black no-underline flex items-center font-bold'
+          className='col-span-full flex items-center font-bold text-black no-underline'
           href='https://github.com/buckyos/SourceDAO/'
           target='_blank'
         >

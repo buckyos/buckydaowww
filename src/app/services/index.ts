@@ -191,12 +191,12 @@ function mapContractTokenInfo(data: ResponseTokenInfo): ContractTokenInfo {
 }
 
 // 获取合约代币信息
-export async function fetchContractTokenInfo(): Promise<
+export async function fetchContractTokenInfo(signal?: AbortSignal): Promise<
   CommonResponse<ContractTokenInfo>
 > {
-  const resp = await fetch('/api/contract/token')
-  if (resp.status != 200) {
-    throw Error("failed")
+  const resp = await fetch('/api/contract/token', { cache: 'no-store', signal })
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch token info [${resp.status}]`)
   }
   const result = await resp.json()
   const data = result as ResponseTokenInfo
