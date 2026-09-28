@@ -21,11 +21,11 @@
     "classnames": "^2.3.2",
     "dayjs": "^1.11.21",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^15.5.18",
+    "eslint-config-next": "15.5.26",
     "ethers": "^6.17.0",
     "lodash": "^4.18.1",
-    "next": "^15.5.18",
-    "postcss": "^8.5.15",
+    "next": "15.5.26",
+    "postcss": "8.5.28",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7",
@@ -40,6 +40,6 @@
     "@types/three": "^0.154.0"
   },
   "overrides": {
-    "postcss": "^8.5.15"
+    "postcss": "8.5.28"
   }
 }
